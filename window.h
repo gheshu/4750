@@ -11,7 +11,7 @@ private:
     static void error_callback(int error, const char* description);
 public:
     Window(int width, int height, int major_ver, int minor_ver, int msaa, std::string title);
-    virtual ~Window();
+    ~Window();
     GLFWwindow* getWindow();
 
 };

@@ -7,7 +7,7 @@ int main()
 {
 	{
 		Renderer renderer;
-		renderer.init(1280, 720, 2);
+		renderer.init(1280, 720, 0);
 		renderer.draw();
 		renderer.destroy();
 	}
