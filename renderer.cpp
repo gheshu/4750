@@ -3,6 +3,7 @@
 #include <iostream>
 #include "debugmacro.h"
 #include "window.h"
+#include "input.h"
 
 #include <algorithm>
 
@@ -11,12 +12,15 @@ using namespace std;
 void Renderer::destroy() {
     delete m_window;
 	m_window = nullptr;
+	delete m_input;
+	m_input = nullptr;
 }
 
 void Renderer::init(const int width, const int height, const int msaa) {
 	m_width = width; m_height = height;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
+	m_input = new Input(m_glwindow);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -34,6 +38,7 @@ void Renderer::draw() {
 	float avg_rate = 0.0f;
 	unsigned frame_counter = 0;
     while (!glfwWindowShouldClose(m_glwindow)) {
+		m_input->poll();
 		bresenhamPass();
         glfwSwapBuffers(m_glwindow);
 

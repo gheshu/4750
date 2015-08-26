@@ -1,9 +1,8 @@
 #include "camera.h"
 #include "math.h"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/rotate_vector.hpp"
 #include "stdio.h"
 
+/*
 void Camera::init(float fov, float ratio, float near, float far, glm::vec3& position)
 {
 	m_fov = fov;
@@ -110,5 +109,5 @@ float Camera::getFov()
 glm::vec3* Camera::getPosition()
 {
 	return &m_position;
-	
 }
+*/

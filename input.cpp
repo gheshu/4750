@@ -10,10 +10,9 @@ float Input::m_cursorY = 0.0f;
 float Input::m_relCursorX = 0.0f;
 float Input::m_relCursorY = 0.0f;
 
-Input::Input(GLFWwindow* window, Camera* camera)
+Input::Input(GLFWwindow* window)
 {
     m_glwindow = window;
-    m_camera = camera;
 
     glfwSetInputMode(m_glwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(m_glwindow, key_callback);
@@ -35,6 +34,7 @@ void Input::poll()
 
 void Input::pollInput()
 {
+	/*
 	if (glfwGetKey(m_glwindow, GLFW_KEY_W)){
 		m_camera->moveForward(0.05f);
 	}
@@ -68,6 +68,7 @@ void Input::pollInput()
     m_relCursorY = 0.0f;
 
     m_camera->updateViewMatrix();
+	*/
 }
 
 bool Input::leftMouseDown()

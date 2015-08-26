@@ -4,11 +4,13 @@
 #include "myglheaders.h"
 
 class Window;
+class Input;
 
 class Renderer
 {
 private:
 	Window* m_window;
+	Input* m_input;
 	GLFWwindow* m_glwindow;
 
 	GLuint m_width, m_height;

@@ -11,7 +11,7 @@ int main()
 		renderer.draw();
 		renderer.destroy();
 	}
-	//printf("Clean exit\n");
-	//std::cin.ignore();
+	printf("Clean exit\n");
+	std::cin.ignore();
 	return 0;
 }

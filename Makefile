@@ -2,14 +2,14 @@ CXX = g++
 EXE = Renderer.exe
  
 INC_DIRS = -I./include
-CXXFLAGS = $(INC_DIRS) -std=c++11
-LDFLAGS = .\glfw3.dll .\glew32.dll  -L./lib 
-LDLIBS = -lopengl32
+CXXFLAGS = $(INC_DIRS) -std=c++11 
+LDFLAGS = -L./lib
+LDLIBS = .\glfw3.dll -lglew32 -lopengl32 
  
-LINK = $(CXX) $(LDFLAGS) $(LDLIBS) -o
-COMPILE = $(CXX) $(CXXFLAGS) -c
+LINK = $(CXX) -o
+COMPILE = $(CXX) -c
  
-FILES = main.o renderer.o window.o 
+FILES = main.o renderer.o window.o input.o
  
 .PHONY: clean all run debug release
  
@@ -29,7 +29,7 @@ run:	$(EXE)
 	./$(EXE) $(SCENE)
 
 $(EXE): 	$(FILES)
-	$(LINK) $(EXE) $(FILES)
+	$(LINK) $(EXE) $(FILES) $(LDFLAGS) $(LDLIBS) 
 
 %.o: 	%.cpp %.h
-	$(COMPILE) $<
+	$(COMPILE) $< $(CXXFLAGS)

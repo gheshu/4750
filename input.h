@@ -1,13 +1,13 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "camera.h"
 #include "myglheaders.h"
+
+class Camera;
 
 class Input
 {
 private:
-Camera* m_camera;
 GLFWwindow* m_glwindow;
 
 static bool m_rightMouseDown, m_leftMouseDown;
@@ -21,7 +21,7 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 void pollInput();
 
 public:
-    Input(GLFWwindow* window, Camera* camera);
+    Input(GLFWwindow* window);
     virtual ~Input();
     void poll();
     static bool rightMouseDown();
