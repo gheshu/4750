@@ -3,8 +3,8 @@ EXE = Renderer.exe
  
 INC_DIRS = -I./include
 CXXFLAGS = $(INC_DIRS) -std=c++11
-LDFLAGS = -L./lib
-LDLIBS = -lglfw3 -lglew32 -lopengl32
+LDFLAGS = .\glfw3.dll .\glew32.dll  -L./lib 
+LDLIBS = -lopengl32
  
 LINK = $(CXX) $(LDFLAGS) $(LDLIBS) -o
 COMPILE = $(CXX) $(CXXFLAGS) -c
