@@ -1,5 +1,12 @@
 #include "mat3.h"
+
 #include "vec3.h"
+#include <algorithm>
+/*
+0, 3, 6
+1, 4, 7
+2, 5, 8
+*/
 
 namespace hlm{
 
@@ -15,19 +22,30 @@ mat3::mat3(const float s){
 	data[6] = 0.0f; data[7] = 0.0f; data[8] = s;
 }
 
-mat3::mat3(vec3* a, vec3* b, vec3* c){
-	data[0] = a->x; data[1] = a->y; data[2] = a->z;
-	data[3] = b->x; data[4] = b->y; data[5] = b->z;
-	data[6] = c->x; data[7] = c->y; data[8] = c->z;
-}
-
 mat3::mat3(float* array){
-	memcpy(&data, array, sizeof(float) * 9);
+	std::copy(array, array + 9, &data[0]);
 }
 
 mat3& mat3::operator=(const mat3& other){
-	memcpy(&data, &other.data, sizeof(float) * 9);
+	std::copy(&other.data[0], &other.data[9], &data[0]);
 	return *this;
+}
+
+mat3 mat3::operator*(const mat3& lhs, const mat3& rhs){
+	mat3 m;
+	// COLUMN MAJOR to comply with openGL
+	m[0] = lhs[0] * rhs[0] + lhs[3] * rhs[1] + lhs[6] * rhs[2];
+	m[1] = lhs[1] * rhs[0] + lhs[4] * rhs[1] + lhs[7] * rhs[2];
+	m[2] = lhs[2] * rhs[0] + lhs[5] * rhs[1] + lhs[8] * rhs[2];
+	
+	m[3] = lhs[0] * rhs[3] + lhs[3] * rhs[4] + lhs[6] * rhs[5];
+	m[4] = lhs[1] * rhs[3] + lhs[4] * rhs[4] + lhs[7] * rhs[5];
+	m[5] = lhs[2] * rhs[3] + lhs[5] * rhs[4] + lhs[8] * rhs[5];
+	
+	m[6] = lhs[0] * rhs[6] + lhs[3] * rhs[7] + lhs[6] * rhs[8];
+	m[7] = lhs[1] * rhs[6] + lhs[4] * rhs[7] + lhs[7] * rhs[8];
+	m[8] = lhs[2] * rhs[6] + lhs[5] * rhs[7] + lhs[8] * rhs[8];
+	return m;
 }
 
 mat3 mat3::operator+(const mat3& mat, const float s){

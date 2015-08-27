@@ -4,7 +4,7 @@
 #include "debugmacro.h"
 #include "window.h"
 #include "input.h"
-#include "hlm.h"
+#include "hlm/hlm.h"
 
 #include <algorithm>
 
@@ -24,6 +24,7 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
+	m_camera.init(90.0f, (float)m_width / (float)m_height, 0.1f, 10.0f, hlm::vec3(-1.0f, 1.0f, -1.0f));
 	
 	if(!m_prog.build("shaders/main.vert", "shaders/main.frag")){
 		exit(1);
@@ -83,7 +84,7 @@ void Renderer::glPass(GLSLProgram& prog, Image& img, GLuint& vao, GLuint& fb_id)
 	MYGLERRORMACRO
 }
 
-void Renderer::bresenhamPass(VertexBuffer& verts, Image& img){
+void Renderer::bresenhamPass(Camera& cam, VertexBuffer& verts, Image& img){
 	
 }
 
@@ -93,13 +94,14 @@ void Renderer::draw() {
 	bool front_buffer = true;
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
+		m_camera.updateViewMatrix();
 		
 		if(front_buffer){
-			bresenhamPass(verts, fb0);
+			bresenhamPass(m_camera, verts, fb0);
 			glPass(m_prog, fb0, m_vao, fb0_id);
 			front_buffer = false;
 		} else {
-			bresenhamPass(verts, fb1);
+			bresenhamPass(m_camera, verts, fb1);
 			glPass(m_prog, fb0, m_vao, fb1_id);
 			front_buffer = true;
 		}
