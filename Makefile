@@ -28,8 +28,11 @@ run:	$(EXE)
 	clear
 	./$(EXE) $(SCENE)
 
-$(EXE): 	$(FILES)
+$(EXE):		$(FILES)
 	$(LINK) $(EXE) $(FILES) $(LDFLAGS) $(LDLIBS) 
+	
+main.o: 	main.cpp
+	$(COMPILE) $< $(CXXFLAGS)
 
 %.o: 	%.cpp %.h
 	$(COMPILE) $< $(CXXFLAGS)
