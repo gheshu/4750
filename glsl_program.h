@@ -3,11 +3,8 @@
 
 #include "myglheaders.h"
 #include <vector>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-//#include <glm/ext.hpp>
 #include <unordered_map>
+#include "hlm.h"
 
 enum GLSLShaderTypes
 {
@@ -35,13 +32,13 @@ public:
 	void unbind();
 
 	GLuint getId() const;
-	bool getUniform(const std::string& name, glm::mat4& uniform);
+	bool getUniform(const std::string& name, hlm::mat4& uniform);
 	bool getSubroutineIndex(const std::string& name, GLuint& uniform);
 
-	bool setUniform(const std::string& name, const glm::mat4& uniform);
-	bool setUniform(const std::string& name, const glm::mat3& uniform);
-	bool setUniform(const std::string& name, const glm::vec4& uniform);
-	bool setUniform(const std::string& name, const glm::vec3& uniform);
+	bool setUniform(const std::string& name, const hlm::mat4& uniform);
+	bool setUniform(const std::string& name, const hlm::mat3& uniform);
+	bool setUniform(const std::string& name, const hlm::vec4& uniform);
+	bool setUniform(const std::string& name, const hlm::vec3& uniform);
 
 	// NB: overloading deliberately avoided here to prevent problems with literals
 	// being converted, e.g. with an integer setUniform func setUniform("bob", 1.f)

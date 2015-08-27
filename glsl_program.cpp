@@ -244,7 +244,7 @@ bool GLSLProgram::getSubroutineIndex(const std::string& name, GLuint& uniform)
 
 // ----------------------------------------------------------------------------
 
-bool GLSLProgram::setUniform(const std::string& name, const glm::mat4& uniform)
+bool GLSLProgram::setUniform(const std::string& name, const hlm::mat4& uniform)
 {
 	const GLint location = getUniformLocation(name);
 	if (location == -1)
@@ -252,14 +252,14 @@ bool GLSLProgram::setUniform(const std::string& name, const glm::mat4& uniform)
 		return false;
 	}
 
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(uniform));
+	glUniformMatrix4fv(location, 1, GL_FALSE, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
 	return true;
 }
 
 // ----------------------------------------------------------------------------
 
-bool GLSLProgram::setUniform(const std::string& name, const glm::mat3& uniform)
+bool GLSLProgram::setUniform(const std::string& name, const hlm::mat3& uniform)
 {
 	const GLint location = getUniformLocation(name);
 	if (location == -1)
@@ -267,14 +267,14 @@ bool GLSLProgram::setUniform(const std::string& name, const glm::mat3& uniform)
 		return false;
 	}
 
-	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(uniform));
+	glUniformMatrix3fv(location, 1, GL_FALSE, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
 	return true;
 }
 
 // ----------------------------------------------------------------------------
 
-bool GLSLProgram::setUniform(const std::string& name, const glm::vec4& uniform)
+bool GLSLProgram::setUniform(const std::string& name, const hlm::vec4& uniform)
 {
 	const GLint location = getUniformLocation(name);
 	if (location == -1)
@@ -282,14 +282,14 @@ bool GLSLProgram::setUniform(const std::string& name, const glm::vec4& uniform)
 		return false;
 	}
 
-	glUniform4fv(location, 1, glm::value_ptr(uniform));
+	glUniform4fv(location, 1, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
 	return true;
 }
 
 // ----------------------------------------------------------------------------
 
-bool GLSLProgram::setUniform(const std::string& name, const glm::vec3& uniform)
+bool GLSLProgram::setUniform(const std::string& name, const hlm::vec3& uniform)
 {
 	const GLint location = getUniformLocation(name);
 	if (location == -1)
@@ -297,7 +297,7 @@ bool GLSLProgram::setUniform(const std::string& name, const glm::vec3& uniform)
 		return false;
 	}
 
-	glUniform3fv(location, 1, glm::value_ptr(uniform));
+	glUniform3fv(location, 1, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
 	return true;
 }
