@@ -20,13 +20,9 @@ debug:	$(EXE)
 
 release: CXXFLAGS += -O3
 release: $(EXE)
- 
-clean:
-	rm -r *.o *.exe *.log
 
 run:	$(EXE)
-	clear
-	./$(EXE) $(SCENE)
+	./$(EXE)
 
 $(EXE):		$(FILES)
 	$(LINK) $(EXE) $(FILES) $(LDFLAGS) $(LDLIBS) 
