@@ -2,11 +2,6 @@
 
 #include "vec3.h"
 #include <algorithm>
-/*
-0, 3, 6
-1, 4, 7
-2, 5, 8
-*/
 
 namespace hlm{
 
@@ -26,6 +21,12 @@ mat3::mat3(float* array){
 	std::copy(array, array + 9, &data[0]);
 }
 
+mat3::mat3(mat4& m){
+	data[0] = m[0]; data[1] = m[1]; data[2] = m[2];
+	data[3] = m[4]; data[4] = m[5]; data[5] = m[6];
+	data[6] = m[8]; data[7] = m[9]; data[8] = m[10];
+}
+
 mat3& mat3::operator=(const mat3& other){
 	std::copy(&other.data[0], &other.data[9], &data[0]);
 	return *this;
@@ -34,6 +35,8 @@ mat3& mat3::operator=(const mat3& other){
 mat3 mat3::operator*(const mat3& lhs, const mat3& rhs){
 	mat3 m;
 	// COLUMN MAJOR to comply with openGL
+	// lhs horizontal
+	// rhs vertical
 	m[0] = lhs[0] * rhs[0] + lhs[3] * rhs[1] + lhs[6] * rhs[2];
 	m[1] = lhs[1] * rhs[0] + lhs[4] * rhs[1] + lhs[7] * rhs[2];
 	m[2] = lhs[2] * rhs[0] + lhs[5] * rhs[1] + lhs[8] * rhs[2];

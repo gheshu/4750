@@ -70,6 +70,8 @@ mat4& mat4::operator-=(const mat4& rhs){
 */
 
 mat4 mat4::operator*(const mat4& lhs, const mat4& rhs){
+	// lhs horizontal
+	// rhs vertical
 	mat4 m;
 	m[0] = lhs[0]  * rhs[0]  + lhs[4] * rhs[1]  + lhs[8]  * rhs[2]  + lhs[12] * rhs[3];
 	m[1] = lhs[1]  * rhs[0]  + lhs[5] * rhs[1]  + lhs[9]  * rhs[2]  + lhs[13] * rhs[3];
