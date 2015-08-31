@@ -28,48 +28,57 @@ float length(const vec4& lhs){
 	return distance(vec4(0.0f, lhs);
 }
 
-vec3 abs(const vec3& v){
-	vec3 r;
-	r.x = abs(v.x); r.y = abs(v.y);
-	r.z = abs(v.z);
-	return r;
+void abs(vec3& v){
+	v.x = abs(v.x); v.y = abs(v.y);
+	v.z = abs(v.z);
 }
 
-vec4 abs(const vec4& v){
-	vec4 r;
-	r.x = abs(v.x); r.y = abs(v.y);
-	r.z = abs(v.z); r.w = abs(v.w);
-	return r;
+void abs(vec4& v){
+	v.x = abs(v.x); v.y = abs(v.y);
+	v.z = abs(v.z); v.w = abs(v.w);
 }
 
-mat3 inverse(const mat3& mat){
-	mat3 inv;
-	float det;
-	
-	
-	
+bool inverse(const mat3& m, mat3& inv){
+	float det = m[0] * (m[4] * m[8] - m[5] * m[7]) -
+			 m[3] * (m[1] * m[8] - m[7] * m[2]) +
+			 m[6] * (m[1] * m[5] - m[4] * m[2]);
+
 	if(det == 0){
-		return inv;
+		return false;
 	}
-    det = 1.0f / det;
-    inv *= det;
-    return inv;
+	det = 1.0f / det;
+
+	inv[0] = (m[4] * m[8] - m[5] * m[7]) * det;
+	inv[3] = (m[6] * m[5] - m[3] * m[8]) * det;
+	inv[6] = (m[3] * m[7] - m[6] * m[4]) * det;
+	inv[1] = (m[7] * m[2] - m[1] * m[8]) * det;
+	inv[4] = (m[0] * m[8] - m[6] * m[2]) * det;
+	inv[7] = (m[1] * m[6] - m[0] * m[7]) * det;
+	inv[2] = (m[1] * m[5] - m[2] * m[4]) * det;
+	inv[5] = (m[2] * m[3] - m[0] * m[5]) * det;
+	inv[8] = (m[0] * m[4] - m[1] * m[3]) * det;
+	
+    return true;
 }
 /*
 0, 3, 6
 1, 4, 7
 2, 5, 8
 */
-mat3 transpose(const mat3& mat){
-	mat3 m;
-	m[0] = mat[0]; m[1] = mat[3]; m[2] = mat[6];
-	m[3] = mat[1]; m[4] = mat[4]; m[5] = mat[7];
-	m[6] = mat[2]; m[7] = mat[5]; m[8] = mat[8];
-	return m;
+void transpose(mat3& mat){
+	std::swap(mat[1], mat[3]);
+	std::swap(mat[2], mat[6]);
+	std::swap(mat[5], mat[7]);
 }
 
-mat4 inverse(const mat4& m){
-	mat4 inv;
+/*
+0,4,8 ,12
+1,5,9 ,13
+2,6,10,14
+3,7,11,15
+*/
+
+bool inverse(const mat4& m, mat4& inv){
     float det;
  
     inv[ 0] =  m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
@@ -92,11 +101,11 @@ mat4 inverse(const mat4& m){
     det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 	
     if(det == 0){
-		return inv;
+		return false;
 	}
     det = 1.0f / det;
     inv *= det;
-    return inv;
+    return true;
 }
 /*
 0,4,8 ,12
@@ -105,13 +114,13 @@ mat4 inverse(const mat4& m){
 3,7,11,15
 */
 
-mat4 transpose(const mat4& mat){
-	mat4 m;
-	m[0]  = mat[0];  m[1]  = mat[4]; m[2]  = mat[8];  m[3]  = mat[12];
-	m[4]  = mat[1];  m[5]  = mat[5]; m[6]  = mat[9];  m[7]  = mat[13];
-	m[8]  = mat[11]; m[9]  = mat[6]; m[10] = mat[10]; m[11] = mat[14];
-	m[12] = mat[3];  m[13] = mat[7]; m[14] = mat[11]; m[15] = mat[15];
-	return m;
+void transpose(mat4& mat){
+	std::swap(mat[1], mat[4]);
+	std::swap(mat[2], mat[8]);
+	std::swap(mat[3], mat[12]);
+	std::swap(mat[6], mat[9]);
+	std::swap(mat[7], mat[13]);
+	std::swap(mat[11], mat[14]);
 }
 
 float fract(const float f){
@@ -119,52 +128,80 @@ float fract(const float f){
 	return modf(f, &i);
 }
 
-void fract(const vec3& v){
+void fract(vec3& v){
 	float i;
-	return vec3(modf(v.x, &i), modf(v.y, &i), modf(v.z, &i));
+	v.x = modf(v.x, &i);
+	v.y = modf(v.y, &i);
+	v.z = modf(v.z, &i);
 }
-void fract(const vec4& v){
+void fract(vec4& v){
 	float i;
-	return vec4(modf(v.x, &i), modf(v.y, &i), modf(v.z, &i), modf(v.w, &i));
+	v.x = modf(v.x, &i);
+	v.y = modf(v.y, &i);
+	v.z = modf(v.z, &i);
+	v.w = modf(v.w, &i);
 }
 
-vec3 floor(const vec3& v){
-	return vec3(floor(v.x), floor(v.y), floor(v.z));
+void floor(vec3& v){
+	v.x = floor(v.x);
+	v.y = floor(v.y);
+	v.z = floor(v.z);
 }
-vec4 floor(const vec4& v){
-	return vec4(floor(v.x), floor(v.y), floor(v.z), floor(v.w));
-}
-
-vec3 ceil(const vec3& v){
-	return vec3(ceil(v.x), ceil(v.y), ceil(v.x));
-}
-vec4 ceil(const vec4& v){
-	return vec4(ceil(v.x), ceil(v.y), ceil(v.z), ceil(v.w));
+void floor(vec4& v){
+	v.x = floor(v.x);
+	v.y = floor(v.y);
+	v.z = floor(v.z);
+	v.w = floor(v.w);
 }
 
-vec3 abs(const vec3& v){
-	return vec3(abs(v.x), abs(v.y), abs(v.z));
+void ceil(vec3& v){
+	v.x = ceil(v.x);
+	v.y = ceil(v.y);
+	v.z = ceil(v.z);
 }
-vec4 abs(const vec4& v){
-	return vec4(abs(v.x), abs(v.y), abs(v.z), abs(v.w));
+void ceil(vec4& v){
+	v.x = ceil(v.x);
+	v.y = ceil(v.y);
+	v.z = ceil(v.z);
+	v.w = ceil(v.w);
 }
 
-vec3 normalize(const vec3& v){
-	vec3 r;
+void round(vec3& v){
+	v.x = round(v.x);
+	v.y = round(v.y);
+	v.z = round(v.z);
+}
+void round(vec4& v){
+	v.x = round(v.x);
+	v.y = round(v.y);
+	v.z = round(v.z);
+	v.w = round(v.w);
+}
+
+void abs(vec3& v){
+	v.x = abs(v.x);
+	v.y = abs(v.y);
+	v.z = abs(v.z);
+}
+void abs(vec4& v){
+	v.x = abs(v.x);
+	v.y = abs(v.y);
+	v.z = abs(v.z);
+	v.w = abs(v.w);
+}
+
+void normalize(vec3& v){
 	float len = length(v);
-	r.x /= len;
-	r.y /= len;
-	r.z /= len;
-	return r;
+	v.x /= len;
+	v.y /= len;
+	v.z /= len;
 }
-vec4 normalize(const vec4& v){
-	vec4 r;
+void normalize(vec4& v){
 	float len = length(v);
-	r.x /= len;
-	r.y /= len;
-	r.z /= len;
-	r.w /= len;
-	return r;
+	v.x /= len;
+	v.y /= len;
+	v.z /= len;
+	v.w /= len;
 }
 
 void print(const vec3& v){
@@ -185,15 +222,18 @@ void print(const mat4& mat){
 	printf("%f, %f, %f, %f\n", mat[3], mat[7], mat[11], mat[15]);
 }
 
-mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
-	vec3 forward = normalize(center - eye);
-	vec3 up = normalize(_up);
-	vec3 side = normalize(cross(forward, up));
-	up = cross(side, forward);
-	mat4 m;
+void lookAt(const mat4& m, const vec3& eye, const vec3& center, const vec3& _up){
+	vec3 forward = center - eye;
+	normalize(forward);
+	vec3 up = _up;
+	normalize(up);
+	vec3 side;
+	cross(forward, up, side);
+	normalize(side);
+	cross(side, forward, up);
 	m[0] = side.x;
     m[1] = side.y;
-    m[2] = side.z];
+    m[2] = side.z;
 
     m[4] = up.x;
     m[5] = up.y;
@@ -206,11 +246,9 @@ mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
 	m[12] = -dot(side, eye);
 	m[13] = -dot(up, eye);
 	m[14] = -dot(forward, eye);
-	return m;
 }
 
-mat4 perspective(const float fov, const float WHaspect, const float near, const float far){
-	mat4 m;
+void perspective(const mat4& m, const float fov, const float WHaspect, const float near, const float far){
 	float sine, cotangent, deltaZ;
 	float radians = fov / 2.0f * PI80;
 	deltaZ = far - near;
@@ -220,13 +258,12 @@ mat4 perspective(const float fov, const float WHaspect, const float near, const 
 		return m;
 	}
 	cotangent  = cos(radians) / sine;
-	m[0][0] = cotangent / aspect;
-    m[1][1] = cotangent;
-    m[2][2] = -(zFar + zNear) / deltaZ;
-    m[2][3] = -1.0f;
-    m[3][2] = -2.0f * zNear * zFar / deltaZ;
-    m[3][3] = 0.0f;
-	return m;
+	m[0] = cotangent / aspect;
+    m[5] = cotangent;
+    m[10] = -(zFar + zNear) / deltaZ;
+    m[14] = -1.0f;
+    m[11] = -2.0f * zNear * zFar / deltaZ;
+    m[15] = 0.0f;
 }
 
 /*
@@ -236,23 +273,29 @@ mat4 perspective(const float fov, const float WHaspect, const float near, const 
 3,7,11,15
 */
 
-mat4 ortho(const float left, const float right, const float top, const float bottom, const float znear, const float zfar){
-	mat4 m;
+void ortho(const mat4& m, const float left, const float right, const float top, const float bottom, const float znear, const float zfar){
 	m[0] = 2.0f / (right - left);
 	m[5] = 2.0f / (top - bottom);
 	m[10] = 2.0f / (zfar - znear);
 	m[3] = (right + left) / (right - left);
 	m[7] = (top + bottom) / (top - bottom);
 	m[11] = (zfar + znear) / (zfar - znear);
-	return m;
 }
 
-vec3 cross(const vec3& lhs, const vec3& rhs){
-	vec3 v;
+void cross(const vec3& lhs, const vec3& rhs, const vec3& v){
 	v.x = lhs.y * rhs.z - lhs.z * rhs.y;
 	v.y = lhs.z * rhs.x - lhs.x * rhs.z;
 	v.z = lhs.x * rhs.y - lhs.y * rhs.x;
-	return v;
+}
+
+void rotate(mat4& in, const float angle, const vec3& v){
+	
+}
+void scale(mat4& in, const vec3& v){
+	
+}
+void translate(mat4& in, const vec3& v){
+	
 }
 
 vec3 const * value_ptr(const vec3& v){

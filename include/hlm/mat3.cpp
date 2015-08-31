@@ -32,9 +32,14 @@ mat3& mat3::operator=(const mat3& other){
 	return *this;
 }
 
+/*
+0, 3, 6
+1, 4, 7
+2, 5, 8
+*/
+
 mat3 mat3::operator*(const mat3& lhs, const mat3& rhs){
 	mat3 m;
-	// COLUMN MAJOR to comply with openGL
 	// lhs horizontal
 	// rhs vertical
 	m[0] = lhs[0] * rhs[0] + lhs[3] * rhs[1] + lhs[6] * rhs[2];

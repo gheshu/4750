@@ -20,48 +20,55 @@ float distance(const vec4& lhs, const vec4& rhs);
 float length(const vec3& lhs);
 float length(const vec4& lhs);
 
-vec3 abs(const vec3& v);
-vec3 abs(const vec4& v);
+void abs( vec3& v);
+void abs( vec4& v);
 
-mat3 inverse(const mat3& mat);
-mat3 transpose(const mat3& mat);
+bool inverse(const mat3& in, mat3& out);
+void transpose( mat3& mat);
 
-mat4 inverse(const mat4& mat):
-mat4 transpose(const mat4& mat);
+bool inverse(const mat4& in, mat4& out):
+void transpose( mat4& mat);
 
 float fract(const float f);
-vec3 fract(const vec3& v);
-vec4 fract(const vec4& v);
+void fract( vec3& v);
+void fract( vec4& v);
 
-vec3 floor(const vec3& v);
-vec4 floor(const vec4& v);
+void floor( vec3& v);
+void floor( vec4& v);
 
-vec3 ceil(const vec3& v);
-vec4 ceil(const vec4& v);
+void ceil( vec3& v);
+void ceil( vec4& v);
 
-vec3 abs(const vec3& v);
-vec4 abs(const vec4& v);
+void round( vec3& v);
+void round( vec4& v);
 
-vec3 normalize(const vec3& v);
-vec4 normalize(const vec4& v);
+void abs( vec3& v);
+void abs( vec4& v);
+
+void normalize( vec3& v);
+void normalize( vec4& v);
 
 void print(const vec3& v);
 void print(const vec4& v);
 void print(const mat3& mat);
 void print(const mat4& mat);
 
-mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up);
-mat4 perspective(const float fov, const float WHaspect, const float near, const float far);
-mat4 ortho(const float left, const float right, const float top, const float bottom, const float znear, const float zfar);
+void lookAt(const mat4& m, const vec3& eye, const vec3& center, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
+void perspective(mat4& in, const float fov, const float WHaspect, const float near, const float far);
+void ortho(mat4& in, const float left, const float right, const float top, const float bottom, const float znear, const float zfar);
 
 inline float radians(const float degrees){ return degrees * PI80; }
 
-vec3 cross(const vec3& lhs, const vec3& rhs);
+void cross(const vec3& lhs, const vec3& rhs, vec3& out);
 
 vec3 const * value_ptr(const vec3& v);
 vec4 const * value_ptr(const vec4& v);
 mat3 const * value_ptr(const mat3& m);
 mat4 const * value_ptr(const mat4& m);
+
+void rotate(mat4& in, const float angle, const vec3& v);
+void scale(mat4& in, const vec3& v);
+void translate(mat4& in, const vec3& v);
 
 };
 
