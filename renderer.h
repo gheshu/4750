@@ -2,9 +2,8 @@
 #define RENDERER_H
 
 #include "myglheaders.h"
-#include "camera.h"
 #include "image.h"
-#include "GLSLProgram.h"
+#include "glsl_program.h"
 #include "window.h"
 #include "input.h"
 #include "hlm.h"
