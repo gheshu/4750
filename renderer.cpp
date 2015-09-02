@@ -4,7 +4,7 @@
 #include "debugmacro.h"
 #include "window.h"
 #include "input.h"
-#include "hlm/hlm.h"
+#include "hlm.h"
 
 #include <algorithm>
 

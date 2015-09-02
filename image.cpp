@@ -1,18 +1,40 @@
 #include "image.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-
-void Image::load(const std::string& filename){
-	if (data != nullptr){
-		return;
-	}
-	data = stbi_load(filename.c_str(), &width, &height, &n, 3);
-	if (!data){
-		printf("image %s could not be loaded\n", filename.c_str());
-	}
+Image::Image(const int _width, const int _height){
+	width = _width; height = _height;
+	data = new unsigned [width * height];
 }
-void Image::unload(){
-	stbi_image_free(data);
+
+Image::~Image(){
+	delete data;
 	data = nullptr;
+}
+
+void Image::setPixel(const int x, const int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+	unsigned value = r;
+	value <<= 8;
+	value |= g;
+	value <<= 8;
+	value |= b;
+	value <<= 8;
+	value |= a;
+	*(data + x + y * width) = value;
+}
+
+void Image::setPixel(const int x, const int y, const vec4& color){
+	vec4 c = color;
+	normalize(c);
+	unsigned char r = floor(c.x * 255.0f);
+	unsigned char g = floor(c.y * 255.0f);
+	unsigned char b = floor(c.z * 255.0f);
+	unsigned char a = floor(c.w * 255.0f);
+	
+	unsigned value = r;
+	value <<= 8;
+	value |= g;
+	value <<= 8;
+	value |= b;
+	value <<= 8;
+	value |= a;
+	*(data + x + y * width) = value;
 }
