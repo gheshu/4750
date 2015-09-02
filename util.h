@@ -54,10 +54,6 @@ void print(const mat3& mat);
 void print(const mat4& mat);
 
 void lookAt(const mat4& m, const vec3& eye, const vec3& center, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
-void perspective(mat4& in, const float fov, const float WHaspect, const float near, const float far);
-void ortho(mat4& in, const float left, const float right, const float top, const float bottom, const float znear, const float zfar);
-
-void orthoToPixels(mat4& in, float left, float right, float top, float bottom, float near, float far, float fov);
 
 inline float radians(const float degrees){ return degrees * PI80; }
 

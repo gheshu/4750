@@ -248,39 +248,12 @@ void lookAt(const mat4& m, const vec3& eye, const vec3& center, const vec3& _up)
 	m[14] = -dot(forward, eye);
 }
 
-void perspective(const mat4& m, const float fov, const float WHaspect, const float near, const float far){
-	float sine, cotangent, deltaZ;
-	float radians = fov / 2.0f * PI80;
-	deltaZ = far - near;
-	sine = sin(radians);
-	if((deltaZ == 0) || (sine == 0) || (aspect == 0)){
-		printf("invalid parameters to hlm::perspective\n");
-		return m;
-	}
-	cotangent  = cos(radians) / sine;
-	m[0] = cotangent / aspect;
-    m[5] = cotangent;
-    m[10] = -(zFar + zNear) / deltaZ;
-    m[14] = -1.0f;
-    m[11] = -2.0f * zNear * zFar / deltaZ;
-    m[15] = 0.0f;
-}
-
 /*
 0,4,8 ,12
 1,5,9 ,13
 2,6,10,14
 3,7,11,15
 */
-
-void ortho(const mat4& m, const float left, const float right, const float top, const float bottom, const float znear, const float zfar){
-	m[0] = 2.0f / (right - left);
-	m[5] = 2.0f / (top - bottom);
-	m[10] = 2.0f / (zfar - znear);
-	m[3] = (right + left) / (right - left);
-	m[7] = (top + bottom) / (top - bottom);
-	m[11] = (zfar + znear) / (zfar - znear);
-}
 
 void cross(const vec3& lhs, const vec3& rhs, const vec3& v){
 	v.x = lhs.y * rhs.z - lhs.z * rhs.y;

@@ -11,31 +11,7 @@ void Image::destroy(){
 	data = nullptr;
 }
 
-void Image::setPixel(const int x, const int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
-	unsigned value = r;
-	value <<= 8;
-	value |= g;
-	value <<= 8;
-	value |= b;
-	value <<= 8;
-	value |= a;
-	*(data + x + y * width) = value;
-}
-
-void Image::setPixel(const int x, const int y, const vec4& color){
-	vec4 c = color;
-	normalize(c);
-	unsigned char r = floor(c.x * 255.0f);
-	unsigned char g = floor(c.y * 255.0f);
-	unsigned char b = floor(c.z * 255.0f);
-	unsigned char a = floor(c.w * 255.0f);
-	
-	unsigned value = r;
-	value <<= 8;
-	value |= g;
-	value <<= 8;
-	value |= b;
-	value <<= 8;
-	value |= a;
-	*(data + x + y * width) = value;
+void Image::setPixel(const int x, const int y, unsigned c){
+	if(x + y * width >= width * height){ return; }
+	*(data + x + y * width) = c;
 }

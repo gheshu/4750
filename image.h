@@ -10,8 +10,7 @@ struct Image{
 	unsigned* data = nullptr;
 	void init(const int width, const int height);
 	void destroy();
-	void setPixel(const int x, const int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-	void setPixel(const int x, const int y, const vec4& color);
+	void setPixel(const int x, const int y, unsigned c);
 };
 
 #endif

@@ -9,7 +9,7 @@
 #include "input.h"
 #include "hlm.h"
 
-typedef vector<vec3> VertexBuffer;
+typedef vector<vec4> VertexBuffer;
 typedef vector<int> IndexBuffer;
 
 class Renderer
@@ -26,6 +26,7 @@ private:
 	
 	void bresenhamPass();
 	void DDAPass();
+	void glPass();
 public:
     void init(const int width, const int height, const int msaa);
 	void destroy();
