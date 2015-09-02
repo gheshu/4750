@@ -29,45 +29,45 @@ Input::~Input()
 void Input::poll()
 {
     glfwPollEvents();
-    pollInput();
 }
 
-void Input::pollInput()
+void Input::poll(Camera& cam)
 {
+	glfwPollEvents();
 	/*
 	if (glfwGetKey(m_glwindow, GLFW_KEY_W)){
-		m_camera->moveForward(0.05f);
+		cam.moveForward(0.05f);
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_S)){
-        m_camera->moveForward(-0.05f);
+        cam.moveForward(-0.05f);
 	}
     if(glfwGetKey(m_glwindow, GLFW_KEY_A)){
-        m_camera->moveRight(-0.05f);
+        cam.moveRight(-0.05f);
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_D)){
-        m_camera->moveRight(0.05f);
+        cam.moveRight(0.05f);
 	}
     if(glfwGetKey(m_glwindow, GLFW_KEY_SPACE)){
-        m_camera->moveUp(0.05f);
+        cam.moveUp(0.05f);
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_LEFT_SHIFT)){
-        m_camera->moveUp(-0.05f);
+        cam.moveUp(-0.05f);
 	}
     if(glfwGetKey(m_glwindow, GLFW_KEY_E)){
-        m_camera->setFov(m_camera->getFov() + 0.5f);
-		//printf("fov: %f\n", m_camera->getFov());
+        cam.setFov(cam.getFov() + 0.5f);
+		//printf("fov: %f\n", cam.getFov());
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_Q)){
-        m_camera->setFov(m_camera->getFov() - 0.5f);
-		//printf("fov: %f\n", m_camera->getFov());
+        cam.setFov(cam.getFov() - 0.5f);
+		//printf("fov: %f\n", cam.getFov());
 	}
 
-    m_camera->yaw(m_relCursorX * 0.05f);
-    m_camera->pitch(m_relCursorY * 0.05f);
+    cam.yaw(m_relCursorX * 0.05f);
+    cam.pitch(m_relCursorY * 0.05f);
     m_relCursorX = 0.0f;
     m_relCursorY = 0.0f;
 
-    m_camera->updateViewMatrix();
+    cam.updateViewMatrix();
 	*/
 }
 

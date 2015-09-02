@@ -12,6 +12,7 @@ float x, y, z, w;
 	vec4(float x, float y, float z, float w);
 	vec4(float s);
 	vec4(const vec4& other);
+	vec4(const vec3& other);
 	
 	vec4 operator+(const vec4& lhs, const vec4& rhs);
 	vec4 operator-(const vec4& lhs, const vec4& rhs);

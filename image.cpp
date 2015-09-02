@@ -1,11 +1,12 @@
 #include "image.h"
 
-Image::Image(const int _width, const int _height){
+void Image::init(const int _width, const int _height){
+	if(data != nullptr){return;}
 	width = _width; height = _height;
 	data = new unsigned [width * height];
 }
 
-Image::~Image(){
+void Image::destroy(){
 	delete data;
 	data = nullptr;
 }

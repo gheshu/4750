@@ -18,6 +18,10 @@ vec4::vec4(const vec4& other){
 	x = other.x; y = other.y; z = other.z; w = other.w;
 }
 
+vec4::vec4(const vec3& other){
+	x = other.x; y = other.y; z = other.z; w = 1.0f;
+}
+
 vec4& vec4::operator=(const vec4& other){
 	x = other.x; y = other.y; z = other.z; w = other.w;
 	return *this;

@@ -18,12 +18,11 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 
-void pollInput();
-
 public:
     Input(GLFWwindow* window);
-    virtual ~Input();
-    void poll();
+    ~Input();
+    void poll(Camera& cam);
+	void poll();
     static bool rightMouseDown();
     static bool leftMouseDown();
     static float scrollOffset();

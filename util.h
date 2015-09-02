@@ -57,6 +57,8 @@ void lookAt(const mat4& m, const vec3& eye, const vec3& center, const vec3& up);
 void perspective(mat4& in, const float fov, const float WHaspect, const float near, const float far);
 void ortho(mat4& in, const float left, const float right, const float top, const float bottom, const float znear, const float zfar);
 
+void orthoToPixels(mat4& in, float left, float right, float top, float bottom, float near, float far, float fov);
+
 inline float radians(const float degrees){ return degrees * PI80; }
 
 void cross(const vec3& lhs, const vec3& rhs, vec3& out);

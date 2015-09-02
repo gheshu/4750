@@ -5,25 +5,27 @@
 #include "camera.h"
 #include "image.h"
 #include "GLSLProgram.h"
+#include "window.h"
+#include "input.h"
+#include "hlm.h"
 
-
-class Window;
-class Input;
+typedef vector<vec3> VertexBuffer;
+typedef vector<int> IndexBuffer;
 
 class Renderer
 {
 private:
-	Camera m_camera;
-	Image fb0, fb1;
 	GLSLProgram m_prog;
+	Image fbs[2];
 	Window* m_window;
-	Input* m_input;
 	GLFWwindow* m_glwindow;
+	Input* m_input;
 
-	GLuint m_width, m_height, m_vao, fb0_id, fb1_id;
+	GLuint m_width, m_height, m_vao;
+	GLuint fb_ids[2];
 	
-
 	void bresenhamPass();
+	void DDAPass();
 public:
     void init(const int width, const int height, const int msaa);
 	void destroy();

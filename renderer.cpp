@@ -1,14 +1,11 @@
 
 #include "renderer.h"
 #include <iostream>
-#include "debugmacro.h"
-#include "window.h"
-#include "input.h"
-#include "hlm.h"
-
 #include <algorithm>
+#include "debugmacro.h"
 
 using namespace std;
+using namespace hlm;
 
 void Renderer::destroy() {
 	fb1.unload();
@@ -24,15 +21,14 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
-	m_camera.init(90.0f, (float)m_width / (float)m_height, 0.1f, 10.0f, hlm::vec3(-1.0f, 1.0f, -1.0f));
 	
 	if(!m_prog.build("shaders/main.vert", "shaders/main.frag")){
 		exit(1);
 	}
+	fbs[0].init();
+	fbs[1].init();
 	
-	fb0.load("images/test.png");
-	fb1.init("images/empty.png");
-	screenQuadInit(m_vao, fb0_id, fb1_id);
+	screenQuadInit(m_vao, fb_ids[0], fb_ids[1]);
 	MYGLERRORMACRO
 }
 
@@ -84,30 +80,56 @@ void Renderer::glPass(GLSLProgram& prog, Image& img, GLuint& vao, GLuint& fb_id)
 	MYGLERRORMACRO
 }
 
-void Renderer::bresenhamPass(Camera& cam, VertexBuffer& verts, Image& img){
-	
+void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
+	for(unsigned i = 0; i < verts.size(); i += 3){
+		vec3 face[3];
+		face[0] = vec3(proj * vec4(verts[i]));
+		face[1] = vec3(proj * vec4(verts[i + 1]));
+		face[2] = vec3(proj * vec4(verts[i + 2]));
+			
+		for(int t = 0; t < 3; t++){
+			vec3& v1 = face[t%3];
+			vec3& v2 = face[(t + 1)%3];
+			float slope = (v2.y - v1.y) / (v2.x - v1.x);
+			if(abs(slope) > 1.0f){
+				slope = 1.0f / slope;
+				int x = (int)round(v1.x);
+				int k = 0;
+				for(int y = (int)round(v1.y); y <= (int)round(v2.y); y++){
+					img.setPixel(x, y, 255, 0, 0, 0);
+					x = (int)round(v1.x + (float)k * slope);
+					k++;
+				}
+			} 
+			else {
+				int y = (int)round(v1.y);
+				int k = 0;
+				for(int x = (int)round(v1.x); x <= (int)round(v2.x); x++){
+					img.setPixel(x, y, 255, 0, 0, 0);
+					y = (int)round(v1.y + (float)k * slope);
+					k++;
+				}
+			}
+		}
+	}
 }
 
 void Renderer::draw() {
 	float avg_rate = 0.0f;
 	unsigned frame_counter = 0;
 	bool front_buffer = true;
+	unsigned i = 0;
+	mat4 proj;
+	hlm::orthoToPixels(proj, m_width, m_height, -1, 1, -1, 1, 0.1f, 100.0f, 90.0f);
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
-		m_camera.updateViewMatrix();
 		
-		if(front_buffer){
-			bresenhamPass(m_camera, verts, fb0);
-			glPass(m_prog, fb0, m_vao, fb0_id);
-			front_buffer = false;
-		} else {
-			bresenhamPass(m_camera, verts, fb1);
-			glPass(m_prog, fb0, m_vao, fb1_id);
-			front_buffer = true;
-		}
+		DDAPass(m_camera, verts, fbs[i]);
+		bresenhamPass(m_camera, verts, fbs[i]);
+		glPass(m_prog, fbs[i], m_vao, fb_ids[i]);
 		
         glfwSwapBuffers(m_glwindow);
-
+		i = (i + 1) % 2;
 #if 0
 		avg_rate += (float)glfwGetTime();
 		avg_rate *= 0.5f;
