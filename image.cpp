@@ -1,25 +1,24 @@
 #include "image.h"
+#include <string>
 
 void Image::init(const int _width, const int _height){
 	if(data != nullptr){return;}
 	width = _width; height = _height;
-	data = new unsigned [width * height];
+	data = (Pixel*)malloc(sizeof(Pixel) * width * height);
 }
 
 void Image::destroy(){
-	delete data;
+	free(data);
 	data = nullptr;
 }
 
-void Image::setPixel(const int x, const int y, unsigned c){
+void Image::setPixel(const int x, const int y, const Pixel& p){
 	if(x >= width || x < 0 || y >= height || y < 0){ return; }
-	*(data + x + y * width) = c;
+	*(data + x + y * width) = p;
 }
 
-void Image::clear(unsigned clearColor){
-	unsigned i = 0; 
-	while(i < width * height){
-		*(data + i) = clearColor;
-		i++;
+void Image::clear(const Pixel& p){
+	for(int i = 0; i < width * height; i++){
+		*(data + i) = p;
 	}
 }

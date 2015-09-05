@@ -17,22 +17,20 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
 	}
-	fbs[0].init(m_width, m_height);
-	fbs[1].init(m_width, m_height);
+	fb.init(m_width, m_height);
 	
-	screenQuadInit(m_vao, fb_ids[0], fb_ids[1]);
+	screenQuadInit(m_vao, fb_id);
 }
 
 void Renderer::destroy() {
-	fbs[0].destroy();
-	fbs[1].destroy();
+	fb.destroy();
     delete m_window;
 	m_window = nullptr;
 	delete m_input;
 	m_input = nullptr;
 }
 
-void Renderer::screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1){
+void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
     GLuint vbo;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -52,13 +50,7 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1){
     glBindVertexArray(0);
 	
 	glGenTextures(1, &id0);
-	glGenTextures(1, &id1);
 	glBindTexture(GL_TEXTURE_2D, id0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, id1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -68,23 +60,18 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1){
 	MYGLERRORMACRO
 }
 
-void Renderer::glPass(Image& img, GLuint& vao, GLuint& fb_id){
+void Renderer::glPass(Image& img, GLuint& vao, GLuint fb_id){
 	glBindTexture(GL_TEXTURE_2D, fb_id);
-	PRINTLINEMACRO
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, img.data);
-	PRINTLINEMACRO
     glBindVertexArray(vao);
-	PRINTLINEMACRO
     glDrawArrays(GL_TRIANGLES, 0, 6);
-	PRINTLINEMACRO
 	glBindVertexArray(0);
-	PRINTLINEMACRO
 	MYGLERRORMACRO
 }
 
 void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
-	unsigned c = 0xFF000000;
+	Pixel p(0, 0, 0, 0);
 	for(unsigned i = 0; i < verts.size(); i += 3){
 		vec4 face[3];
 		face[0] = proj * verts[i];
@@ -99,7 +86,7 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 				int x = (int)round(v1.x);
 				int k = 0;
 				for(int y = (int)round(v1.y); y <= (int)round(v2.y); y++){
-					img.setPixel(x, y, c);
+					img.setPixel(x, y, p);
 					x = (int)round(v1.x + (float)k * slope);
 					k++;
 				}
@@ -108,7 +95,7 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 				int y = (int)round(v1.y);
 				int k = 0;
 				for(int x = (int)round(v1.x); x <= (int)round(v2.x); x++){
-					img.setPixel(x, y, c);
+					img.setPixel(x, y, p);
 					y = (int)round(v1.y + (float)k * slope);
 					k++;
 				}
@@ -124,28 +111,23 @@ void Renderer::bresenhamPass(mat4& proj, VertexBuffer& verts, Image& img){
 void Renderer::draw() {
 	float avg_rate = 0.0f;
 	unsigned frame_counter = 0;
-	unsigned i = 0;
 	mat4 proj;
 	VertexBuffer verts;
 	objload("test.obj", verts);
+	Pixel w(0xFF, 0xFF, 0xFF, 0xFF);
+	Pixel b(0, 0, 0, 0xFF);
+	m_prog.bind();
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
-		fbs[i].clear(0);
-		DDAPass(proj, verts, fbs[i]);
-		bresenhamPass(proj, verts, fbs[i]);
-		fbs[i].setPixel(100, 100, 0xFFFFFFFF);
-		glPass(fbs[i], m_vao, fb_ids[i]);
-        glfwSwapBuffers(m_glwindow);
-		i = (i + 1) % 2;
-#if 0
-		avg_rate += (float)glfwGetTime();
-		avg_rate *= 0.5f;
-        glfwSetTime(0.0);
-		frame_counter++;
-		if (frame_counter >= 60){
-			frame_counter = 0;
-			printf("framerate: %f\n", 1.0f / avg_rate);
+		fb.clear(b);
+		DDAPass(proj, verts, fb);
+		bresenhamPass(proj, verts, fb);
+		for(int y = 0; y < 100; y++){
+			for(int x = 0; x < 100; x++){
+				fb.setPixel(x, y, w);
+			}
 		}
-#endif
+		glPass(fb, m_vao, fb_id);
+        glfwSwapBuffers(m_glwindow);
     }
 }

@@ -13,18 +13,18 @@ class Renderer
 {
 private:
 	GLSLProgram m_prog;
-	Image fbs[2];
+	Image fb;
 	Window* m_window;
 	GLFWwindow* m_glwindow;
 	Input* m_input;
 
 	GLuint m_width, m_height, m_vao;
-	GLuint fb_ids[2];
+	GLuint fb_id;
 	
 	void bresenhamPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
 	void DDAPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
-	void glPass(Image& img, GLuint& vao, GLuint& fb_id);
-	void screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1);
+	void glPass(Image& img, GLuint& vao, GLuint fb_id);
+	void screenQuadInit(GLuint& vao, GLuint& id0);
 public:
     void init(const int width, const int height, const int msaa);
 	void destroy();
