@@ -69,15 +69,16 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1){
 }
 
 void Renderer::glPass(Image& img, GLuint& vao, GLuint& fb_id){
-	PRINTLINEMACRO
 	glBindTexture(GL_TEXTURE_2D, fb_id);
-	PRINTLINEMACRO	// SEGFAULT HERE
+	PRINTLINEMACRO
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
-		GL_UNSIGNED_INT, img.data);
-		PRINTLINEMACRO
+		GL_UNSIGNED_BYTE, img.data);
+	PRINTLINEMACRO
     glBindVertexArray(vao);
 	PRINTLINEMACRO
     glDrawArrays(GL_TRIANGLES, 0, 6);
+	PRINTLINEMACRO
+	glBindVertexArray(0);
 	PRINTLINEMACRO
 	MYGLERRORMACRO
 }
@@ -89,7 +90,6 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 		face[0] = proj * verts[i];
 		face[1] = proj * verts[i + 1];
 		face[2] = proj * verts[i + 2];
-			
 		for(int t = 0; t < 3; t++){
 			vec4& v1 = face[t%3];
 			vec4& v2 = face[(t + 1)%3];
@@ -124,15 +124,16 @@ void Renderer::bresenhamPass(mat4& proj, VertexBuffer& verts, Image& img){
 void Renderer::draw() {
 	float avg_rate = 0.0f;
 	unsigned frame_counter = 0;
-	bool front_buffer = true;
 	unsigned i = 0;
 	mat4 proj;
 	VertexBuffer verts;
 	objload("test.obj", verts);
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
+		fbs[i].clear(0);
 		DDAPass(proj, verts, fbs[i]);
 		bresenhamPass(proj, verts, fbs[i]);
+		fbs[i].setPixel(100, 100, 0xFFFFFFFF);
 		glPass(fbs[i], m_vao, fb_ids[i]);
         glfwSwapBuffers(m_glwindow);
 		i = (i + 1) % 2;

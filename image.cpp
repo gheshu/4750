@@ -15,3 +15,11 @@ void Image::setPixel(const int x, const int y, unsigned c){
 	if(x >= width || x < 0 || y >= height || y < 0){ return; }
 	*(data + x + y * width) = c;
 }
+
+void Image::clear(unsigned clearColor){
+	unsigned i = 0; 
+	while(i < width * height){
+		*(data + i) = clearColor;
+		i++;
+	}
+}
