@@ -14,34 +14,20 @@ public:
 	mat3();
 	mat3(mat4& m);
 	
-	inline float& operator[](const int i){ return data[i]; };
+	mat3 operator+(const float s) const;
+	mat3 operator+(const mat3& mat) const;
+	mat3 operator-(const mat3& rhs) const;
+	mat3 operator-(const float s) const;
+	mat3 operator*(const mat3& mat) const;
+	mat3 operator*(const float s) const;
+	mat3 operator/(const float s) const;
 	
+	inline float& operator[](const int i) { return data[i]; };
+	inline const float operator[](const int i) const {return data[i];};
 	mat3& operator=(const mat3& other);
-	
-	mat3 operator+(const mat3& mat, const float s);
-	mat3& operator+=(const float s);
-	mat3 operator+(const float s, const mat& mat);
-	mat3& operator+=(const mat3& mat);
-	mat3 operator+(const mat3& lhs, const mat3& rhs);
-	mat3 operator*(const mat3& lhs, const mat3& rhs);
-	
-	mat3 operator-(const mat3& lhs, const mat3& rhs);
-	mat3& operator-=(const mat3& mat);
-	mat3 operator-(const mat3& mat, const float s);
-	mat3& operator-=(const float s);
-	mat3 operator-(const float s, const mat3& mat);
-	
-	mat3 operator*(const float s, const mat3& mat);
-	mat3& operator*=(const float s);
-	mat3 operator*(const mat3& mat, const float s);
-	
-	mat3 operator/(const float s, const float mat3& mat);
-	mat3 operator/(const mat3& mat, const float s);
-	mat3& operator/=(const float s);
-	
-};
+};	// mat3
 
-};
+}; // hlm
 
 /*
 EXAMPLE OF HOW OPENGL ADDRESSES MATRIX MEMORY:

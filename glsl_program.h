@@ -4,7 +4,7 @@
 #include "myglheaders.h"
 #include <vector>
 #include <unordered_map>
-#include "hlm/hlm.h"
+#include "hlm.h"
 
 enum GLSLShaderTypes
 {

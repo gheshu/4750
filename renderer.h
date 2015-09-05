@@ -8,8 +8,10 @@
 #include "input.h"
 #include "hlm.h"
 
-typedef vector<vec4> VertexBuffer;
-typedef vector<int> IndexBuffer;
+#include <vector>
+
+typedef std::vector<hlm::vec4> VertexBuffer;
+typedef std::vector<int> IndexBuffer;
 
 class Renderer
 {
@@ -23,9 +25,10 @@ private:
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_ids[2];
 	
-	void bresenhamPass();
-	void DDAPass();
-	void glPass();
+	void bresenhamPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
+	void DDAPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
+	void glPass(Image& img, GLuint& vao, GLuint& fb_id);
+	void screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1);
 public:
     void init(const int width, const int height, const int msaa);
 	void destroy();

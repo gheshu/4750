@@ -17,8 +17,8 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
 	}
-	fbs[0].init();
-	fbs[1].init();
+	fbs[0].init(m_width, m_height);
+	fbs[1].init(m_width, m_height);
 	
 	screenQuadInit(m_vao, fb_ids[0], fb_ids[1]);
 }
@@ -69,9 +69,8 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1){
 }
 
 void Renderer::glPass(Image& img, GLuint& vao, GLuint& fb_id){
-	prog.bind();
 	glBindTexture(GL_TEXTURE_2D, fb_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32, img.width, img.height, 0, GL_RGBA,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
 		GL_UNSIGNED_INT, img.data);
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -82,7 +81,7 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 	unsigned c = 0xFF000000;
 	for(unsigned i = 0; i < verts.size(); i += 3){
 		vec4 face[3];
-		face[0] = proj * verts[i]);
+		face[0] = proj * verts[i];
 		face[1] = proj * verts[i + 1];
 		face[2] = proj * verts[i + 2];
 			
@@ -111,6 +110,10 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 			}
 		}
 	}
+}
+
+void Renderer::bresenhamPass(mat4& proj, VertexBuffer& verts, Image& img){
+	
 }
 
 void Renderer::draw() {

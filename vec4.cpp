@@ -1,9 +1,10 @@
 #include "vec4.h"
+#include "vec3.h"
 #include "mat4.h"
 
 namespace hlm{
 
-vec4(){
+vec4::vec4(){
 	x = 0.0f; y = 0.0f; z = 0.0f; w = 0.0f;
 }
 vec4::vec4(float _x, float _y, float _z, float _w){
@@ -27,15 +28,15 @@ vec4& vec4::operator=(const vec4& other){
 	return *this;
 }
 
-vec4 vec4::operator+(const vec4& lhs, const vec4& rhs){
+vec4 operator+(const vec4& lhs, const vec4& rhs){
 	return vec4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
 }
 
-vec4 vec4::operator-(const vec4& lhs, const vec4& rhs){
+vec4 operator-(const vec4& lhs, const vec4& rhs){
 	return vec4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
 }
 
-vec4 vec4::operator*(const vec4& lhs, const vec4& rhs){
+vec4 operator*(const vec4& lhs, const vec4& rhs){
 	return vec4(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w);
 }
 
@@ -50,35 +51,35 @@ vec4& vec4::operator-=(const vec4& other){
 }
 
 
-vec4 vec4::operator+(const float s, const vec4& v){
+vec4 operator+(const float s, const vec4& v){
 	return vec4(s + v.x, s + v.y, s + v.z, s + v.w);
 }
 
-vec4 vec4::operator-(const float s, const vec4& v){
+vec4 operator-(const float s, const vec4& v){
 	return vec4(s - v.x, s - v.y, s - v.z, s - v.w);
 }
 
-vec4 vec4::operator*(const float s, const vec4& v){
+vec4 operator*(const float s, const vec4& v){
 	return vec4(s * v.x, s * v.y, s * v.z, s * v.w);
 }
 
-vec4 vec4::operator/(const float s, const vec4& v){
+vec4 operator/(const float s, const vec4& v){
 	return vec4(s / v.x, s / v.y, s / v.z, s / v.w);
 }
 
-vec4 vec4::operator+(const vec4& v, const float s){
+vec4 operator+(const vec4& v, const float s){
 	return vec4(v.x + s, v.y + s, v.z + s, v.w + s);
 }
 
-vec4 vec4::operator-(const vec4& v, const float s){
+vec4 operator-(const vec4& v, const float s){
 	return vec4(v.x - s, v.y - s, v.z - s, v.w - s);
 }
 
-vec4 vec4::operator*(const vec4& v, const float s){
+vec4 operator*(const vec4& v, const float s){
 	return vec4(v.x * s, v.y * s, v.z * s, v.w * s);
 }
 
-vec4 vec4::operator/(const vec4& v, const float s){
+vec4 operator/(const vec4& v, const float s){
 	return vec4(v.x / s, v.y / s, v.z / s, v.w / s);
 }
 
@@ -109,7 +110,7 @@ vec4& vec4::operator/=(const float s){
 3,7,11,15
 */
 
-vec4 vec4::operator*(mat4& mat, vec4& vec){
+vec4 operator*(mat4& mat, vec4& v){
 	float x = mat[0] * v.x + mat[4] * v.y + mat[8]  * v.z + mat[12] * v.w;
 	float y = mat[1] * v.x + mat[5] * v.y + mat[9]  * v.z + mat[13] * v.w;
 	float z = mat[2] * v.x + mat[6] * v.y + mat[10] * v.z + mat[14] * v.w;

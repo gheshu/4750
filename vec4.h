@@ -4,6 +4,7 @@
 namespace hlm{
 // column major
 class mat4;
+class vec3;
 
 class vec4{
 public:
@@ -14,6 +15,17 @@ float x, y, z, w;
 	vec4(const vec4& other);
 	vec4(const vec3& other);
 	
+	vec4& operator =(const vec4& other);
+	vec4& operator+=(const vec4& other);
+	vec4& operator-=(const vec4& other);
+	
+	vec4& operator+=(const float s);
+	vec4& operator-=(const float s);
+	vec4& operator*=(const float s);
+	vec4& operator/=(const float s);
+	
+}; // vec4
+
 	vec4 operator+(const vec4& lhs, const vec4& rhs);
 	vec4 operator-(const vec4& lhs, const vec4& rhs);
 	vec4 operator*(const vec4& lhs, const vec4& rhs);
@@ -27,19 +39,8 @@ float x, y, z, w;
 	vec4 operator-(const vec4& v, const float s);
 	vec4 operator*(const vec4& v, const float s);
 	vec4 operator/(const vec4& v, const float s);
-	
-	vec4& operator =(const vec4& other);
-	vec4& operator+=(const vec4& other);
-	vec4& operator-=(const vec4& other);
-	
-	vec4& operator+=(const float s);
-	vec4& operator-=(const float s);
-	vec4& operator*=(const float s);
-	vec4& operator/=(const float s);
-	
+
 	vec4 operator*(mat4& mat, vec4& vec);
-	
-}; // vec4
 }; // hlm
 
 #endif // define VEC4_H

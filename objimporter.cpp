@@ -5,7 +5,7 @@
 using namespace std;
 using namespace hlm;
 
-void objload(std::string& filename, VertexBuffer& verts){
+void objload(const std::string& filename, VertexBuffer& verts){
 	ifstream stream(filename);
 	if(stream.is_open()){
 		string line;

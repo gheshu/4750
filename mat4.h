@@ -6,37 +6,27 @@ namespace hlm{
 
 class mat4{
 private:
-	float data[4][4];
+	float data[16];
 public:
 	mat4();
 	mat4(const float f);
 	mat4(float* array);
 	mat4(const mat4& other);
 	
+	inline float& operator[](const int i){ return data[i]; };
+	inline const float operator[](const int i)const{return data[i];};
 	mat4& operator=(const mat4& other);
 	
-	inline float& operator[][](const int r, const int c){ return data[r][c] };
-	
-	mat4 operator+(const mat4& lhs, const mat4& rhs);
-	mat4& operator+=(const mat4& rhs);
-	mat4 operator-(const mat4& lhs, const mat4& rhs);
-	mat4& operator-=(const mat4& rhs);
-	mat4 operator*(const mat4& lhs, const mat4& rhs);
-	
-	mat4 operator+(const mat4& mat, const float s);
-	mat4& operator+=(const float s);
-	mat4 operator+(const float s, const mat4& mat);
-	mat4 operator-(const mat4& mat, const float s);
-	mat4& operator-=(const float s);
-	mat4 operator-(const float s, const mat4& mat);
-	
-	mat4 operator*(const mat4& mat, const float s);
-	mat4& operator*=(const float s);
-	mat4 operator*(const float s, const mat4& mat);
-	mat4 operator/(const mat4& mat, const float s);
-	mat4& operator/=(const float s);
-	mat4 operator/(const float s, const mat4& mat);
-};
+	mat4 operator+(const mat4& rhs)const;
+	mat4 operator-(const mat4& rhs)const;
+	mat4 operator*(const mat4& rhs)const;
+	mat4 operator+(const float s)const;
+	mat4 operator-(const float s)const;
+	mat4 operator*(const float s)const;
+	mat4 operator/(const float s)const;
+};	// mat4
+
+
 
 }; //hlm
 

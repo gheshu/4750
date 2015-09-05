@@ -8,6 +8,6 @@
 typedef std::vector<hlm::vec4> VertexBuffer;
 typedef std::vector<int> IndexBuffer;
 
-void objload(std::string& filename, VertexBuffer& verts);
+void objload(const std::string& filename, VertexBuffer& verts);
 
 #endif
