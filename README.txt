@@ -1,3 +1,5 @@
+Currently builds with TDM-GCC-64, glew, and glfw3 on Windows.
+
 Build instructions:
 	build <drive letter> <optional target>
 	
@@ -5,7 +7,9 @@ Build instructions:
 			run: runs the program after building with default flags
 			debug: builds with debug flags
 			release: builds with optimization flags (-O3)
-			clean: removes object files and executables from directory
+			
+	clean.bat removes .o and .exe files.
+	commit.sh commits changes and prompts for repository log-in.
 			
 Running:
 	Program will capture mouse. Press escape key to close program.
