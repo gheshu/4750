@@ -13,7 +13,7 @@ public:
 	mat4(float* array);
 	mat4(const mat4& other);
 	
-	inline float& operator[](const int i){ return data[i]; };
+	inline float& operator()(const int i){ return data[i]; };
 	inline const float operator[](const int i)const{return data[i];};
 	mat4& operator=(const mat4& other);
 	

@@ -53,16 +53,16 @@ void print(const vec4& v);
 void print(const mat3& mat);
 void print(const mat4& mat);
 
-void lookAt(const mat4& m, const vec3& eye, const vec3& center, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
+void lookAt(mat4& m, const vec3& eye, const vec3& center, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
 
 inline float radians(const float degrees){ return degrees * PI80; }
 
 void cross(const vec3& lhs, const vec3& rhs, vec3& out);
 
-const float * value_ptr(const vec3& v);
-const float * value_ptr(const vec4& v);
-const float * value_ptr(const mat3& m);
-const float * value_ptr(const mat4& m);
+const float * value_ptr(vec3& v);
+const float * value_ptr(vec4& v);
+const float * value_ptr(mat3& m);
+const float * value_ptr(mat4& m);
 
 void rotate(mat4& in, const float angle, const vec3& v);
 void scale(mat4& in, const vec3& v);

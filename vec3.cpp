@@ -8,6 +8,10 @@ vec3::vec3(){
 	x = 0.0f; y = 0.0f; z = 0.0f;
 }
 
+vec3::vec3(const float s){
+	x = s; y = s; z = s;
+}
+
 vec3::vec3(const float _x, const float _y, const float _z){
 	x = _x; y = _y; z = _z;
 }

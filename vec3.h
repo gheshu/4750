@@ -10,6 +10,7 @@ class vec3{
 public:
 float x, y, z;
 	vec3();
+	vec3(const float s);
 	vec3(const float x, const float y, const float z);
 	vec3(const vec3& other);
 	vec3(vec4& other);

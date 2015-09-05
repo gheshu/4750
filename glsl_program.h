@@ -35,10 +35,10 @@ public:
 	bool getUniform(const std::string& name, hlm::mat4& uniform);
 	bool getSubroutineIndex(const std::string& name, GLuint& uniform);
 
-	bool setUniform(const std::string& name, const hlm::mat4& uniform);
-	bool setUniform(const std::string& name, const hlm::mat3& uniform);
-	bool setUniform(const std::string& name, const hlm::vec4& uniform);
-	bool setUniform(const std::string& name, const hlm::vec3& uniform);
+	bool setUniform(const std::string& name, hlm::mat4& uniform);
+	bool setUniform(const std::string& name, hlm::mat3& uniform);
+	bool setUniform(const std::string& name, hlm::vec4& uniform);
+	bool setUniform(const std::string& name, hlm::vec3& uniform);
 
 	// NB: overloading deliberately avoided here to prevent problems with literals
 	// being converted, e.g. with an integer setUniform func setUniform("bob", 1.f)

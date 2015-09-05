@@ -22,7 +22,7 @@ public:
 	mat3 operator*(const float s) const;
 	mat3 operator/(const float s) const;
 	
-	inline float& operator[](const int i) { return data[i]; };
+	inline float& operator()(const int i) { return data[i]; };
 	inline const float operator[](const int i) const {return data[i];};
 	mat3& operator=(const mat3& other);
 };	// mat3

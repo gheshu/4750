@@ -2,7 +2,7 @@ CXX = g++
 EXE = Renderer.exe
  
 INC_DIRS = -I./include
-CXXFLAGS = $(INC_DIRS) -std=c++11 
+CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors
 LDFLAGS = -L./lib
 LDLIBS = .\glfw3.dll -lglew32 -lopengl32 
  

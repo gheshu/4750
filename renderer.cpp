@@ -69,11 +69,16 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0, GLuint& id1){
 }
 
 void Renderer::glPass(Image& img, GLuint& vao, GLuint& fb_id){
+	PRINTLINEMACRO
 	glBindTexture(GL_TEXTURE_2D, fb_id);
+	PRINTLINEMACRO	// SEGFAULT HERE
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
 		GL_UNSIGNED_INT, img.data);
+		PRINTLINEMACRO
     glBindVertexArray(vao);
+	PRINTLINEMACRO
     glDrawArrays(GL_TRIANGLES, 0, 6);
+	PRINTLINEMACRO
 	MYGLERRORMACRO
 }
 
@@ -126,11 +131,9 @@ void Renderer::draw() {
 	objload("test.obj", verts);
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
-		
 		DDAPass(proj, verts, fbs[i]);
 		bresenhamPass(proj, verts, fbs[i]);
 		glPass(fbs[i], m_vao, fb_ids[i]);
-		
         glfwSwapBuffers(m_glwindow);
 		i = (i + 1) % 2;
 #if 0
