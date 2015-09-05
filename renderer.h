@@ -7,11 +7,7 @@
 #include "window.h"
 #include "input.h"
 #include "hlm.h"
-
-#include <vector>
-
-typedef std::vector<hlm::vec4> VertexBuffer;
-typedef std::vector<int> IndexBuffer;
+#include "vertexbuffer.h"
 
 class Renderer
 {
