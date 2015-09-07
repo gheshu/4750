@@ -9,7 +9,7 @@ using namespace std;
 using namespace hlm;
 
 void Renderer::init(const int width, const int height, const int msaa) {
-	m_width = width; m_height = height;
+	m_width = width; m_height = height; m_fov = 90.0f;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
@@ -71,7 +71,7 @@ void Renderer::glPass(Image& img, GLuint& vao, GLuint fb_id){
 }
 
 void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
-	Pixel p(0, 0, 0, 0);
+	Pixel blue(0, 0, 0xFF, 0xFF);
 	for(unsigned i = 0; i < verts.size(); i += 3){
 		vec4 face[3];
 		face[0] = proj * verts[i];
@@ -86,7 +86,7 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 				int x = (int)round(v1.x);
 				int k = 0;
 				for(int y = (int)round(v1.y); y <= (int)round(v2.y); y++){
-					img.setPixel(x, y, p);
+					img.setPixel(x, y, blue);
 					x = (int)round(v1.x + (float)k * slope);
 					k++;
 				}
@@ -95,7 +95,7 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 				int y = (int)round(v1.y);
 				int k = 0;
 				for(int x = (int)round(v1.x); x <= (int)round(v2.x); x++){
-					img.setPixel(x, y, p);
+					img.setPixel(x, y, blue);
 					y = (int)round(v1.y + (float)k * slope);
 					k++;
 				}
@@ -111,9 +111,10 @@ void Renderer::bresenhamPass(mat4& proj, VertexBuffer& verts, Image& img){
 void Renderer::draw() {
 	float avg_rate = 0.0f;
 	unsigned frame_counter = 0;
-	mat4 proj;
+	mat4 proj = Wmatrix((float)m_width, (float)m_height) 
+		* Amatrix((float)m_width / (float)m_height, m_fov);
 	VertexBuffer verts;
-	objload("test.obj", verts);
+	objload("sphere.obj", verts);
 	Pixel w(0xFF, 0xFF, 0xFF, 0xFF);
 	Pixel b(0, 0, 0, 0xFF);
 	m_prog.bind();
@@ -122,11 +123,6 @@ void Renderer::draw() {
 		fb.clear(b);
 		DDAPass(proj, verts, fb);
 		bresenhamPass(proj, verts, fb);
-		for(int y = 0; y < 100; y++){
-			for(int x = 0; x < 100; x++){
-				fb.setPixel(x, y, w);
-			}
-		}
 		glPass(fb, m_vao, fb_id);
         glfwSwapBuffers(m_glwindow);
     }

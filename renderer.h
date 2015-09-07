@@ -20,6 +20,7 @@ private:
 
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
+	float m_fov;
 	
 	void bresenhamPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
 	void DDAPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
