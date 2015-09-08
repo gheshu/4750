@@ -15,6 +15,7 @@ struct Image{
 	void init(const int width, const int height);
 	void destroy();
 	void setPixel(const int x, const int y, const Pixel& p);
+	void orPixel(const int x, const int y, const Pixel& p);
 	void clear(const Pixel& p);
 };
 

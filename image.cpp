@@ -17,6 +17,14 @@ void Image::setPixel(const int x, const int y, const Pixel& p){
 	*(data + x + y * width) = p;
 }
 
+void Image::orPixel(const int x, const int y, const Pixel& p){
+	if(x >= width || x < 0 || y >= height || y < 0){ return; }
+	(data + x + y * width)->r |= p.r;
+	(data + x + y * width)->g |= p.g;
+	(data + x + y * width)->b |= p.b;
+	(data + x + y * width)->a |= p.a;
+}
+
 void Image::clear(const Pixel& p){
 	for(int i = 0; i < width * height; i++){
 		*(data + i) = p;

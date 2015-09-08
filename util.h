@@ -53,7 +53,7 @@ void print(const mat4& mat);
 mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
 
 mat4 Wmatrix(const float width, const float height);
-mat4 Amatrix(const float whratio, const float fov);
+mat4 Amatrix(const float hwratio, const float fov);
 
 inline float radians(const float degrees){ return degrees * PI80; }
 

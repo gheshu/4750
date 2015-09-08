@@ -225,11 +225,11 @@ mat4 Wmatrix(const float width, const float height){
 	return m;
 }
 
-mat4 Amatrix(const float whratio, const float fov){
+mat4 Amatrix(const float hwratio, const float fov){
 	mat4 m;
 	float d = 1.0f;
-	float h = 2.0f * d * std::tan(radians(fov / 2.0f));
-	float w = whratio * h;
+	float w = 2.0f * d * std::tan(radians(fov / 2.0f));
+	float h = hwratio * w;
 	m(0) = 2.0f / w;
 	m(5) = 2.0f / h;
 	return m;	
