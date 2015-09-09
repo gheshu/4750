@@ -14,13 +14,13 @@ public:
 	mat3();
 	mat3(mat4& m);
 	
-	mat3 operator+(const float s) const;
-	mat3 operator+(const mat3& mat) const;
-	mat3 operator-(const mat3& rhs) const;
-	mat3 operator-(const float s) const;
-	mat3 operator*(const mat3& mat) const;
-	mat3 operator*(const float s) const;
-	mat3 operator/(const float s) const;
+	const mat3 operator+(const float s) const;
+	const mat3 operator+(const mat3& mat) const;
+	const mat3 operator-(const mat3& rhs) const;
+	const mat3 operator-(const float s) const;
+	const mat3 operator*(const mat3& mat) const;
+	const mat3 operator*(const float s) const;
+	const mat3 operator/(const float s) const;
 	
 	inline float& operator()(const int i) { return data[i]; };
 	inline const float operator[](const int i) const {return data[i];};

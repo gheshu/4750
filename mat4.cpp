@@ -27,7 +27,7 @@ mat4& mat4::operator=(const mat4& other){
 	return *this;
 }
 
-mat4 mat4::operator+(const mat4& rhs)const{
+const mat4 mat4::operator+(const mat4& rhs)const{
 	mat4 m;
 	m(0)  = data[0]  + rhs[0];  m(1)  = data[1]  + rhs[1];  
 	m(2)  = data[2]  + rhs[2];  m(3)  = data[3]  + rhs[3];
@@ -40,7 +40,7 @@ mat4 mat4::operator+(const mat4& rhs)const{
 	return m;
 }
 
-mat4 mat4::operator-(const mat4& rhs)const{
+const mat4 mat4::operator-(const mat4& rhs)const{
 	mat4 m;
 	m(0)  = data[0]  - rhs[0];  m(1)  = data[1]  - rhs[1];  
 	m(2)  = data[2]  - rhs[2];  m(3)  = data[3]  - rhs[3];
@@ -60,7 +60,7 @@ mat4 mat4::operator-(const mat4& rhs)const{
 3,7,11,15
 */
 
-mat4 mat4::operator*(const mat4& rhs)const{
+const mat4 mat4::operator*(const mat4& rhs)const{
 	// lhs horizontal
 	// rhs vertical
 	mat4 m;
@@ -86,7 +86,7 @@ mat4 mat4::operator*(const mat4& rhs)const{
 	return m;
 }
 
-mat4 mat4::operator+(const float s)const{
+const mat4 mat4::operator+(const float s)const{
 	mat4 m;
 	m(0)  = data[0]  + s; m(1)  = data[1]  + s;  
 	m(2)  = data[2]  + s; m(3)  = data[3]  + s;
@@ -99,7 +99,7 @@ mat4 mat4::operator+(const float s)const{
 	return m;
 }
 
-mat4 mat4::operator-(const float s)const{
+const mat4 mat4::operator-(const float s)const{
 	mat4 m;
 	m(0)  = data[0]  - s; m(1)  = data[1]  - s;  
 	m(2)  = data[2]  - s; m(3)  = data[3]  - s;
@@ -112,7 +112,7 @@ mat4 mat4::operator-(const float s)const{
 	return m;	
 }
 
-mat4 mat4::operator*(const float s)const{
+const mat4 mat4::operator*(const float s)const{
 	mat4 m;
 	m(0)  = data[0]  * s; m(1)  = data[1]  * s;  
 	m(2)  = data[2]  * s; m(3)  = data[3]  * s;
@@ -125,7 +125,7 @@ mat4 mat4::operator*(const float s)const{
 	return m;	
 }
 
-mat4 mat4::operator/(const float s)const{
+const mat4 mat4::operator/(const float s)const{
 	mat4 m;
 	m(0)  = data[0]  / s; m(1)  = data[1]  / s;  
 	m(2)  = data[2]  / s; m(3)  = data[3]  / s;

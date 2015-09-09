@@ -26,21 +26,21 @@ float x, y, z, w;
 	
 }; // vec4
 
-	vec4 operator+(const vec4& lhs, const vec4& rhs);
-	vec4 operator-(const vec4& lhs, const vec4& rhs);
-	vec4 operator*(const vec4& lhs, const vec4& rhs);
+	const vec4 operator+(const vec4& lhs, const vec4& rhs);
+	const vec4 operator-(const vec4& lhs, const vec4& rhs);
+	const vec4 operator*(const vec4& lhs, const vec4& rhs);
 	
-	vec4 operator+(const float s, const vec4& v);
-	vec4 operator-(const float s, const vec4& v);
-	vec4 operator*(const float s, const vec4& v);
-	vec4 operator/(const float s, const vec4& v);
+	const vec4 operator+(const float s, const vec4& v);
+	const vec4 operator-(const float s, const vec4& v);
+	const vec4 operator*(const float s, const vec4& v);
+	const vec4 operator/(const float s, const vec4& v);
 	
-	vec4 operator+(const vec4& v, const float s);
-	vec4 operator-(const vec4& v, const float s);
-	vec4 operator*(const vec4& v, const float s);
-	vec4 operator/(const vec4& v, const float s);
+	const vec4 operator+(const vec4& v, const float s);
+	const vec4 operator-(const vec4& v, const float s);
+	const vec4 operator*(const vec4& v, const float s);
+	const vec4 operator/(const vec4& v, const float s);
 
-	vec4 operator*(mat4& mat, vec4& vec);
+	const vec4 operator*(const mat4& mat, const vec4& vec);
 }; // hlm
 
 #endif // define VEC4_H

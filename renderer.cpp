@@ -60,7 +60,7 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
 	MYGLERRORMACRO
 }
 
-void Renderer::glPass(Image& img, GLuint& vao, GLuint fb_id){
+void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
 	glBindTexture(GL_TEXTURE_2D, fb_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, img.data);
@@ -70,16 +70,16 @@ void Renderer::glPass(Image& img, GLuint& vao, GLuint fb_id){
 	MYGLERRORMACRO
 }
 
-void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
-	Pixel blue(0, 0, 0xFF, 0xFF);
+void Renderer::DDAPass(const mat4& proj, const VertexBuffer& verts, Image& img){
+	const Pixel blue(0, 0, 0xFF, 0xFF);
 	for(unsigned i = 0; i < verts.size(); i += 3){
 		vec4 face[3];
 		face[0] = proj * verts[i];
 		face[1] = proj * verts[i + 1];
 		face[2] = proj * verts[i + 2];
 		for(int t = 0; t < 3; t++){
-			vec4& v1 = face[t%3];
-			vec4& v2 = face[(t + 1)%3];
+			const vec4& v1 = face[t%3];
+			const vec4& v2 = face[(t + 1)%3];
 			
 			const bool steep = abs(v2.y - v1.y) > abs(v2.x - v1.x);
 			float x0, x1, y0, y1;
@@ -124,21 +124,20 @@ void Renderer::DDAPass(mat4& proj, VertexBuffer& verts, Image& img){
 					k++;
 				}
 			}
-			
 		}
 	}
 }
 
-void Renderer::bresenhamPass(mat4& proj, VertexBuffer& verts, Image& img){
-	Pixel red(0xFF, 0, 0, 0xFF);
+void Renderer::bresenhamPass(const mat4& proj, const VertexBuffer& verts, Image& img){
+	const Pixel red(0xFF, 0, 0, 0xFF);
 	for(unsigned i = 0; i < verts.size(); i += 3){
 		vec4 face[3];
 		face[0] = proj * verts[i];
 		face[1] = proj * verts[i + 1];
 		face[2] = proj * verts[i + 2];
 		for(int t = 0; t < 3; t++){
-			vec4& v1 = face[t%3];
-			vec4& v2 = face[(t + 1)%3];
+			const vec4& v1 = face[t%3];
+			const vec4& v2 = face[(t + 1)%3];
 			const bool steep = abs(v2.y - v1.y) > abs(v2.x - v1.x);
 			float x0, x1, y0, y1;
 			if(steep){
@@ -188,18 +187,15 @@ void Renderer::bresenhamPass(mat4& proj, VertexBuffer& verts, Image& img){
 }
 
 void Renderer::draw() {
-	float avg_rate = 0.0f;
-	unsigned frame_counter = 0;
-	mat4 proj = Wmatrix((float)m_width, (float)m_height) 
+	const mat4 proj = Wmatrix((float)m_width, (float)m_height) 
 		* Amatrix((float)m_height / (float)m_width, m_fov);
 	VertexBuffer verts;
 	objload("sphere.obj", verts);
-	Pixel w(0xFF, 0xFF, 0xFF, 0xFF);
-	Pixel b(0, 0, 0, 0xFF);
+	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
-		fb.clear(b);
+		fb.clear(black);
 		DDAPass(proj, verts, fb);
 		bresenhamPass(proj, verts, fb);
 		glPass(fb, m_vao, fb_id);

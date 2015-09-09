@@ -25,18 +25,18 @@ float x, y, z;
 	
 }; // vec3
 
-	vec3 operator+(const vec3& lhs, const vec3& rhs);
-	vec3 operator+(const vec3& v, const float f);
-	vec3 operator+(const float f, const vec3& v);
-	vec3 operator-(const vec3& lhs, const vec3& rhs);
-	vec3 operator-(const vec3& v, const float f);
-	vec3 operator-(const float f, const vec3& v);
-	vec3 operator*(const vec3& lhs, const vec3& rhs);
-	vec3 operator*(const vec3& v, const float f);
-	vec3 operator*(const float f, const vec3& v);
-	vec3 operator/(const vec3& v, const float f);
-	vec3 operator/(const float f, const vec3& v);
-	vec3 operator*(mat3& mat, const vec3& v);
+	const vec3 operator+(const vec3& lhs, const vec3& rhs);
+	const vec3 operator+(const vec3& v, const float f);
+	const vec3 operator+(const float f, const vec3& v);
+	const vec3 operator-(const vec3& lhs, const vec3& rhs);
+	const vec3 operator-(const vec3& v, const float f);
+	const vec3 operator-(const float f, const vec3& v);
+	const vec3 operator*(const vec3& lhs, const vec3& rhs);
+	const vec3 operator*(const vec3& v, const float f);
+	const vec3 operator*(const float f, const vec3& v);
+	const vec3 operator/(const vec3& v, const float f);
+	const vec3 operator/(const float f, const vec3& v);
+	const vec3 operator*(const mat3& mat, const vec3& v);
 
 }; // hlm
 #endif // define VEC3_H

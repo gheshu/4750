@@ -5,7 +5,7 @@ typedef unsigned char uint_8;
 
 struct Pixel{
 	uint_8 r, g, b, a;
-	Pixel(uint_8 _r, uint_8 _g, uint_8 _b, uint_8 _a) 
+	Pixel(const uint_8 _r, const uint_8 _g, const uint_8 _b, const uint_8 _a) 
 		: r(_r), g(_g), b(_b), a(_a){};
 };
 

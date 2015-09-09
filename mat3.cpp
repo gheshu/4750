@@ -38,7 +38,7 @@ mat3& mat3::operator=(const mat3& other){
 2, 5, 8
 */
 
-mat3 mat3::operator*(const mat3& rhs) const{
+const mat3 mat3::operator*(const mat3& rhs) const{
 	mat3 m;
 	// data horizontal
 	// rhs vertical
@@ -56,7 +56,7 @@ mat3 mat3::operator*(const mat3& rhs) const{
 	return m;
 }
 
-mat3 mat3::operator+(const float s)const{
+const mat3 mat3::operator+(const float s)const{
 	mat3 m;
 	m(0) = s + data[0]; m(1) = s + data[1]; m(2) = s + data[2];
 	m(3) = s + data[3]; m(4) = s + data[4]; m(5) = s + data[5];
@@ -64,7 +64,7 @@ mat3 mat3::operator+(const float s)const{
 	return m;
 }
 
-mat3 mat3::operator+(const mat3& rhs)const{
+const mat3 mat3::operator+(const mat3& rhs)const{
 	mat3 m;
 	m(0) = data[0] + rhs[0]; m(1) = data[1] + rhs[1]; m(2) = data[2] + rhs[2];
 	m(3) = data[3] + rhs[3]; m(4) = data[4] + rhs[4]; m(5) = data[5] + rhs[5];
@@ -72,7 +72,7 @@ mat3 mat3::operator+(const mat3& rhs)const{
 	return m;
 }
 
-mat3 mat3::operator-(const mat3& rhs)const{
+const mat3 mat3::operator-(const mat3& rhs)const{
 	mat3 m;
 	m(0) = data[0] - rhs[0]; m(1) = data[1] - rhs[1]; m(2) = data[2] - rhs[2];
 	m(3) = data[3] - rhs[3]; m(4) = data[4] - rhs[4]; m(5) = data[5] - rhs[5];
@@ -80,7 +80,7 @@ mat3 mat3::operator-(const mat3& rhs)const{
 	return m;
 }
 
-mat3 mat3::operator-(const float s)const{
+const mat3 mat3::operator-(const float s)const{
 	mat3 m;
 	m(0) = data[0] - s; m(1) = data[1] - s; m(2) = data[2] - s;
 	m(3) = data[3] - s; m(4) = data[4] - s; m(5) = data[5] - s;
@@ -88,7 +88,7 @@ mat3 mat3::operator-(const float s)const{
 	return m;
 }
 
-mat3 mat3::operator*(const float s)const{
+const mat3 mat3::operator*(const float s)const{
 	mat3 m;
 	m(0) = s * data[0]; m(1) = s * data[1]; m(2) = s * data[2];
 	m(3) = s * data[3]; m(4) = s * data[4]; m(5) = s * data[5];
@@ -96,7 +96,7 @@ mat3 mat3::operator*(const float s)const{
 	return m;
 }
 
-mat3 mat3::operator/(const float s)const{
+const mat3 mat3::operator/(const float s)const{
 	mat3 m;
 	m(0) = data[0] / s; m(1) = data[1] / s; m(2) = data[2] / s;
 	m(3) = data[3] / s; m(4) = data[4] / s; m(5) = data[5] / s;

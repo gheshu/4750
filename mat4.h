@@ -17,13 +17,13 @@ public:
 	inline const float operator[](const int i)const{return data[i];};
 	mat4& operator=(const mat4& other);
 	
-	mat4 operator+(const mat4& rhs)const;
-	mat4 operator-(const mat4& rhs)const;
-	mat4 operator*(const mat4& rhs)const;
-	mat4 operator+(const float s)const;
-	mat4 operator-(const float s)const;
-	mat4 operator*(const float s)const;
-	mat4 operator/(const float s)const;
+	const mat4 operator+(const mat4& rhs)const;
+	const mat4 operator-(const mat4& rhs)const;
+	const mat4 operator*(const mat4& rhs)const;
+	const mat4 operator+(const float s)const;
+	const mat4 operator-(const float s)const;
+	const mat4 operator*(const float s)const;
+	const mat4 operator/(const float s)const;
 };	// mat4
 
 

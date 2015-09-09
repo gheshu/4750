@@ -22,9 +22,9 @@ private:
 	GLuint fb_id;
 	float m_fov;
 	
-	void bresenhamPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
-	void DDAPass(hlm::mat4& proj, VertexBuffer& verts, Image& img);
-	void glPass(Image& img, GLuint& vao, GLuint fb_id);
+	void bresenhamPass(const hlm::mat4& proj, const VertexBuffer& verts, Image& img);
+	void DDAPass(const hlm::mat4& proj, const VertexBuffer& verts, Image& img);
+	void glPass(const Image& img, const GLuint vao, const GLuint fb_id);
 	void screenQuadInit(GLuint& vao, GLuint& id0);
 public:
     void init(const int width, const int height, const int msaa);
