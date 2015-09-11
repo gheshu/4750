@@ -1,5 +1,6 @@
 #include "image.h"
 #include <string>
+#include <algorithm>
 
 void Image::init(const int _width, const int _height){
 	if(data != nullptr){return;}
