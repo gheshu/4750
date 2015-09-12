@@ -13,13 +13,13 @@ void Image::destroy(){
 	data = nullptr;
 }
 
-void Image::setPixel(const int x, const int y, const Pixel& p){
+void Image::setPixel(int x, int y, const Pixel& p){
 	x = std::min(width - 1, std::max(0, x));
 	y = std::min(height - 1, std::max(0, y));
 	*(data + x + y * width) = p;
 }
 
-void Image::orPixel(const int x, const int y, const Pixel& p){
+void Image::orPixel(int x, int y, const Pixel& p){
 	x = std::min(width - 1, std::max(0, x));
 	y = std::min(height - 1, std::max(0, y));
 	Pixel* i = (data + x + y * width);

@@ -14,8 +14,8 @@ struct Image{
 	Pixel* data = nullptr;
 	void init(const int width, const int height);
 	void destroy();
-	void setPixel(const int x, const int y, const Pixel& p);
-	void orPixel(const int x, const int y, const Pixel& p);
+	void setPixel(int x, int y, const Pixel& p);
+	void orPixel(int x, int y, const Pixel& p);
 	void clear(const Pixel& p);
 };
 
