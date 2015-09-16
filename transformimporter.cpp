@@ -16,7 +16,7 @@ void transformLoad(const std::string& filename, hlm::mat4& mat){
 		cout << "Cannot open file " << filename << endl;
 		return;
 	}
-	
+	mat4 t, r, s;
 	string line;
 	getline(stream, line);
 	if(line.substr(0, 3) == "sca"){
@@ -27,7 +27,7 @@ void transformLoad(const std::string& filename, hlm::mat4& mat){
 		v.y = atof(line.c_str());
 		getline(stream, line);
 		v.z = atof(line.c_str());
-		mat = mat * scale(v);
+		s = scale(v);
 		getline(stream, line);
 	}
 	else {
@@ -42,7 +42,7 @@ void transformLoad(const std::string& filename, hlm::mat4& mat){
 		getline(stream, line);
 		v.z = atof(line.c_str());
 		float angle = max(v.x, max(v.y, v.z));
-		mat = mat * rotate(angle, v);
+		r = rotate(angle, v);
 		getline(stream, line);
 	}
 	else {
@@ -56,11 +56,14 @@ void transformLoad(const std::string& filename, hlm::mat4& mat){
 		v.y = atof(line.c_str());
 		getline(stream, line);
 		v.z = atof(line.c_str());
-		mat = mat * translate(v);
+		t = translate(v);
 		getline(stream, line);
 	}
 	else {
 		cout << "No translation in " << filename << endl;
 	}
+	
+	mat = t * r * s;
+	
 	stream.close();
 }

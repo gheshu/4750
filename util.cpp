@@ -219,7 +219,7 @@ mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
 mat4 Wmatrix(const float width, const float height){
 	mat4 m;
 	m(0) = width / 2.0f;
-	m(5) = -height / 2.0f;
+	m(5) = height / 2.0f;	// positive here because of openGL texture coordinates
 	m(12) = (width - 1) / 2.0f;
 	m(13) = (height - 1) / 2.0f;
 	return m;
