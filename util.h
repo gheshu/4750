@@ -57,6 +57,9 @@ mat4 Amatrix(const float hwratio, const float fov);
 
 inline float radians(const float degrees){ return degrees * PI80; }
 
+vec3 radians(const vec3& v);
+vec4 radians(const vec4& v);
+
 vec3 cross(const vec3& lhs, const vec3& rhs);
 
 const float * value_ptr(vec3& v);

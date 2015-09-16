@@ -242,6 +242,13 @@ mat4 Amatrix(const float hwratio, const float fov){
 3,7,11,15
 */
 
+vec3 radians(const vec3& v){
+	return vec3(radians(v.x), radians(v.y), radians(v.z));
+}
+vec4 radians(const vec4& v){
+	return vec4(radians(v.x), radians(v.y), radians(v.z), radians(v.w));
+}
+
 vec3 cross(const vec3& lhs, const vec3& rhs){
 	vec3 v;
 	v.x = lhs.y * rhs.z - lhs.z * rhs.y;
@@ -250,16 +257,42 @@ vec3 cross(const vec3& lhs, const vec3& rhs){
 	return v;
 }
 
-mat4 rotate(const float angle, const vec3& v){
+// normalized matrix for rotations around the origin
+mat4 rotate(const float angle, const vec3& _v){
 	mat4 m;
+	vec3 v = normalize(_v);
+	float c = cos(radians(angle));
+	float s = sin(radians(angle));
+	float u2 = v.x*v.x;
+	float v2 = v.y*v.y;
+	float w2 = v.z*v.z;
+	
+	m(0)  = u2 + (1.0f - u2) * c;
+    m(4)  = v.x * v.y * (1.0f - c) - v.z * s;
+    m(8)  = v.x * v.z * (1.0f - c) + v.y * s;
+ 
+    m(1)  = v.x * v.y * (1.0f - c) + v.z * s;
+    m(5)  = v2 + (1.0f - v2) * c;
+    m(9)  = v.y * v.z * (1.0f - c) - v.x * s;
+ 
+    m(2)  = v.x * v.z * (1.0f - c) - v.y * s;
+    m(6)  = v.y * v.z * (1.0f - c) + v.x * s;
+    m(10) = w2 + (1.0f - w2) * c;
+	
 	return m;
 }
 mat4 scale(const vec3& v){
 	mat4 m;
+	m(0) = v.x;
+	m(5) = v.y;
+	m(10) = v.z;
 	return m;
 }
 mat4 translate(const vec3& v){
 	mat4 m;
+	m(12) = v.x;
+	m(13) = v.y;
+	m(14) = v.z;
 	return m;
 }
 

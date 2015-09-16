@@ -9,7 +9,7 @@ LDLIBS = .\glfw3.dll -lglew32 -lopengl32
 LINK = $(CXX) -o
 COMPILE = $(CXX) -c
  
-FILES = main.o renderer.o glsl_program.o image.o window.o input.o objimporter.o vec3.o vec4.o mat3.o mat4.o util.o
+FILES = main.o renderer.o glsl_program.o image.o window.o input.o objimporter.o vec3.o vec4.o mat3.o mat4.o util.o transformimporter.o
  
 .PHONY: clean all run debug release
  
