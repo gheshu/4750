@@ -14,7 +14,7 @@ Input::Input(GLFWwindow* window)
 {
     m_glwindow = window;
 
-    glfwSetInputMode(m_glwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(m_glwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(m_glwindow, key_callback);
     glfwSetCursorPosCallback(m_glwindow, cursor_position_callback);
     glfwSetMouseButtonCallback(m_glwindow, mouse_button_callback);
