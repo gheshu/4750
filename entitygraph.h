@@ -16,8 +16,8 @@ struct Transform{
 struct Entity{
 	hlm::mat4 transform;
 	std::set<int> children;
-	int id, mesh_id, parent_id;
-	Entity(int _id, int _mesh_id, int _parent_id, const Transform& trans);
+	int id, parent_id;
+	Entity(int _id, int _parent_id, const Transform& trans);
 	Entity(int _id) : id(_id){};
 };
 

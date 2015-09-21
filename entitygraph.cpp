@@ -1,9 +1,8 @@
 #include "entitygraph.h"
 #include <vector>
 
-Entity::Entity(int _id, int _mesh_id, int _parent_id, const Transform& trans){
+Entity::Entity(int _id, int _parent_id, const Transform& trans){
 	id = _id;
-	mesh_id = _mesh_id;
 	parent_id = _parent_id;
 	hlm::mat4 t, r, s;
 	t = hlm::translate(trans.translation);
