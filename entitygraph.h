@@ -28,7 +28,7 @@ private:
 public:
 	void init(int size);
 	void destroy();
-	int insert(const Entity& ent, int parent_id);
+	int insert(const Entity& ent);
 	void remove(int _id);
 	void getWorldTransform(int _id, hlm::mat4& out_mat);
 };
