@@ -1,5 +1,6 @@
 #include "entitygraph.h"
 #include <algorithm>
+#include "util.h"
 
 Entity::Entity(const int _id, const int _parent_id, const int _mesh_id, const Transform& trans){
 	id = _id;
@@ -26,7 +27,7 @@ int EntityGraph::insert(const Entity& ent){
 	if(entities.find(id) != entities.end()){
 		return -1;	//entity already exists
 	}
-	if(parent == 0){
+	if(parent_id == 0){
 		// entity claims to be child of root
 		entities.insert({id, ent});
 		root_children.insert(id);
@@ -60,7 +61,7 @@ void EntityGraph::remove(const int id){
 				// and add new parent to each child's parent set
 				auto child_iterator = entities.find(child_id);
 				if(child_iterator != entities.end()){
-					auto child = child_iterator.second;
+					auto child = child_iterator->second;
 					child.parents.erase(id);
 					child.parents.insert(0);
 				}
@@ -76,7 +77,7 @@ void EntityGraph::remove(const int id){
 					// and add new parent to each child's parent set
 					auto child_iterator = entities.find(child_id);
 					if(child_iterator != entities.end()){
-						auto child = child_iterator.second;
+						auto child = child_iterator->second;
 						child.parents.erase(id);
 						child.parents.insert(parent_id);
 					}
@@ -119,7 +120,7 @@ void EntityGraph::addParent(const int _id, const int _parent_id){
 void EntityGraph::update(){
 	{
 		mesh_transforms.clear();
-		const int reserve_size = std::max(8, entities.size() / 4);
+		const int reserve_size = std::max(8, (int)(entities.size() / 4));
 		mesh_transforms.reserve(reserve_size);
 	}
 	for(auto i : root_children){
@@ -130,7 +131,7 @@ void EntityGraph::update(){
 	}
 }
 void EntityGraph::update(const Entity& ent, const hlm::mat4& inmat){
-	mat4 outmat = inmat * ent.transform;
+	hlm::mat4 outmat = inmat * ent.transform;
 	if(ent.mesh_id != -1){
 		// -1 is sentinel flag for being a transform only node
 		mesh_transforms.push_back(MeshTransform(ent.mesh_id, outmat));

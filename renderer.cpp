@@ -5,6 +5,7 @@
 #include "debugmacro.h"
 #include "objimporter.h"
 #include "transformimporter.h"
+#include "entitygraph.h"
 
 using namespace std;
 using namespace hlm;
@@ -130,25 +131,80 @@ void Renderer::DDAPass(const mat4& proj, const VertexBuffer& verts, Image& img){
 }
 
 void Renderer::draw() {
+
+		
+	//-----scenegraph code----------------------------
+	PRINTLINEMACRO
+	EntityGraph graph;
+	graph.init(16);
+	PRINTLINEMACRO
+	VertexBuffer verts[2];
+	objload("cylinder.obj", verts[0]);
+	objload("cube.obj", verts[1]);
+	PRINTLINEMACRO
+	std::vector<MeshTransform>* instance_xforms = nullptr;
+	std::vector<int> entity_ids;
+	PRINTLINEMACRO
+	// robot arm 1: id=1
+	graph.insert(Entity(1, 0, -1, 
+		Transform(vec3(0, 0, -3), 
+			0.0f, vec3(), 
+			vec3(0.2f, 0.2f, 0.2f))));
+	// robot arm 2: id=2
+	graph.insert(Entity(2, 0, -1, 
+		Transform(vec3(-3.0f, 0.5f, 0.0f), 
+			45.0f, vec3(1.0f, 0.0f, 0.0f), 
+			vec3(0.04f, 0.04f, 0.04f))));
+	// base transform: id=3
+	graph.insert(Entity(3, 1, 0,
+		Transform(vec3(0.0f, -2.0f, 0.0f),
+			30.0f, vec3(0.0f, 1.0f, 0.0f),
+			vec3())));
+	graph.addParent(3, 2);
+	PRINTLINEMACRO
+	// update scenegraph output
+	graph.update();
+	graph.getTransforms(instance_xforms);
+	PRINTLINEMACRO
+	//----end scenegraph code----------------------------
+	
 	const mat4 proj = Wmatrix((float)m_width, (float)m_height) 
 		* Amatrix((float)m_height / (float)m_width, m_fov);
-	mat4 a, b;
-	transformLoad("trs1.txt", a);
-	transformLoad("trs2.txt", b);
-	a = proj * a;
-	b = proj * b;
-	VertexBuffer verts;
-	objload("sphere.obj", verts);
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
+	
+	//------------draw loop-----------------------------
+	unsigned frame_i = 0;
+	glfwSetTime(0.0);
     while (!glfwWindowShouldClose(m_glwindow)) {
-		glfwSetTime(0.0);
 		m_input->poll();
 		fb.clear(black);
-		DDAPass(a, verts, fb);
-		DDAPass(b, verts, fb);
+		
+		PRINTLINEMACRO
+		if(instance_xforms){
+			// draw each mesh instance
+			for(int i = 0; i < instance_xforms->size(); i++){
+				PRINTLINEMACRO
+				MeshTransform& mt = instance_xforms->at(i);
+				PRINTLINEMACRO
+				mat4 MP = proj * mt.mat;
+				PRINTLINEMACRO
+				DDAPass(MP, verts[mt.mesh_id], fb);
+				PRINTLINEMACRO
+			}
+		}
+		
+		// send framebuffer to opengl
 		glPass(fb, m_vao, fb_id);
         glfwSwapBuffers(m_glwindow);
-		//cout << "fps: " << 1.0f / glfwGetTime() << endl;
+		frame_i++;
+		if(frame_i >= 60){
+			frame_i = 0;
+			cout << "fps: " << (1.0f / (glfwGetTime() / 60.0f)) << endl;
+			glfwSetTime(0.0);
+		}
     }
+	//---------end draw loop--------------------------------
+	instance_xforms = nullptr;
+	graph.destroy();
 }

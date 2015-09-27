@@ -1,7 +1,8 @@
 #ifndef ENTITY_GRAPH_H
 #define ENTITY_GRAPH_H
 
-#include "hlm.h"
+#include "vec3.h"
+#include "mat4.h"
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -40,7 +41,7 @@ public:
 	void remove(const int _id);
 	void addParent(const int _id, const int _parent_id);
 	void update();
-	inline void getTransforms(std::vector<MeshTransform>& out_vec){out_vec = mesh_transforms;};
+	inline void getTransforms(std::vector<MeshTransform>* out_vec){ out_vec = &mesh_transforms; };
 };
 
 #endif
