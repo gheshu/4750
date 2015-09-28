@@ -15,8 +15,8 @@ enum TRANFORM_TYPE{
 };
 
 struct TransOp{
-	TRANFORM_TYPE type;
 	hlm::vec4 data;
+	TRANFORM_TYPE type;
 	TransOp(const TRANFORM_TYPE _type, const hlm::vec4& _data){
 		type = _type;
 		data = _data;
