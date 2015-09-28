@@ -2,11 +2,9 @@
 #include <algorithm>
 #include "util.h"
 
-Entity::Entity(const int _id, const int _parent_id, const int _mesh_id, const Transform& trans){
-	id = _id;
+Entity::Entity(const int _id, const int _parent_id, const int _mesh_id, const Transform& trans) 
+: id(_id), mesh_id(_mesh_id) {
 	parents.insert(_parent_id);
-	mesh_id = _mesh_id;
-	transform = hlm::mat4();
 	
 	for(auto i : trans.data){
 		switch(i.type){
@@ -23,14 +21,6 @@ Entity::Entity(const int _id, const int _parent_id, const int _mesh_id, const Tr
 	}
 }
 
-void EntityGraph::init(const int size){
-	entities.reserve(size);
-}
-void EntityGraph::destroy(){
-	entities.clear();
-	mesh_transforms.clear();
-	root_children.clear();
-}
 int EntityGraph::insert(const int id, const int parent_id, const int mesh_id, const Transform& trans){
 	Entity ent(id, parent_id, mesh_id, trans);
 	if(entities.find(id) != entities.end()){

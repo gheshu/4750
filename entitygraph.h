@@ -17,30 +17,28 @@ enum TRANFORM_TYPE{
 struct TransOp{
 	hlm::vec4 data;
 	TRANFORM_TYPE type;
-	TransOp(const TRANFORM_TYPE _type, const hlm::vec4& _data){
-		type = _type;
-		data = _data;
-	}
+	TransOp(const TRANFORM_TYPE _type, const hlm::vec4& _data) 
+		: type(_type), data(_data){};
 };
 
 struct Transform{
 	std::vector<TransOp> data;
-	void add(const TransOp& t){
+	inline void add(const TransOp& t){
 		data.push_back(t);
 	}
-	void add(const TRANFORM_TYPE type, const hlm::vec4& in){
+	inline void add(const TRANFORM_TYPE type, const hlm::vec4& in){
 		data.push_back(TransOp(type, in));
 	}
-	void add(const TRANFORM_TYPE type, const float x, const float y, const float z, const float w){
+	inline void add(const TRANFORM_TYPE type, const float x, const float y, const float z, const float w){
 		data.push_back(TransOp(type, hlm::vec4(x, y, z, w)));
 	}
-	void add(const TRANFORM_TYPE type, const float x, const float y, const float z){
+	inline void add(const TRANFORM_TYPE type, const float x, const float y, const float z){
 		data.push_back(TransOp(type, hlm::vec4(x, y, z, 0.0f)));
 	}
-	void add(const TRANFORM_TYPE type, const float s){
+	inline void add(const TRANFORM_TYPE type, const float s){
 		data.push_back(TransOp(type, hlm::vec4(s)));
 	}
-	void clear(){
+	inline void clear(){
 		data.clear();
 	}
 };
@@ -66,8 +64,14 @@ private:
 	std::set<int> root_children;
 	void update(const Entity& ent, const hlm::mat4& inmat);
 public:
-	void init(const int size);
-	void destroy();
+	inline void init(const int size){
+		entities.reserve(size);
+	};
+	inline void destroy(){
+		entities.clear();
+		mesh_transforms.clear();
+		root_children.clear();
+	};
 	int insert(const int id, const int parent_id, const int mesh_id, const Transform& trans);
 	void remove(const int _id);
 	int addParent(const int _id, const int _parent_id);
