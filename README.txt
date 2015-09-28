@@ -10,7 +10,3 @@ Build instructions:
 			
 	clean.bat removes .o and .exe files.
 	commit.sh commits changes and prompts for repository log-in.
-			
-Running:
-	Program will capture mouse. Press escape key to close program.
-	Loads test.obj from directory and displays it using DDA and Bresenham line drawing algorithms.
