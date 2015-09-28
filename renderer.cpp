@@ -131,41 +131,77 @@ void Renderer::DDAPass(const mat4& proj, const VertexBuffer& verts, Image& img){
 }
 
 void Renderer::draw() {
-
-		
 	//-----scenegraph code----------------------------
-	PRINTLINEMACRO
+	
 	EntityGraph graph;
 	graph.init(16);
-	PRINTLINEMACRO
+	
 	VertexBuffer verts[2];
 	objload("cylinder.obj", verts[0]);
 	objload("cube.obj", verts[1]);
-	PRINTLINEMACRO
+	
 	std::vector<MeshTransform>* instance_xforms = nullptr;
 	std::vector<int> entity_ids;
-	PRINTLINEMACRO
-	// robot arm 1: id=1
-	graph.insert(Entity(1, 0, -1, 
-		Transform(vec3(0, 0, -3), 
-			0.0f, vec3(), 
-			vec3(0.2f, 0.2f, 0.2f))));
-	// robot arm 2: id=2
-	graph.insert(Entity(2, 0, -1, 
-		Transform(vec3(-3.0f, 0.5f, 0.0f), 
-			45.0f, vec3(1.0f, 0.0f, 0.0f), 
-			vec3(0.04f, 0.04f, 0.04f))));
-	// base transform: id=3
-	graph.insert(Entity(3, 1, 0,
-		Transform(vec3(0.0f, -2.0f, 0.0f),
-			30.0f, vec3(0.0f, 1.0f, 0.0f),
-			vec3())));
+	
+	Transform t;
+	// robot arm 1: id=1; parent=0
+	//translate(0,0,-3); scale(0.2);
+	t.add(T, 0.0f, 0.0f, -3.0f);
+	t.add(S, 0.2f);
+	graph.insert(1, 0, -1, t);
+	// robot arm 2: id=2; parent=0
+	//scale 0.2, translate -3, .5, 0; rotateX 45; scale .2;
+	t.clear();
+	t.add(S, vec4(0.2f));
+	t.add(T, -3.0f, 0.5f, 0.0f);
+	t.add(R, 1.0f, 0.0f, 0.0f, 45.0f);
+	t.add(S, 0.2f);
+	graph.insert(2, 0, -1, t);
+	//base transform w/instance; id=3, parent=1, 2; meshid=0
+	//translate 0 -2 0; rotateY 30;
+	// mesh = cylinder (verts[0]); mesh_id=0
+	t.clear();
+	t.add(T, 0.0f, -2.0f, 0.0f);
+	t.add(R, 0.0f, 1.0f, 0.0f, 30.0f);
+	graph.insert(3, 1, 0, t);
 	graph.addParent(3, 2);
-	PRINTLINEMACRO
+	//lower arm transform w/instance: id=4, parent=3; meshid=1;
+	//translate 0 3 0; translate 0 -2 0; rotateZ -20; translate 0 2 0;
+	t.clear();
+	t.add(T, 0.0f, 3.0f, 0.0f);
+	t.add(T, 0.0f, -2.0f, 0.0f);
+	t.add(R, 0.0f, 0.0f, 1.0f, -20.0f);
+	t.add(T, 0.0f, -2.0f, 0.0f);
+	graph.insert(4, 3, 1, t);
+	//upper arm transform, w/instance: id=5; parent=4; mesh_id=1;
+	//translate 0 3 0, translate 0 -1 0, rotateZ 90, translate 0 1 0;
+	t.clear();
+	t.add(T, 0.0f, 3.0f, 0.0f);
+	t.add(T, 0.0f, -1.0f, 0.0f);
+	t.add(R, 0.0f, 0.0f, 1.0f, 90.0f);
+	t.add(T, 0.0f, 1.0f, 0.0f);
+	graph.insert(5, 4, 1, t);
+	//upper arm: id=6; parent=5; mesh_id=1;
+	//scale .2, 1, .2
+	t.clear();
+	t.add(S, 0.2f, 1.0f, 0.2f);
+	graph.insert(6, 5, 1, t);
+	//lower arm: id=7; parent=4; meshid=1;
+	//scale .2, 2.0f, 0.2f;
+	t.clear();
+	t.add(S, 0.2f, 2.0f, 0.2f);
+	graph.insert(7, 4, 1, t);
+	t.clear();
+	// all done!
+	
 	// update scenegraph output
 	graph.update();
-	graph.getTransforms(instance_xforms);
-	PRINTLINEMACRO
+	graph.getTransforms(&instance_xforms);
+	cout << "Transforms size: " << instance_xforms->size() << endl;
+	cout << "Verts[0] size: " << verts[0].size() << endl;
+	cout << "Verts[1] size: " << verts[1].size() << endl;
+	
+	
 	//----end scenegraph code----------------------------
 	
 	const mat4 proj = Wmatrix((float)m_width, (float)m_height) 
@@ -179,21 +215,14 @@ void Renderer::draw() {
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
 		fb.clear(black);
-		
-		PRINTLINEMACRO
-		if(instance_xforms){
-			// draw each mesh instance
-			for(int i = 0; i < instance_xforms->size(); i++){
-				PRINTLINEMACRO
-				MeshTransform& mt = instance_xforms->at(i);
-				PRINTLINEMACRO
-				mat4 MP = proj * mt.mat;
-				PRINTLINEMACRO
-				DDAPass(MP, verts[mt.mesh_id], fb);
-				PRINTLINEMACRO
-			}
+	
+		// draw each mesh instance
+		for(int i = 0; i < instance_xforms->size(); i++){
+			MeshTransform& mt = instance_xforms->at(i);
+			mat4 MP = proj * mt.mat;
+			DDAPass(MP, verts[mt.mesh_id], fb);
 		}
-		
+
 		// send framebuffer to opengl
 		glPass(fb, m_vao, fb_id);
         glfwSwapBuffers(m_glwindow);

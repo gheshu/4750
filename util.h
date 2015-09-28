@@ -71,6 +71,10 @@ mat4 rotate(const float angle, const vec3& v);
 mat4 scale(const vec3& v);
 mat4 translate(const vec3& v);
 
+mat4 rotate(const vec4& v);
+mat4 scale(const vec4& v);
+mat4 translate(const vec4& v);
+
 };
 
 #endif // HLM_UTIL_H

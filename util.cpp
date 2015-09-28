@@ -174,21 +174,21 @@ vec4 normalize(const vec4& v){
 }
 
 void print(const vec3& v){
-	printf("%f, %f, %f\n", v.x, v.y, v.z);
+	printf("%6.3f, %6.3f, %6.3f\n", v.x, v.y, v.z);
 }
 void print(const vec4& v){
-	printf("%f, %f, %f, %f\n", v.x, v.y, v.z, v.w);
+	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", v.x, v.y, v.z, v.w);
 }
 void print(const mat3& mat){
-	printf("%f, %f, %f\n", mat[0], mat[3], mat[6]);
-	printf("%f, %f, %f\n", mat[1], mat[4], mat[7]);
-	printf("%f, %f, %f\n", mat[2], mat[5], mat[8]);
+	printf("%6.3f, %6.3f, %6.3f\n", mat[0], mat[3], mat[6]);
+	printf("%6.3f, %6.3f, %6.3f\n", mat[1], mat[4], mat[7]);
+	printf("%6.3f, %6.3f, %6.3f\n", mat[2], mat[5], mat[8]);
 }
 void print(const mat4& mat){
-	printf("%f, %f, %f, %f\n", mat[0], mat[4], mat[8] , mat[12]);
-	printf("%f, %f, %f, %f\n", mat[1], mat[5], mat[9] , mat[13]);
-	printf("%f, %f, %f, %f\n", mat[2], mat[6], mat[10], mat[14]);
-	printf("%f, %f, %f, %f\n", mat[3], mat[7], mat[11], mat[15]);
+	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", mat[0], mat[4], mat[8] , mat[12]);
+	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", mat[1], mat[5], mat[9] , mat[13]);
+	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", mat[2], mat[6], mat[10], mat[14]);
+	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", mat[3], mat[7], mat[11], mat[15]);
 }
 
 mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
@@ -257,12 +257,42 @@ vec3 cross(const vec3& lhs, const vec3& rhs){
 	return v;
 }
 
+/*
+0,4,8 ,12
+1,5,9 ,13
+2,6,10,14
+3,7,11,15
+*/
+
 // normalized matrix for rotations around the origin
 mat4 rotate(const float angle, const vec3& _v){
 	mat4 m;
 	vec3 v = normalize(_v);
 	float c = cos(radians(angle));
 	float s = sin(radians(angle));
+	float u2 = v.x*v.x;
+	float v2 = v.y*v.y;
+	float w2 = v.z*v.z;
+	
+	m(0)  = u2 + (1.0f - u2) * c;
+    m(4)  = v.x * v.y * (1.0f - c) - v.z * s;
+    m(8)  = v.x * v.z * (1.0f - c) + v.y * s;
+ 
+    m(1)  = v.x * v.y * (1.0f - c) + v.z * s;
+    m(5)  = v2 + (1.0f - v2) * c;
+    m(9)  = v.y * v.z * (1.0f - c) - v.x * s;
+ 
+    m(2)  = v.x * v.z * (1.0f - c) - v.y * s;
+    m(6)  = v.y * v.z * (1.0f - c) + v.x * s;
+    m(10) = w2 + (1.0f - w2) * c;
+	
+	return m;
+}
+mat4 rotate(const vec4& _v){
+	mat4 m;
+	vec3 v = normalize(vec3(_v.x, _v.y, _v.z));
+	float c = cos(radians(_v.w));
+	float s = sin(radians(_v.w));
 	float u2 = v.x*v.x;
 	float v2 = v.y*v.y;
 	float w2 = v.z*v.z;
@@ -288,7 +318,21 @@ mat4 scale(const vec3& v){
 	m(10) = v.z;
 	return m;
 }
+mat4 scale(const vec4& v){
+	mat4 m;
+	m(0) = v.x;
+	m(5) = v.y;
+	m(10) = v.z;
+	return m;
+}
 mat4 translate(const vec3& v){
+	mat4 m;
+	m(12) = v.x;
+	m(13) = v.y;
+	m(14) = v.z;
+	return m;
+}
+mat4 translate(const vec4& v){
 	mat4 m;
 	m(12) = v.x;
 	m(13) = v.y;
