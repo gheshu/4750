@@ -60,6 +60,7 @@ struct Entity{
 
 class EntityGraph{
 private:
+	//would use map here for better memory, but gcc 4.9.2 is bugged
 	std::unordered_map<int, Entity> entities;
 	std::vector<MeshTransform> mesh_transforms;
 	std::set<int> root_children;

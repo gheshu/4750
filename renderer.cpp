@@ -4,7 +4,6 @@
 #include <algorithm>
 #include "debugmacro.h"
 #include "objimporter.h"
-#include "transformimporter.h"
 #include "entitygraph.h"
 
 using namespace std;
@@ -171,16 +170,16 @@ void Renderer::draw() {
 	t.add(T, 0.0f, 3.0f, 0.0f);
 	t.add(T, 0.0f, -2.0f, 0.0f);
 	t.add(R, 0.0f, 0.0f, 1.0f, -20.0f);
-	t.add(T, 0.0f, -2.0f, 0.0f);
-	graph.insert(4, 3, 1, t);
-	//upper arm transform, w/instance: id=5; parent=4; mesh_id=1;
+	t.add(T, 0.0f, 2.0f, 0.0f);
+	graph.insert(4, 3, -1, t);
+	//upper arm transform: id=5; parent=4; mesh_id=1;
 	//translate 0 3 0, translate 0 -1 0, rotateZ 90, translate 0 1 0;
 	t.clear();
 	t.add(T, 0.0f, 3.0f, 0.0f);
 	t.add(T, 0.0f, -1.0f, 0.0f);
 	t.add(R, 0.0f, 0.0f, 1.0f, 90.0f);
 	t.add(T, 0.0f, 1.0f, 0.0f);
-	graph.insert(5, 4, 1, t);
+	graph.insert(5, 4, -1, t);
 	//upper arm: id=6; parent=5; mesh_id=1;
 	//scale .2, 1, .2
 	t.clear();
@@ -212,9 +211,11 @@ void Renderer::draw() {
 	//------------draw loop-----------------------------
 	unsigned frame_i = 0;
 	glfwSetTime(0.0);
+	bool insert = false;
     while (!glfwWindowShouldClose(m_glwindow)) {
 		m_input->poll();
 		fb.clear(black);
+		
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
@@ -231,6 +232,23 @@ void Renderer::draw() {
 			frame_i = 0;
 			cout << "fps: " << (1.0f / (glfwGetTime() / 60.0f)) << endl;
 			glfwSetTime(0.0);
+			
+			// insert or remove upper arm
+			if(insert){
+				t.clear();
+				t.add(S, 0.2f, 1.0f, 0.2f);
+				graph.insert(6, 5, 1, t);
+				graph.update();
+				graph.getTransforms(&instance_xforms);
+				insert = false;
+			}
+			else{
+				graph.remove(6);
+				graph.update();
+				graph.getTransforms(&instance_xforms);
+				insert = true;
+			}
+			
 		}
     }
 	//---------end draw loop--------------------------------

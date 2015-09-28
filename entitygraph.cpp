@@ -1,9 +1,6 @@
 #include "entitygraph.h"
 #include <algorithm>
-#include <iostream>
 #include "util.h"
-
-#define PRINT_DEBUG
 
 Entity::Entity(const int _id, const int _parent_id, const int _mesh_id, const Transform& trans){
 	id = _id;
@@ -37,12 +34,10 @@ void EntityGraph::destroy(){
 int EntityGraph::insert(const int id, const int parent_id, const int mesh_id, const Transform& trans){
 	Entity ent(id, parent_id, mesh_id, trans);
 	if(entities.find(id) != entities.end()){
-		std::cout << "Entity " << id << " already exists\n";
 		return -1;	//entity already exists
 	}
 	if(parent_id == 0){
 		// entity claims to be child of root
-		std::cout << "Inserted " << id << " as child of " << parent_id << std::endl;
 		entities.insert({id, ent});
 		root_children.insert(id);
 		return id;
@@ -50,14 +45,11 @@ int EntityGraph::insert(const int id, const int parent_id, const int mesh_id, co
 	auto parent_iterator = entities.find(parent_id);
 	if(parent_iterator == entities.end()){
 		// parent doesn't exist
-		std::cout << "Parent " << parent_id << " doesn't exist\n";
 		return -1;
 	}
 	if(parent_iterator->second.parents.find(id) != parent_iterator->second.parents.end()){
-		std::cout << "Cycle would exist between " << id << " and parent " << parent_id << std::endl;
 		return -1;	//cycle
 	}
-	std::cout << "Inserted " << id << " as child of " << parent_id << std::endl;
 	parent_iterator->second.children.insert(id);
 	entities.insert({id, ent});
 	return id;
@@ -65,7 +57,6 @@ int EntityGraph::insert(const int id, const int parent_id, const int mesh_id, co
 void EntityGraph::remove(const int id){
 	auto iterator = entities.find(id);
 	if(iterator == entities.end()){
-		std::cout << "id " << id << " doesn't exist\n";
 		return;// no entity to remove
 	}
 	std::set<int>& i_children = iterator->second.children;
@@ -105,7 +96,6 @@ void EntityGraph::remove(const int id){
 			}
 		}
 	}
-	std::cout << "Erased " << id << " from scenegraph\n";
 	entities.erase(iterator);
 }
 int EntityGraph::addParent(const int _id, const int _parent_id){
@@ -129,17 +119,6 @@ int EntityGraph::addParent(const int _id, const int _parent_id){
 			}
 			p->second.children.insert(_id);
 			i->second.parents.insert(_parent_id);
-			
-		#ifdef PRINT_DEBUG
-			std::cout << "Parents of " << _id << ": \n";
-			for(int f : i->second.parents){
-				std::cout << f << std::endl;
-			}
-			std::cout << "Children of " << _parent_id << ": \n";
-			for(int f : p->second.children){
-				std::cout << f << std::endl;
-			}
-		#endif
 		}
 	}
 	return 1;
@@ -151,11 +130,7 @@ void EntityGraph::update(){
 		const int reserve_size = std::max(8, (int)(entities.size() / 4));
 		mesh_transforms.reserve(reserve_size);
 	}
-#ifdef PRINT_DEBUG
-	std::cout << "scenegraph traversal printout: \n";
-#endif
 	for(int i : root_children){
-		std::cout << i << std::endl;
 		auto a = entities.find(i);
 		if(a != entities.end()){
 			update(a->second, hlm::mat4());
@@ -164,12 +139,6 @@ void EntityGraph::update(){
 }
 void EntityGraph::update(const Entity& ent, const hlm::mat4& inmat){
 	hlm::mat4 outmat = inmat * ent.transform;
-#ifdef PRINT_DEBUG
-	std::cout << "ent id: " << ent.id << std::endl;
-	print(ent.transform);
-	printf("\n");
-	print(outmat);
-#endif
 	
 	if(ent.mesh_id != -1){
 		// -1 is sentinel flag for being a transform only node
