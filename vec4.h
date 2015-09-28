@@ -9,10 +9,10 @@ class vec3;
 class vec4{
 public:
 float x, y, z, w;
-	vec4();
-	vec4(float x, float y, float z, float w);
-	vec4(float s);
-	vec4(const vec4& other);
+	vec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f){};
+	vec4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w){};
+	vec4(float s) : x(s), y(s), z(s), w(s){};
+	vec4(const vec4& o) : x(o.x), y(o.y), z(o.z), w(o.w){};
 	vec4(const vec3& other);
 	
 	vec4& operator =(const vec4& other);

@@ -4,21 +4,6 @@
 
 namespace hlm{
 
-vec4::vec4(){
-	x = 0.0f; y = 0.0f; z = 0.0f; w = 0.0f;
-}
-vec4::vec4(float _x, float _y, float _z, float _w){
-	x = _x; y = _y; z = _z; w = _w;
-}
-
-vec4::vec4(float s){
-	x = s; y = s; z = s; w = s;
-}
-
-vec4::vec4(const vec4& other){
-	x = other.x; y = other.y; z = other.z; w = other.w;
-}
-
 vec4::vec4(const vec3& other){
 	x = other.x; y = other.y; z = other.z; w = 1.0f;
 }

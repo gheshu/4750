@@ -4,29 +4,7 @@
 
 namespace hlm{
 
-vec3::vec3(){
-	x = 0.0f; y = 0.0f; z = 0.0f;
-}
-
-vec3::vec3(const float s){
-	x = s; y = s; z = s;
-}
-
-vec3::vec3(const float _x, const float _y, const float _z){
-	x = _x; y = _y; z = _z;
-}
-
-vec3::vec3(const vec3& other){
-	x = other.x;
-	y = other.y;
-	z = other.y;
-}
-
-vec3::vec3(vec4& other){
-	x = other.x;
-	y = other.y;
-	z = other.z;
-}
+vec3::vec3(vec4& o) : x(o.x), y(o.y), z(o.z){}
 
 vec3& vec3::operator+=(const vec3& v){
 	x += v.x;
