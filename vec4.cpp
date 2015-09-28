@@ -4,9 +4,7 @@
 
 namespace hlm{
 
-vec4::vec4(const vec3& other){
-	x = other.x; y = other.y; z = other.z; w = 1.0f;
-}
+vec4::vec4(const vec3& o) : x(o.x), y(o.y), z(o.z), w(0.0f){};
 
 vec4& vec4::operator=(const vec4& other){
 	x = other.x; y = other.y; z = other.z; w = other.w;
