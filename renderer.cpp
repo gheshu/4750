@@ -139,7 +139,7 @@ void Renderer::draw() {
 	objload("cylinder.obj", verts[0]);
 	objload("cube.obj", verts[1]);
 	
-	std::vector<MeshTransform>* instance_xforms = nullptr;
+	
 	std::vector<int> entity_ids;
 	
 	Transform t;
@@ -195,7 +195,7 @@ void Renderer::draw() {
 	
 	// update scenegraph output
 	graph.update();
-	graph.getTransforms(&instance_xforms);
+	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
 	cout << "Transforms size: " << instance_xforms->size() << endl;
 	cout << "Verts[0] size: " << verts[0].size() << endl;
 	cout << "Verts[1] size: " << verts[1].size() << endl;
@@ -228,6 +228,7 @@ void Renderer::draw() {
 		glPass(fb, m_vao, fb_id);
         glfwSwapBuffers(m_glwindow);
 		frame_i++;
+		
 		if(frame_i >= 60){
 			frame_i = 0;
 			cout << "fps: " << (1.0f / (glfwGetTime() / 60.0f)) << endl;

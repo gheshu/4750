@@ -51,32 +51,26 @@ struct MeshTransform{
 
 struct Entity{
 	hlm::mat4 transform;
-	std::set<int> children, parents;
-	int id, mesh_id;
-	Entity(const int _id, const int _parent_id, const int _mesh_id, const Transform& trans);
+	std::set<Entity*> children, parents;
+	std::string id, mesh_id;
+	Entity(const string& _id, const string& _parent_id, const int _mesh_id, const Transform& trans);
 };
 
 class EntityGraph{
 private:
 	//would use map here for better memory, but gcc 4.9.2 is bugged
-	std::unordered_map<int, Entity> entities;
+	std::unordered_map<std::string, Entity*> entities;
 	std::vector<MeshTransform> mesh_transforms;
-	std::set<int> root_children;
+	Entity* root = nullptr;
 	void update(const Entity& ent, const hlm::mat4& inmat);
 public:
-	inline void init(const int size){
-		entities.reserve(size);
-	};
-	inline void destroy(){
-		entities.clear();
-		mesh_transforms.clear();
-		root_children.clear();
-	};
-	int insert(const int id, const int parent_id, const int mesh_id, const Transform& trans);
-	void remove(const int _id);
-	int addParent(const int _id, const int _parent_id);
+	void init(const int size);
+	void destroy();
+	int insert(const string& id, const string& parent_id, const int mesh_id, const Transform& trans);
+	void remove(const string& _id);
+	int addParent(const string& _id, const string& _parent_id);
 	void update();
-	inline void getTransforms(std::vector<MeshTransform>** out_vec){ *out_vec = &mesh_transforms; };
+	inline std::vector<MeshTransform>* getTransforms(){ return &mesh_transforms; };
 };
 
 #endif
