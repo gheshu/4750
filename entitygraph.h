@@ -7,6 +7,7 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 enum TRANFORM_TYPE{
 	T,
@@ -45,15 +46,21 @@ struct Transform{
 
 struct MeshTransform{
 	hlm::mat4 mat;
-	int mesh_id;
-	MeshTransform(const int id, const hlm::mat4& inmat) : mesh_id(id), mat(inmat){};
+	std::string mesh_id;
+	MeshTransform(const std::string& id, const hlm::mat4& inmat) : mesh_id(id), mat(inmat){};
 };
 
 struct Entity{
 	hlm::mat4 transform;
 	std::set<Entity*> children, parents;
 	std::string id, mesh_id;
-	Entity(const string& _id, const string& _parent_id, const int _mesh_id, const Transform& trans);
+	Entity(const std::string& _id, Entity* parent_ptr, const std::string& _mesh_id, const Transform& trans);
+	void addChild(Entity* ent);
+	void removeChild(Entity* ent);
+	void rotate(const hlm::vec4& v);
+	void scale(const hlm::vec3& v);
+	void translate(const hlm::vec3& v);
+	void setTransform(const Transform& trans);
 };
 
 class EntityGraph{
@@ -62,15 +69,19 @@ private:
 	std::unordered_map<std::string, Entity*> entities;
 	std::vector<MeshTransform> mesh_transforms;
 	Entity* root = nullptr;
-	void update(const Entity& ent, const hlm::mat4& inmat);
+	void update(Entity* ent, const hlm::mat4& inmat);
 public:
 	void init(const int size);
 	void destroy();
-	int insert(const string& id, const string& parent_id, const int mesh_id, const Transform& trans);
-	void remove(const string& _id);
-	int addParent(const string& _id, const string& _parent_id);
+	void insert(const std::string& id, const std::string& parent_id, const std::string& mesh_id, const Transform& trans);
+	void remove(const std::string& _id);
+	void addParent(const std::string& _id, const std::string& _parent_id);
 	void update();
 	inline std::vector<MeshTransform>* getTransforms(){ return &mesh_transforms; };
+	void translate(const std::string& id, const hlm::vec3& v);
+	void rotate(const std::string& id, const hlm::vec4& v);
+	void scale(const std::string& id, const hlm::vec3& v);
+	void setTransform(const std::string& id, const Transform& trans);
 };
 
 #endif
