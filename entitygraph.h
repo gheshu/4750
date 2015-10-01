@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-enum TRANFORM_TYPE{
+enum TRANSFORM_TYPE{
 	T,
 	R,
 	S
@@ -17,8 +17,8 @@ enum TRANFORM_TYPE{
 
 struct TransOp{
 	hlm::vec4 data;
-	TRANFORM_TYPE type;
-	TransOp(const TRANFORM_TYPE _type, const hlm::vec4& _data) 
+	TRANSFORM_TYPE type;
+	TransOp(const TRANSFORM_TYPE _type, const hlm::vec4& _data) 
 		: type(_type), data(_data){};
 };
 
@@ -65,7 +65,6 @@ struct Entity{
 
 class EntityGraph{
 private:
-	//would use map here for better memory, but gcc 4.9.2 is bugged
 	std::unordered_map<std::string, Entity*> entities;
 	std::vector<MeshTransform> mesh_transforms;
 	Entity* root = nullptr;
