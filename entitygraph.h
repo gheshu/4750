@@ -27,16 +27,16 @@ struct Transform{
 	inline void add(const TransOp& t){
 		data.push_back(t);
 	}
-	inline void add(const TRANFORM_TYPE type, const hlm::vec4& in){
+	inline void add(const TRANSFORM_TYPE type, const hlm::vec4& in){
 		data.push_back(TransOp(type, in));
 	}
-	inline void add(const TRANFORM_TYPE type, const float x, const float y, const float z, const float w){
+	inline void add(const TRANSFORM_TYPE type, const float x, const float y, const float z, const float w){
 		data.push_back(TransOp(type, hlm::vec4(x, y, z, w)));
 	}
-	inline void add(const TRANFORM_TYPE type, const float x, const float y, const float z){
+	inline void add(const TRANSFORM_TYPE type, const float x, const float y, const float z){
 		data.push_back(TransOp(type, hlm::vec4(x, y, z, 0.0f)));
 	}
-	inline void add(const TRANFORM_TYPE type, const float s){
+	inline void add(const TRANSFORM_TYPE type, const float s){
 		data.push_back(TransOp(type, hlm::vec4(s)));
 	}
 	inline void clear(){

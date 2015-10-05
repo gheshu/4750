@@ -1,9 +1,9 @@
 #ifndef OBJ_IMPORT_H
 #define OBJ_IMPORT_H
 
-#include "vertexbuffer.h"
 #include <string>
+class Mesh;
 
-void objload(const std::string& filename, VertexBuffer& verts);
+bool objload(const std::string& filename, Mesh& out);
 
 #endif

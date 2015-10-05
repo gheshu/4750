@@ -8,12 +8,16 @@
 #include "input.h"
 #include "hlm.h"
 #include "vertexbuffer.h"
+#include "resourcemanager.h"
+#include "camera.h"
 
 class Renderer
 {
 private:
+	Camera m_camera;
 	GLSLProgram m_prog;
 	Image fb;
+	ResourceManager res_man;
 	Window* m_window;
 	GLFWwindow* m_glwindow;
 	Input* m_input;

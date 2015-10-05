@@ -235,6 +235,16 @@ mat4 Amatrix(const float hwratio, const float fov){
 	return m;	
 }
 
+mat4 Nmatrix(const float znear, const float zfar){
+	mat4 m;
+	float alpha = (znear + zfar) / (zfar - znear);
+	float beta = (2.0f * znear * zfar) / (znear - zfar);
+	m(10) = alpha;
+	m(14) = beta;
+	m(11) = -1.0f;
+	return m;
+}
+
 /*
 0,4,8 ,12
 1,5,9 ,13

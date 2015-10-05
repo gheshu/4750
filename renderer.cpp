@@ -14,6 +14,7 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
+	m_camera.init(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
 	
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
@@ -21,9 +22,14 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	fb.init(m_width, m_height);
 	
 	screenQuadInit(m_vao, fb_id);
+	res_man.init(2);
+	res_man.load("cylinder");
+	res_man.load("cube");
 }
 
 void Renderer::destroy(){
+	m_camera.destroy();
+	res_man.destroy();
 	fb.destroy();
     delete m_window;
 	m_window = nullptr;
@@ -71,7 +77,7 @@ void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
 	MYGLERRORMACRO
 }
 
-void Renderer::DDAPass(const mat4& proj, const VertexBuffer& verts, Image& img){
+void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 	const Pixel color(0xFF, 0xFF, 0xFF, 0xFF);
 	for(unsigned i = 0; i < verts.size(); i += 3){
 		vec4 face[3];
@@ -135,61 +141,54 @@ void Renderer::draw() {
 	EntityGraph graph;
 	graph.init(16);
 	
-	VertexBuffer verts[2];
-	objload("cylinder.obj", verts[0]);
-	objload("cube.obj", verts[1]);
-	
-	
-	std::vector<int> entity_ids;
-	
 	Transform t;
-	// robot arm 1: id=1; parent=0
+	// robot arm 1: id=1; parent=root
 	//translate(0,0,-3); scale(0.2);
 	t.add(T, 0.0f, 0.0f, -3.0f);
 	t.add(S, 0.2f);
-	graph.insert(1, 0, -1, t);
-	// robot arm 2: id=2; parent=0
+	graph.insert("robot arm", "root", "", t);
+	// robot arm 2: id=2; parent=root
 	//scale 0.2, translate -3, .5, 0; rotateX 45; scale .2;
 	t.clear();
 	t.add(S, vec4(0.2f));
 	t.add(T, -3.0f, 0.5f, 0.0f);
 	t.add(R, 1.0f, 0.0f, 0.0f, 45.0f);
 	t.add(S, 0.2f);
-	graph.insert(2, 0, -1, t);
+	graph.insert("robot arm 2", "root", "", t);
 	//base transform w/instance; id=3, parent=1, 2; meshid=0
 	//translate 0 -2 0; rotateY 30;
 	// mesh = cylinder (verts[0]); mesh_id=0
 	t.clear();
 	t.add(T, 0.0f, -2.0f, 0.0f);
 	t.add(R, 0.0f, 1.0f, 0.0f, 30.0f);
-	graph.insert(3, 1, 0, t);
-	graph.addParent(3, 2);
-	//lower arm transform w/instance: id=4, parent=3; meshid=1;
+	graph.insert("base transform", "robot arm", "cylinder", t);
+	graph.addParent("base transform", "robot arm 2");
+	//lower arm transform: id=4, parent=3;
 	//translate 0 3 0; translate 0 -2 0; rotateZ -20; translate 0 2 0;
 	t.clear();
 	t.add(T, 0.0f, 3.0f, 0.0f);
 	t.add(T, 0.0f, -2.0f, 0.0f);
 	t.add(R, 0.0f, 0.0f, 1.0f, -20.0f);
 	t.add(T, 0.0f, 2.0f, 0.0f);
-	graph.insert(4, 3, -1, t);
-	//upper arm transform: id=5; parent=4; mesh_id=1;
+	graph.insert("lower arm transform", "base transform", "", t);
+	//upper arm transform: id=5; parent=4;
 	//translate 0 3 0, translate 0 -1 0, rotateZ 90, translate 0 1 0;
 	t.clear();
 	t.add(T, 0.0f, 3.0f, 0.0f);
 	t.add(T, 0.0f, -1.0f, 0.0f);
 	t.add(R, 0.0f, 0.0f, 1.0f, 90.0f);
 	t.add(T, 0.0f, 1.0f, 0.0f);
-	graph.insert(5, 4, -1, t);
+	graph.insert("upper arm transform", "lower arm transform", "", t);
 	//upper arm: id=6; parent=5; mesh_id=1;
 	//scale .2, 1, .2
 	t.clear();
 	t.add(S, 0.2f, 1.0f, 0.2f);
-	graph.insert(6, 5, 1, t);
+	graph.insert("upper arm", "upper arm transform", "cube", t);
 	//lower arm: id=7; parent=4; meshid=1;
 	//scale .2, 2.0f, 0.2f;
 	t.clear();
 	t.add(S, 0.2f, 2.0f, 0.2f);
-	graph.insert(7, 4, 1, t);
+	graph.insert("lower arm", "lower arm transform", "cube", t);
 	t.clear();
 	// all done!
 	
@@ -200,10 +199,12 @@ void Renderer::draw() {
 	cout << "Verts[0] size: " << verts[0].size() << endl;
 	cout << "Verts[1] size: " << verts[1].size() << endl;
 	
-	
+	t.clear();
+	t.add(S, 0.2f, 1.0f, 0.2f);
 	//----end scenegraph code----------------------------
 	
-	const mat4 proj = Wmatrix((float)m_width, (float)m_height) 
+	const mat4 VP = Wmatrix((float)m_width, (float)m_height)
+		* Nmatrix(0.1f, 100.0f)
 		* Amatrix((float)m_height / (float)m_width, m_fov);
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
@@ -213,15 +214,17 @@ void Renderer::draw() {
 	glfwSetTime(0.0);
 	bool insert = false;
     while (!glfwWindowShouldClose(m_glwindow)) {
-		m_input->poll();
+		m_input->poll(m_camera);
 		fb.clear(black);
-		
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 MP = proj * mt.mat;
-			DDAPass(MP, verts[mt.mesh_id], fb);
+			mat4 MVP = P * m_camera.getView() * mt.mat;
+			Mesh* mesh = res_man.get(mt.mesh_id);
+			if(mesh){
+				DDAPass(MVP, mesh, fb);
+			}
 		}
 
 		// send framebuffer to opengl
@@ -236,15 +239,13 @@ void Renderer::draw() {
 			
 			// insert or remove upper arm
 			if(insert){
-				t.clear();
-				t.add(S, 0.2f, 1.0f, 0.2f);
-				graph.insert(6, 5, 1, t);
+				graph.insert("upper arm", "upper arm transform", "cube", t);
 				graph.update();
 				graph.getTransforms(&instance_xforms);
 				insert = false;
 			}
 			else{
-				graph.remove(6);
+				graph.remove("upper arm");
 				graph.update();
 				graph.getTransforms(&instance_xforms);
 				insert = true;
