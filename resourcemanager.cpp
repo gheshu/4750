@@ -1,4 +1,5 @@
 #include "resourcemanager.h"
+#include "objimporter.h"
 
 void ResourceManager::init(const unsigned size){
 	keys.reserve(size);
@@ -6,33 +7,23 @@ void ResourceManager::init(const unsigned size){
 void ResourceManager::destroy(){
 	keys.clear();
 }
-void ResourceManager::insert(const string& name, const Mesh& item){
+void ResourceManager::insert(const std::string& name, const Mesh& item){
 	keys.insert({name, item});
 }
-void ResourceManager::remove(const string& name){
+void ResourceManager::remove(const std::string& name){
 	keys.erase(name);
 }
-void ResourceManager::load(const string& path, const string& name){
+void ResourceManager::load(const std::string& filename, const std::string& name){
 	Mesh m;
-	std::string fullpath = path;
-	for( char* i : fullpath){
-		if( *i == '\\'){
-			*i = '/';
-		}
-	}
-	if(fullpath.back() != '/')
-		fullpath.push_back('/');
-	}
-	fullpath.push_back(name);
-	if(objload(fullpath, m)){
+	if(objload(filename, m)){
 		keys.insert({name, m});
 	}
 }
 
-Mesh* ResourceManager::get(const string& name){
+Mesh* ResourceManager::get(const std::string& name){
 	auto a = keys.find(name);
-	if(a->second == keys.end()){
+	if(a == keys.end()){
 		return nullptr;
 	}
-	return a->second;
+	return &(a->second);
 }

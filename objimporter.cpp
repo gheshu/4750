@@ -10,15 +10,13 @@ using namespace std;
 using namespace hlm;
 
 bool objload(const std::string& filename, Mesh& out){
-	std::string fname = filename;
-	fname.push_back(".obj");
 	ifstream count_stream(filename);
 	unsigned vcount = 0;
 	unsigned icount = 0;
 	if(count_stream.is_open()){
 		// count number of verts and indices in file to make a well sized buffer to load into.
 		string line;
-		while(getline(stream, line)){
+		while(getline(count_stream, line)){
 			if(line.substr(0, 2) == "v "){
 				vcount++;
 			}

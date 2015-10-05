@@ -3,16 +3,17 @@
 
 #include "mesh.h"
 #include <string>
+#include <unordered_map>
 
 class ResourceManager{
 	std::unordered_map<std::string, Mesh> keys;
 public:
 	void init(const unsigned size);
 	void destroy();
-	void insert(const string& name, const Mesh& item);
-	void remove(const string& name);
-	Mesh* get(const string& name);
-	void load(const string& filename);
+	void insert(const std::string& name, const Mesh& item);
+	void remove(const std::string& name);
+	Mesh* get(const std::string& name);
+	void load(const std::string& filename, const std::string& name);
 };
 
 #endif

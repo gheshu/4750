@@ -14,7 +14,6 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
-	m_camera.init(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
 	
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
@@ -23,12 +22,11 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	
 	screenQuadInit(m_vao, fb_id);
 	res_man.init(2);
-	res_man.load("cylinder");
-	res_man.load("cube");
+	res_man.load("assets/cylinder.obj", "cylinder");
+	res_man.load("assets/cube.obj", "cube");
 }
 
 void Renderer::destroy(){
-	m_camera.destroy();
 	res_man.destroy();
 	fb.destroy();
     delete m_window;
@@ -79,11 +77,11 @@ void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
 
 void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 	const Pixel color(0xFF, 0xFF, 0xFF, 0xFF);
-	for(unsigned i = 0; i < verts.size(); i += 3){
+	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
 		vec4 face[3];
-		face[0] = proj * verts[i];
-		face[1] = proj * verts[i + 1];
-		face[2] = proj * verts[i + 2];
+		face[0] = proj * mesh->vertices[mesh->indices[i]].position;
+		face[1] = proj * mesh->vertices[mesh->indices[i+1]].position;
+		face[2] = proj * mesh->vertices[mesh->indices[i+2]].position;
 		for(int t = 0; t < 3; t++){
 			const vec4& v1 = face[t%3];
 			const vec4& v2 = face[(t + 1)%3];
@@ -195,15 +193,10 @@ void Renderer::draw() {
 	// update scenegraph output
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
-	cout << "Transforms size: " << instance_xforms->size() << endl;
-	cout << "Verts[0] size: " << verts[0].size() << endl;
-	cout << "Verts[1] size: " << verts[1].size() << endl;
 	
-	t.clear();
-	t.add(S, 0.2f, 1.0f, 0.2f);
 	//----end scenegraph code----------------------------
 	
-	const mat4 VP = Wmatrix((float)m_width, (float)m_height)
+	const mat4 P = Wmatrix((float)m_width, (float)m_height)
 		* Nmatrix(0.1f, 100.0f)
 		* Amatrix((float)m_height / (float)m_width, m_fov);
 	const Pixel black(0, 0, 0, 0xFF);
@@ -239,15 +232,17 @@ void Renderer::draw() {
 			
 			// insert or remove upper arm
 			if(insert){
+				t.clear();
+				t.add(S, 0.2f, 1.0f, 0.2f);
 				graph.insert("upper arm", "upper arm transform", "cube", t);
 				graph.update();
-				graph.getTransforms(&instance_xforms);
+				instance_xforms = graph.getTransforms();
 				insert = false;
 			}
 			else{
 				graph.remove("upper arm");
 				graph.update();
-				graph.getTransforms(&instance_xforms);
+				instance_xforms = graph.getTransforms();
 				insert = true;
 			}
 			
