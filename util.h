@@ -60,7 +60,7 @@ mat4 Wmatrix(const float width, const float height);
 mat4 Amatrix(const float hwratio = 9.0f / 16.0f, const float fov = 90.0f);
 mat4 Nmatrix(const float znear, const float zfar);
 
-mat4 perspective(double fovy, double aspect, double znear, double zfar);
+mat4 GLperspective(double fovy, double aspect, double znear, double zfar);
 
 inline float radians(const float degrees){ return degrees * PI80; }
 

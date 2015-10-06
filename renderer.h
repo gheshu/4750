@@ -14,7 +14,6 @@
 class Renderer
 {
 private:
-	Camera m_camera;
 	GLSLProgram m_prog;
 	Image fb;
 	ResourceManager res_man;

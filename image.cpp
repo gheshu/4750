@@ -14,8 +14,12 @@ void Image::destroy(){
 }
 
 void Image::setPixel(int x, int y, const Pixel& p){
-	x = std::min(width - 1, std::max(0, x));
-	y = std::min(height - 1, std::max(0, y));
+	if(x > width-1 || x < 0){
+		return;
+	}
+	if(y > height-1 || y < 0){
+		return;
+	}
 	*(data + x + y * width) = p;
 }
 

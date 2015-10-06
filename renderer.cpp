@@ -11,7 +11,7 @@ using namespace hlm;
 
 void Renderer::init(const int width, const int height, const int msaa) {
 	
-	m_width = width; m_height = height; m_fov = 90.0f;
+	m_width = width; m_height = height; m_fov = 45.0f;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
@@ -23,11 +23,8 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	fb.init(m_width, m_height);
 	
 	screenQuadInit(m_vao, fb_id);
-	res_man.init(2);
-	res_man.load("assets/cylinder.obj", "cylinder");
-	res_man.load("assets/cube.obj", "cube");
-	
-	m_camera.init();
+	res_man.init(1);
+	res_man.load("assets/sphere.obj", "sphere");
 }
 
 void Renderer::destroy(){
@@ -41,7 +38,6 @@ void Renderer::destroy(){
 }
 
 void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
-	
     GLuint vbo;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -72,7 +68,6 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
 }
 
 void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
-	
 	glBindTexture(GL_TEXTURE_2D, fb_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, img.data);
@@ -83,13 +78,17 @@ void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
 }
 
 void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
-	
 	const Pixel color(0xFF, 0xFF, 0xFF, 0xFF);
 	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
 		vec4 face[3];
 		face[0] = proj * mesh->vertices[mesh->indices[i]].position;
 		face[1] = proj * mesh->vertices[mesh->indices[i+1]].position;
 		face[2] = proj * mesh->vertices[mesh->indices[i+2]].position;
+		for(unsigned t = 0; t < 3; t++){
+			// divide into correct perspective
+			face[t] = face[t] / face[t].w;
+		}
+		
 		for(int t = 0; t < 3; t++){
 			const vec4& v1 = face[t%3];
 			const vec4& v2 = face[(t + 1)%3];
@@ -142,73 +141,21 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 }
 
 void Renderer::draw() {
-	
 	//-----scenegraph code----------------------------
-	
 	EntityGraph graph;
 	graph.init(16);
-	
 	Transform t;
-	// robot arm 1: id=1; parent=root
-	//translate(0,0,-3); scale(0.2);
-	t.add(T, 0.0f, 0.0f, -3.0f);
-	t.add(S, 0.2f);
-	graph.insert("robot arm", "root", "", t);
-	// robot arm 2: id=2; parent=root
-	//scale 0.2, translate -3, .5, 0; rotateX 45; scale .2;
-	t.clear();
-	t.add(S, vec4(0.2f));
-	t.add(T, -3.0f, 0.5f, 0.0f);
-	t.add(R, 1.0f, 0.0f, 0.0f, 45.0f);
-	t.add(S, 0.2f);
-	graph.insert("robot arm 2", "root", "", t);
-	//base transform w/instance; id=3, parent=1, 2; meshid=0
-	//translate 0 -2 0; rotateY 30;
-	// mesh = cylinder (verts[0]); mesh_id=0
-	t.clear();
-	t.add(T, 0.0f, -2.0f, 0.0f);
-	t.add(R, 0.0f, 1.0f, 0.0f, 30.0f);
-	graph.insert("base transform", "robot arm", "cylinder", t);
-	graph.addParent("base transform", "robot arm 2");
-	//lower arm transform: id=4, parent=3;
-	//translate 0 3 0; translate 0 -2 0; rotateZ -20; translate 0 2 0;
-	t.clear();
-	t.add(T, 0.0f, 3.0f, 0.0f);
-	t.add(T, 0.0f, -2.0f, 0.0f);
-	t.add(R, 0.0f, 0.0f, 1.0f, -20.0f);
-	t.add(T, 0.0f, 2.0f, 0.0f);
-	graph.insert("lower arm transform", "base transform", "", t);
-	//upper arm transform: id=5; parent=4;
-	//translate 0 3 0, translate 0 -1 0, rotateZ 90, translate 0 1 0;
-	t.clear();
-	t.add(T, 0.0f, 3.0f, 0.0f);
-	t.add(T, 0.0f, -1.0f, 0.0f);
-	t.add(R, 0.0f, 0.0f, 1.0f, 90.0f);
-	t.add(T, 0.0f, 1.0f, 0.0f);
-	graph.insert("upper arm transform", "lower arm transform", "", t);
-	//upper arm: id=6; parent=5; mesh_id=1;
-	//scale .2, 1, .2
-	t.clear();
-	t.add(S, 0.2f, 1.0f, 0.2f);
-	graph.insert("upper arm", "upper arm transform", "cube", t);
-	//lower arm: id=7; parent=4; meshid=1;
-	//scale .2, 2.0f, 0.2f;
-	t.clear();
-	t.add(S, 0.2f, 2.0f, 0.2f);
-	graph.insert("lower arm", "lower arm transform", "cube", t);
-	t.clear();
-	// all done!
-	
-	// update scenegraph output
+	t.add(T, -0.2f, -0.1f, 0.0f);
+	t.add(R, 45.0f, 10.0f, 0.0f, 45.0f + 10.0f);
+	graph.insert("sphere", "root", "sphere", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
-	
 	//----end scenegraph code----------------------------
 	
-	const mat4 P = Wmatrix((float)m_width, (float)m_height)
-		* Nmatrix(0.1f, 100.0f)
+	const mat4 WNAC = Wmatrix((float)m_width, (float)m_height)
+		* Nmatrix(-2.0, -5.0)
 		* Amatrix((float)m_height / (float)m_width, m_fov);
-		//* perspective(m_fov, (double)m_width / (double)m_height, 0.1, 100.0);
+		* lookAt(vec3(0.0f, 0.0f, 6.0f), vec3(2.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
 	
@@ -218,16 +165,16 @@ void Renderer::draw() {
 	bool insert = false;
     while (!glfwWindowShouldClose(m_glwindow)) {
 		
-		m_input->poll(m_camera);
+		m_input->poll();
 		fb.clear(black);
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 MVP = (P * m_camera.getView()) * mt.mat;
+			mat4 WNACI = WNAC * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				DDAPass(MVP, mesh, fb);
+				DDAPass(WNACI, mesh, fb);
 			}
 		}
 
@@ -241,19 +188,11 @@ void Renderer::draw() {
 			cout << "fps: " << (1.0f / (glfwGetTime() / 60.0f)) << endl;
 			glfwSetTime(0.0);
 			
-			// insert or remove upper arm
+			// insert or remove something for memory tests
 			if(insert){
-				t.clear();
-				t.add(S, 0.2f, 1.0f, 0.2f);
-				graph.insert("upper arm", "upper arm transform", "cube", t);
-				graph.update();
-				instance_xforms = graph.getTransforms();
 				insert = false;
 			}
 			else{
-				graph.remove("upper arm");
-				graph.update();
-				instance_xforms = graph.getTransforms();
 				insert = true;
 			}
 			
