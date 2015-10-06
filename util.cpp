@@ -194,9 +194,8 @@ void print(const mat4& mat){
 mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
 	mat4 m;
 	vec3 forward = normalize(center - eye);
-	vec3 up = normalize(_up);
-	vec3 side = normalize(cross(forward, up));
-	up = cross(side, forward);
+	vec3 side = normalize(cross(forward, _up));
+	vec3 up = cross(side, forward);
 	
 	m(0) = side.x;
     m(1) = side.y;
@@ -210,10 +209,24 @@ mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
     m(9)  = -forward.y;
     m(10) = -forward.z;
 	
+	vec3 t(-dot(side, eye), -dot(up, eye), -dot(forward, eye));
+	m = m * hlm::translate(t);
+	/*
 	m(12) = -dot(side, eye);
 	m(13) = -dot(up, eye);
 	m(14) = -dot(forward, eye);
+	*/
 	return m;
+}
+
+vec3 getForward(const mat4& mat){
+	return vec3(-mat[8], -mat[9], -mat[10]);
+}
+vec3 getRight(const mat4& mat){
+	return vec3(mat[0], mat[1], mat[2]);
+}
+vec3 getUp(const mat4& mat){
+	return vec3(mat[4], mat[5], mat[6]);
 }
 
 mat4 Wmatrix(const float width, const float height){
@@ -237,11 +250,30 @@ mat4 Amatrix(const float hwratio, const float fov){
 
 mat4 Nmatrix(const float znear, const float zfar){
 	mat4 m;
-	float alpha = (znear + zfar) / (zfar - znear);
-	float beta = (2.0f * znear * zfar) / (znear - zfar);
+	float alpha = -(znear + zfar) / (zfar - znear);
+	float beta = -(2.0f * znear * zfar) / (zfar - znear);
 	m(10) = alpha;
 	m(14) = beta;
 	m(11) = -1.0f;
+	return m;
+}
+
+mat4 perspective(double fovy, double aspect, double znear, double zfar){
+	mat4 m;
+	double sine, cotangent, dz;
+	double rad = hlm::radians(fovy / 2.0);
+	dz = zfar - znear;
+	sine = sin(rad);
+	if((dz == 0.0) || (sine == 0.0) || (aspect == 0)){
+		return m;
+	}
+	cotangent = cos(rad) / sine;
+	m(0) = cotangent / aspect;
+	m(5) = cotangent;
+	m(10) = -(zfar + znear) / dz;
+	m(14) = -2.0 * znear * zfar / dz;
+	m(11) = -1;
+	m(15) = 0.0;
 	return m;
 }
 

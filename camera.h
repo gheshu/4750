@@ -7,14 +7,14 @@
 
 class Camera{
 	hlm::mat4 view;
-	hlm::vec3 eye, at;
+	hlm::vec3 eye, forward;
 	float m_pitch, m_yaw;
 public:
 	inline void init(){ 
 		m_pitch = 0.0f; m_yaw = 0.0f;
-		eye = hlm::vec3(0.0f, 0.0f, 1.0f);
-		at = hlm::vec3(0.0f);
-		view = lookAt(eye, at, hlm::vec3(0.0f, 1.0f, 0.0f));
+		eye = hlm::vec3(0.0f, 0.0f, 0.0f);
+		forward = hlm::vec3(0.0f, 0.0f, -1.0f);
+		view = hlm::lookAt(eye, forward, hlm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	inline void pitch(const float _pitch){
 		m_pitch = std::min(std::max(-89.0f, m_pitch + _pitch), 89.0f);
@@ -29,18 +29,20 @@ public:
 		}
 	}
 	inline void moveForward(const float amt){
-		eye += hlm::vec3(0.0f, 0.0f, -1.0f) * amt;
+		eye += forward * amt;
 	}
 	inline void moveRight(const float amt){
-		eye += hlm::vec3(1.0f, 0.0f, 0.0f) * amt;
+		eye += hlm::getRight(view) * amt;
 	}
 	inline void moveUp(const float amt){
-		eye += hlm::vec3(0.0f, 1.0f, 0.0f) * amt;
+		eye += hlm::getUp(view) * amt;
 	}
 	inline void update(){
-		at = hlm::vec3(0.0f, 1.0f, 0.0f) * sin(hlm::radians(m_pitch)) 
-			+ hlm::vec3(1.0f, 0.0f, 0.0f) * sin(hlm::radians(m_yaw));
-		view = lookAt(eye, eye + at, hlm::vec3(0.0f, 1.0f, 0.0f));
+		forward.x = cos(hlm::radians(m_yaw)) * cos(hlm::radians(m_pitch));
+		forward.y = sin(hlm::radians(m_pitch));
+		forward.z = sin(hlm::radians(m_yaw)) * cos(hlm::radians(m_pitch));
+		view = hlm::lookAt(eye, eye + forward, hlm::vec3(0.0f, 1.0f, 0.0f));
+		forward = hlm::getForward(view);
 	}
 	inline const hlm::mat4& getView(){return view;};
 

@@ -10,6 +10,7 @@ using namespace std;
 using namespace hlm;
 
 void Renderer::init(const int width, const int height, const int msaa) {
+	
 	m_width = width; m_height = height; m_fov = 90.0f;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
@@ -18,15 +19,19 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
 	}
+	
 	fb.init(m_width, m_height);
 	
 	screenQuadInit(m_vao, fb_id);
 	res_man.init(2);
 	res_man.load("assets/cylinder.obj", "cylinder");
 	res_man.load("assets/cube.obj", "cube");
+	
+	m_camera.init();
 }
 
 void Renderer::destroy(){
+	
 	res_man.destroy();
 	fb.destroy();
     delete m_window;
@@ -36,6 +41,7 @@ void Renderer::destroy(){
 }
 
 void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
+	
     GLuint vbo;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -66,6 +72,7 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
 }
 
 void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
+	
 	glBindTexture(GL_TEXTURE_2D, fb_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, img.data);
@@ -76,6 +83,7 @@ void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
 }
 
 void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
+	
 	const Pixel color(0xFF, 0xFF, 0xFF, 0xFF);
 	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
 		vec4 face[3];
@@ -134,6 +142,7 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 }
 
 void Renderer::draw() {
+	
 	//-----scenegraph code----------------------------
 	
 	EntityGraph graph;
@@ -199,6 +208,7 @@ void Renderer::draw() {
 	const mat4 P = Wmatrix((float)m_width, (float)m_height)
 		* Nmatrix(0.1f, 100.0f)
 		* Amatrix((float)m_height / (float)m_width, m_fov);
+		//* perspective(m_fov, (double)m_width / (double)m_height, 0.1, 100.0);
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
 	
@@ -207,13 +217,14 @@ void Renderer::draw() {
 	glfwSetTime(0.0);
 	bool insert = false;
     while (!glfwWindowShouldClose(m_glwindow)) {
+		
 		m_input->poll(m_camera);
 		fb.clear(black);
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 MVP = P * m_camera.getView() * mt.mat;
+			mat4 MVP = (P * m_camera.getView()) * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				DDAPass(MVP, mesh, fb);
