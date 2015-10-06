@@ -1,5 +1,5 @@
 #include "input.h"
-
+#include "camera.h"
 #include "stdio.h"
 
 bool Input::m_rightMouseDown = false;
@@ -14,7 +14,7 @@ Input::Input(GLFWwindow* window)
 {
     m_glwindow = window;
 
-    //glfwSetInputMode(m_glwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(m_glwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(m_glwindow, key_callback);
     glfwSetCursorPosCallback(m_glwindow, cursor_position_callback);
     glfwSetMouseButtonCallback(m_glwindow, mouse_button_callback);
@@ -34,7 +34,6 @@ void Input::poll()
 void Input::poll(Camera& cam)
 {
 	glfwPollEvents();
-	/*
 	if (glfwGetKey(m_glwindow, GLFW_KEY_W)){
 		cam.moveForward(0.05f);
 	}
@@ -53,22 +52,13 @@ void Input::poll(Camera& cam)
     else if(glfwGetKey(m_glwindow, GLFW_KEY_LEFT_SHIFT)){
         cam.moveUp(-0.05f);
 	}
-    if(glfwGetKey(m_glwindow, GLFW_KEY_E)){
-        cam.setFov(cam.getFov() + 0.5f);
-		//printf("fov: %f\n", cam.getFov());
-	}
-    else if(glfwGetKey(m_glwindow, GLFW_KEY_Q)){
-        cam.setFov(cam.getFov() - 0.5f);
-		//printf("fov: %f\n", cam.getFov());
-	}
 
     cam.yaw(m_relCursorX * 0.05f);
     cam.pitch(m_relCursorY * 0.05f);
     m_relCursorX = 0.0f;
     m_relCursorY = 0.0f;
 
-    cam.updateViewMatrix();
-	*/
+    cam.update();
 }
 
 bool Input::leftMouseDown()
