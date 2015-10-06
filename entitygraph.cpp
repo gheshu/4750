@@ -133,7 +133,7 @@ void EntityGraph::addParent(const std::string& _id, const std::string& _parent_i
 void EntityGraph::update(){
 	{
 		mesh_transforms.clear();
-		const int reserve_size = std::max(8, (int)(entities.size() / 4));
+		const int reserve_size = hlm::clamp(8, 1024, (int)entities.size() / 4);
 		mesh_transforms.reserve(reserve_size);
 	}
 	for(auto i : root->children){

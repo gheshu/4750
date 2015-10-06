@@ -37,6 +37,13 @@ vec4 abs(const vec4& v){
 	return vec4(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w));
 }
 
+int clamp(const int low, const int high, const int val){
+	return std::min(high, std::max(low, val));
+}
+float clamp(const float low, const float high, const float val){
+	return std::min(high, std::max(low, val));
+}
+
 mat3 inverse(const mat3& m){
 	mat3 inv;
 	float det = m[0] * (m[4] * m[8] - m[5] * m[7]) -

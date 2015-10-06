@@ -154,7 +154,7 @@ void Renderer::draw() {
 	
 	const mat4 WNAC = Wmatrix((float)m_width, (float)m_height)
 		* Nmatrix(-2.0, -5.0)
-		* Amatrix((float)m_height / (float)m_width, m_fov);
+		* Amatrix((float)m_height / (float)m_width, m_fov)
 		* lookAt(vec3(0.0f, 0.0f, 6.0f), vec3(2.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();

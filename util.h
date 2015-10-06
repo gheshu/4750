@@ -42,6 +42,9 @@ vec4 round( const vec4& v);
 vec3 abs( const vec3& v);
 vec4 abs( const vec4& v);
 
+int clamp(const int low, const int high, const int val);
+float clamp(const float low, const float high, const float val);
+
 vec3 normalize( const vec3& v);
 vec4 normalize( const vec4& v);
 
