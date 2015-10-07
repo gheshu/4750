@@ -11,6 +11,12 @@
 #include "resourcemanager.h"
 #include "camera.h"
 
+struct BoshartParam{
+	hlm::vec3 t, r, s;
+	hlm::vec3 eye, at, up;
+	float fov, near, far;
+};
+
 class Renderer
 {
 private:
@@ -31,7 +37,7 @@ private:
 public:
     void init(const int width, const int height, const int msaa);
 	void destroy();
-    void draw();
+    void draw(const BoshartParam& param);
 
 };
 #endif

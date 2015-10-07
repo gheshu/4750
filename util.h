@@ -53,7 +53,7 @@ void print(const vec4& v);
 void print(const mat3& mat);
 void print(const mat4& mat);
 
-mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
+mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
 
 vec3 getForward(const mat4& mat);
 vec3 getRight(const mat4& mat);
@@ -63,6 +63,8 @@ mat4 Wmatrix(const float width, const float height);
 mat4 Amatrix(const float hwratio = 9.0f / 16.0f, const float fov = 90.0f);
 mat4 Nmatrix(const float znear, const float zfar);
 
+// aspect here is width / height of the window.
+// must divide by 4th element of vec4 to normalize your points if using this matrix.
 mat4 GLperspective(double fovy, double aspect, double znear, double zfar);
 
 inline float radians(const float degrees){ return degrees * PI80; }

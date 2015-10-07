@@ -140,22 +140,33 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 	}
 }
 
-void Renderer::draw() {
+void Renderer::draw(const BoshartParam& param) {
 	//-----scenegraph code----------------------------
 	EntityGraph graph;
-	graph.init(16);
+	graph.init(4);
 	Transform t;
-	t.add(T, -0.2f, -0.1f, 0.0f);
-	t.add(R, 45.0f, 10.0f, 0.0f, 45.0f + 10.0f);
+	t.add(T, param.t);
+	t.add(R, param.r, length(param.r));
 	graph.insert("sphere", "root", "sphere", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
 	//----end scenegraph code----------------------------
-	
-	const mat4 WNAC = Wmatrix((float)m_width, (float)m_height)
-		* Nmatrix(-2.0, -5.0)
-		* Amatrix((float)m_height / (float)m_width, m_fov)
-		* lookAt(vec3(0.0f, 0.0f, 6.0f), vec3(2.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	printf("\n");
+	mat4 W = Wmatrix((float)m_width, (float)m_height);
+	print(W);
+	printf("\n");
+	mat4 N = Nmatrix(param.near, param.far);
+	print(N);
+	printf("\n");
+	mat4 A = Amatrix((float)m_height / (float)m_width, param.fov);
+	print(A);
+	printf("\n");
+	mat4 C = lookAt(param.eye, param.at, param.up);
+	print(C);
+	printf("\n");
+	const mat4 WNAC = W * N * A * C;
+	print(WNAC);
+	printf("\n");
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
 	

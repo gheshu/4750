@@ -198,27 +198,27 @@ void print(const mat4& mat){
 	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", mat[3], mat[7], mat[11], mat[15]);
 }
 
-mat4 lookAt(const vec3& eye, const vec3& center, const vec3& _up){
+mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up){
 	mat4 m;
-	vec3 forward = normalize(center - eye); // corresponds to n = a - e
-	vec3 side = normalize(cross(_up, forward));	// corresponds to u = v' x n
-	vec3 up = cross(forward, side);	//corresponds to v = n x u
+	vec3 n = normalize(at - eye);
+	vec3 u = normalize(cross(up, n));
+	vec3 v = normalize(cross(n, u));
 	
-	m(0) = side.x;
-    m(4) = side.y;
-    m(8) = side.z;
+	m(0) = u.x;
+    m(4) = u.y;
+    m(8) = u.z;
 
-    m(1) = up.x;
-    m(5) = up.y;
-    m(9) = up.z;
+    m(1) = v.x;
+    m(5) = v.y;
+    m(9) = v.z;
 
-    m(2)  = forward.x;
-    m(6)  = forward.y;
-    m(10) = forward.z;
+    m(2)  = n.x;
+    m(6)  = n.y;
+    m(10) = n.z;
 	
-	m(12) = -dot(side, eye);
-	m(13) = -dot(up, eye);
-	m(14) = -dot(forward, eye);
+	m(12) = -eye.x * u.x - eye.y * u.y - eye.z * u.z;
+	m(13) = -eye.x * v.x - eye.y * v.y - eye.z * v.z;
+	m(14) = -eye.x * n.x - eye.y * n.y - eye.z * n.z;
 
 	return m;
 }
@@ -262,11 +262,11 @@ mat4 Amatrix(const float hwratio, const float fov){
 2,6,10,14
 3,7,11,15
 */
-mat4 Nmatrix(const float znear, const float zfar){
+mat4 Nmatrix(const float near, const float far){
 	mat4 m;
-	const float denom = std::abs(znear) - std::abs(zfar);
-	const float alpha = (std::abs(znear) + std::abs(zfar)) / denom;
-	const float beta = (2.0 * std::abs(znear) * std::abs(zfar)) / denom;
+	const float denom = far - near;
+	const float alpha = -(far + near) / denom;
+	const float beta = -(2.0 * far * near) / denom;
 	m(10) = alpha;
 	m(14) = beta;
 	m(11) = -1.0f;

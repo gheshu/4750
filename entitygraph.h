@@ -30,6 +30,9 @@ struct Transform{
 	inline void add(const TRANSFORM_TYPE type, const hlm::vec4& in){
 		data.push_back(TransOp(type, in));
 	}
+	inline void add(const TRANSFORM_TYPE type, const hlm::vec3& in, const float w){
+		data.push_back(TransOp(type, hlm::vec4(in.x, in.y, in.z, w)));
+	}
 	inline void add(const TRANSFORM_TYPE type, const float x, const float y, const float z, const float w){
 		data.push_back(TransOp(type, hlm::vec4(x, y, z, w)));
 	}
