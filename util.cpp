@@ -340,21 +340,22 @@ mat4 rotate(const vec4& _v){
 	mat4 m;
 	vec3 v = normalize(vec3(_v.x, _v.y, _v.z));
 	float c = cos(radians(_v.w));
+	float cinv = 1.0f - c;
 	float s = sin(radians(_v.w));
 	float u2 = v.x*v.x;
 	float v2 = v.y*v.y;
 	float w2 = v.z*v.z;
 	
 	m(0)  = u2 + (1.0f - u2) * c;
-    m(4)  = v.x * v.y * (1.0f - c) - v.z * s;
-    m(8)  = v.x * v.z * (1.0f - c) + v.y * s;
+    m(4)  = v.x * v.y * cinv - v.z * s;
+    m(8)  = v.x * v.z * cinv + v.y * s;
  
-    m(1)  = v.x * v.y * (1.0f - c) + v.z * s;
+    m(1)  = v.x * v.y * cinv + v.z * s;
     m(5)  = v2 + (1.0f - v2) * c;
-    m(9)  = v.y * v.z * (1.0f - c) - v.x * s;
+    m(9)  = v.y * v.z * cinv - v.x * s;
  
-    m(2)  = v.x * v.z * (1.0f - c) - v.y * s;
-    m(6)  = v.y * v.z * (1.0f - c) + v.x * s;
+    m(2)  = v.x * v.z * cinv - v.y * s;
+    m(6)  = v.y * v.z * cinv + v.x * s;
     m(10) = w2 + (1.0f - w2) * c;
 	
 	return m;
