@@ -9,7 +9,6 @@ Build instructions:
 			release: builds with optimization flags (-O3)
 			
 	clean.bat removes .o and .exe files.
-	commit.sh commits changes and prompts for repository log-in.
 
 default build uses 29,620KB on win7 and has no leaks.
 release build uses 33,724KB on win7 and has no leaks.

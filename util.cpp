@@ -7,26 +7,26 @@
 namespace hlm{
 	
 float dot(const vec3& lhs, const vec3& rhs){
-	return lhs.x * rhs.x + lhs.y + rhs.y + lhs.z + rhs.z;
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
 }
 float dot(const vec4& lhs, const vec4& rhs){
-	return lhs.x * rhs.x + lhs.y + rhs.y + lhs.z + rhs.z + lhs.w + rhs.w;
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
 }
 
 float distance(const vec3& lhs, const vec3& rhs){
-	return std::sqrt(std::pow(rhs.x - lhs.x, 2) + std::pow(rhs.y - lhs.y, 2) 
-		+ std::pow(rhs.z - lhs.z, 2));
+	const vec3 v = lhs - rhs;
+	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 float distance(const vec4& lhs, const vec4& rhs){
-	return std::sqrt(std::pow(rhs.x - lhs.x, 2) + std::pow(rhs.y - lhs.y, 2) 
-		+ std::pow(rhs.z - lhs.z, 2) + std::pow(rhs.w - lhs.w, 2));
+	const vec4 v = lhs - rhs;
+	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
 }
 
-float length(const vec3& lhs){
-	return distance(vec3(0.0f), lhs);
+float length(const vec3& v){
+	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
-float length(const vec4& lhs){
-	return distance(vec4(0.0f), lhs);
+float length(const vec4& v){
+	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
 }
 
 vec3 abs(const vec3& v){
@@ -262,14 +262,13 @@ mat4 Amatrix(const float hwratio, const float fov){
 2,6,10,14
 3,7,11,15
 */
-mat4 Nmatrix(const float near, const float far){
+mat4 Nmatrix(const double near, const double far){
 	mat4 m;
-	const float denom = far - near;
-	const float alpha = -(far + near) / denom;
-	const float beta = -(2.0 * far * near) / denom;
-	m(10) = alpha;
-	m(14) = beta;
+	const double denom = far - near;
+	m(10) = (far + near) / denom;
+	m(14) = -(2.0 * far * near) / denom;
 	m(11) = -1.0f;
+	m(15) = 0.0f;
 	return m;
 }
 

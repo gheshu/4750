@@ -29,7 +29,6 @@ private:
 
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
-	float m_fov;
 	
 	void DDAPass(const hlm::mat4& proj, Mesh* verts, Image& img);
 	void glPass(const Image& img, const GLuint vao, const GLuint fb_id);

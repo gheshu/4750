@@ -17,8 +17,8 @@ float dot(const vec4& lhs, const vec4& rhs);
 float distance(const vec3& lhs, const vec3& rhs);
 float distance(const vec4& lhs, const vec4& rhs);
 
-float length(const vec3& lhs);
-float length(const vec4& lhs);
+float length(const vec3& v);
+float length(const vec4& v);
 
 mat3 inverse(const mat3& in);
 mat3 transpose( const mat3& mat);
@@ -61,7 +61,7 @@ vec3 getUp(const mat4& mat);
 
 mat4 Wmatrix(const float width, const float height);
 mat4 Amatrix(const float hwratio = 9.0f / 16.0f, const float fov = 90.0f);
-mat4 Nmatrix(const float znear, const float zfar);
+mat4 Nmatrix(const double znear, const double zfar);
 
 // aspect here is width / height of the window.
 // must divide by 4th element of vec4 to normalize your points if using this matrix.

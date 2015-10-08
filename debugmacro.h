@@ -1,7 +1,7 @@
 #ifndef DEBUGMACRO_H
 #define DEBUGMACRO_H
 
-#define _DEBUG
+//#define _DEBUG
 
 #include "myglheaders.h"
 #include "stdio.h"

@@ -10,8 +10,7 @@ using namespace std;
 using namespace hlm;
 
 void Renderer::init(const int width, const int height, const int msaa) {
-	
-	m_width = width; m_height = height; m_fov = 45.0f;
+	m_width = width; m_height = height;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
@@ -28,7 +27,6 @@ void Renderer::init(const int width, const int height, const int msaa) {
 }
 
 void Renderer::destroy(){
-	
 	res_man.destroy();
 	fb.destroy();
     delete m_window;
@@ -63,7 +61,6 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
 	MYGLERRORMACRO
 }
 
@@ -147,23 +144,24 @@ void Renderer::draw(const BoshartParam& param) {
 	Transform t;
 	t.add(T, param.t);
 	t.add(R, param.r, length(param.r));
+	t.add(S, param.s);
 	graph.insert("sphere", "root", "sphere", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
 	//----end scenegraph code----------------------------
-	printf("\n");
+	printf("W:\n");
 	mat4 W = Wmatrix((float)m_width, (float)m_height);
 	print(W);
-	printf("\n");
+	printf("N:\n");
 	mat4 N = Nmatrix(param.near, param.far);
 	print(N);
-	printf("\n");
+	printf("A:\n");
 	mat4 A = Amatrix((float)m_height / (float)m_width, param.fov);
 	print(A);
-	printf("\n");
+	printf("C:\n");
 	mat4 C = lookAt(param.eye, param.at, param.up);
 	print(C);
-	printf("\n");
+	printf("WNAC:\n");
 	const mat4 WNAC = W * N * A * C;
 	print(WNAC);
 	printf("\n");
