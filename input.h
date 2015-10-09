@@ -21,7 +21,7 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 public:
     Input(GLFWwindow* window);
     ~Input();
-    void poll(Camera& cam);
+    void poll(const double dt, Camera& cam);
 	void poll();
     static bool rightMouseDown();
     static bool leftMouseDown();

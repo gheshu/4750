@@ -81,11 +81,27 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 		face[0] = proj * mesh->vertices[mesh->indices[i]].position;
 		face[1] = proj * mesh->vertices[mesh->indices[i+1]].position;
 		face[2] = proj * mesh->vertices[mesh->indices[i+2]].position;
+		bool badw = false;
 		for(unsigned t = 0; t < 3; t++){
 			// divide into correct perspective
+			if(face[t].w == 0.0f){
+				badw = true;
+				break;
+			}
 			face[t] = face[t] / face[t].w;
 		}
-		
+		if(badw){
+			continue;
+		}
+		for(int t = 0; t < 3; t++){
+			if(face[t].z > -2.0f){
+				badw = true;
+				break;
+			}
+		}
+		if(badw){
+			continue;
+		}
 		for(int t = 0; t < 3; t++){
 			const vec4& v1 = face[t%3];
 			const vec4& v2 = face[(t + 1)%3];
@@ -162,25 +178,28 @@ void Renderer::draw(const BoshartParam& param) {
 	mat4 C = lookAt(param.eye, param.at, param.up);
 	print(C);
 	printf("WNAC:\n");
-	const mat4 WNAC = W * N * A * C;
+	const mat4 WNAC = W * N * A;// * C;
 	print(WNAC);
 	printf("\n");
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
 	
 	//------------draw loop-----------------------------
-	unsigned frame_i = 0;
 	glfwSetTime(0.0);
 	bool insert = false;
+	Camera cam;
+	cam.init();
+	glfwSetTime(0.0);
     while (!glfwWindowShouldClose(m_glwindow)) {
-		
-		m_input->poll();
+		m_input->poll(glfwGetTime(), cam);
+		glfwSetTime(0.0);
 		fb.clear(black);
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 WNACI = WNAC * mt.mat;
+			mat4 WNACI = WNAC * cam.getViewMatrix() * mt.mat;
+			//mat4 WNACI = WNAC * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				DDAPass(WNACI, mesh, fb);
@@ -190,22 +209,6 @@ void Renderer::draw(const BoshartParam& param) {
 		// send framebuffer to opengl
 		glPass(fb, m_vao, fb_id);
         glfwSwapBuffers(m_glwindow);
-		frame_i++;
-		
-		if(frame_i >= 60){
-			frame_i = 0;
-			cout << "fps: " << (1.0f / (glfwGetTime() / 60.0f)) << endl;
-			glfwSetTime(0.0);
-			
-			// insert or remove something for memory tests
-			if(insert){
-				insert = false;
-			}
-			else{
-				insert = true;
-			}
-			
-		}
     }
 	//---------end draw loop--------------------------------
 	instance_xforms = nullptr;

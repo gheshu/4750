@@ -200,9 +200,9 @@ void print(const mat4& mat){
 
 mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up){
 	mat4 m;
-	vec3 n = normalize(at - eye);
-	vec3 u = normalize(cross(up, n));
-	vec3 v = normalize(cross(n, u));
+	vec3 n(normalize(eye - at));
+	vec3 u(normalize(cross(up, n)));
+	vec3 v(cross(n, u));
 	
 	m(0) = u.x;
     m(4) = u.y;
@@ -216,9 +216,9 @@ mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up){
     m(6)  = n.y;
     m(10) = n.z;
 	
-	m(12) = -eye.x * u.x - eye.y * u.y - eye.z * u.z;
-	m(13) = -eye.x * v.x - eye.y * v.y - eye.z * v.z;
-	m(14) = -eye.x * n.x - eye.y * n.y - eye.z * n.z;
+	m(12) = dot(u, eye);
+	m(13) = dot(v, eye);
+	m(14) = dot(n, eye);
 
 	return m;
 }
@@ -229,13 +229,16 @@ mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up){
 3,7,11,15
 */
 vec3 getForward(const mat4& mat){
-	return vec3(mat[2], mat[6], mat[10]);
+	return vec3(-mat[2], -mat[6], -mat[10]);
 }
 vec3 getRight(const mat4& mat){
 	return vec3(mat[0], mat[4], mat[8]);
 }
 vec3 getUp(const mat4& mat){
 	return vec3(mat[1], mat[5], mat[9]);
+}
+vec3 getPos(const mat4& mat){
+	return vec3(-mat[12], -mat[13], -mat[14]);
 }
 
 mat4 Wmatrix(const float width, const float height){
@@ -313,38 +316,56 @@ vec3 cross(const vec3& lhs, const vec3& rhs){
 */
 
 // normalized matrix for rotations around the origin
-mat4 rotate(const float angle, const vec3& _v){
+mat4 rotate(const float _angle, const vec3& _v){
 	mat4 m;
-	vec3 v = normalize(_v);
-	float c = cos(radians(angle));
-	float s = sin(radians(angle));
-	float u2 = v.x*v.x;
-	float v2 = v.y*v.y;
-	float w2 = v.z*v.z;
+	if(_angle == 0.0f){
+		return m;
+	}
+	const float len = length(_v);
+	if(len <= 0.0f){
+		return m;
+	}
+	const float angle = radians(_angle);
+	vec3 v = _v / len;
+	const float c = cos(angle);
+	const float cinv = 1.0f - c;
+	const float s = sin(angle);
+	const float u2 = v.x*v.x;
+	const float v2 = v.y*v.y;
+	const float w2 = v.z*v.z;
 	
 	m(0)  = u2 + (1.0f - u2) * c;
-    m(4)  = v.x * v.y * (1.0f - c) - v.z * s;
-    m(8)  = v.x * v.z * (1.0f - c) + v.y * s;
+    m(4)  = v.x * v.y * cinv - v.z * s;
+    m(8)  = v.x * v.z * cinv + v.y * s;
  
-    m(1)  = v.x * v.y * (1.0f - c) + v.z * s;
+    m(1)  = v.x * v.y * cinv + v.z * s;
     m(5)  = v2 + (1.0f - v2) * c;
-    m(9)  = v.y * v.z * (1.0f - c) - v.x * s;
+    m(9)  = v.y * v.z * cinv - v.x * s;
  
-    m(2)  = v.x * v.z * (1.0f - c) - v.y * s;
-    m(6)  = v.y * v.z * (1.0f - c) + v.x * s;
+    m(2)  = v.x * v.z * cinv - v.y * s;
+    m(6)  = v.y * v.z * cinv + v.x * s;
     m(10) = w2 + (1.0f - w2) * c;
 	
 	return m;
 }
 mat4 rotate(const vec4& _v){
 	mat4 m;
-	vec3 v = normalize(vec3(_v.x, _v.y, _v.z));
-	float c = cos(radians(_v.w));
-	float cinv = 1.0f - c;
-	float s = sin(radians(_v.w));
-	float u2 = v.x*v.x;
-	float v2 = v.y*v.y;
-	float w2 = v.z*v.z;
+	if(_v.w == 0.0f){
+		return m;
+	}
+	vec3 v = vec3(_v);
+	const float len = length(v);
+	if(len <= 0.0f){
+		return m;
+	}
+	const float angle = radians(_v.w);
+	v = v / len;
+	const float c = cos(angle);
+	const float cinv = 1.0f - c;
+	const float s = sin(angle);
+	const float u2 = v.x*v.x;
+	const float v2 = v.y*v.y;
+	const float w2 = v.z*v.z;
 	
 	m(0)  = u2 + (1.0f - u2) * c;
     m(4)  = v.x * v.y * cinv - v.z * s;

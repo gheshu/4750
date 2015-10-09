@@ -15,7 +15,7 @@ public:
 	void moveRight(const float amt);
 	void moveUp(const float amt);
 	void update();
-	inline const hlm::mat4& getView(){return view;};
+	inline const hlm::mat4& getViewMatrix(){return view;};
 
 };
 

@@ -13,7 +13,7 @@ float x, y, z;
 	vec3(const float s) : x(s), y(s), z(s){}
 	vec3(const float _x, const float _y, const float _z) : x(_x), y(_y), z(_z){}
 	vec3(const vec3& o) : x(o.x), y(o.y), z(o.z){}
-	vec3(vec4& o);
+	vec3(const vec4& o);
 	
 	inline vec3& operator =(const vec3& v){x = v.x; y = v.y; z = v.z; return *this;};
 	vec3& operator+=(const vec3& v);

@@ -4,7 +4,7 @@
 
 namespace hlm{
 
-vec3::vec3(vec4& o) : x(o.x), y(o.y), z(o.z){}
+vec3::vec3(const vec4& o) : x(o.x), y(o.y), z(o.z){}
 
 vec3& vec3::operator+=(const vec3& v){
 	x += v.x;

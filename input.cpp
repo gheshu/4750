@@ -31,30 +31,30 @@ void Input::poll()
     glfwPollEvents();
 }
 
-void Input::poll(Camera& cam)
+void Input::poll(const double dt, Camera& cam)
 {
 	glfwPollEvents();
 	if (glfwGetKey(m_glwindow, GLFW_KEY_W)){
-		cam.moveForward(0.05f);
+		cam.moveForward(0.9f * dt);
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_S)){
-        cam.moveForward(-0.05f);
+        cam.moveForward(-0.9f * dt);
 	}
     if(glfwGetKey(m_glwindow, GLFW_KEY_A)){
-        cam.moveRight(-0.05f);
+        cam.moveRight(-0.9f * dt);
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_D)){
-        cam.moveRight(0.05f);
+        cam.moveRight(0.9f * dt);
 	}
     if(glfwGetKey(m_glwindow, GLFW_KEY_SPACE)){
-        cam.moveUp(0.05f);
+        cam.moveUp(0.9f * dt);
 	}
     else if(glfwGetKey(m_glwindow, GLFW_KEY_LEFT_SHIFT)){
-        cam.moveUp(-0.05f);
+        cam.moveUp(-0.9f * dt);
 	}
 
-    cam.yaw(m_relCursorX * 0.05f);
-    cam.pitch(m_relCursorY * 0.05f);
+    cam.yaw(m_relCursorX * -0.9f * dt);
+    cam.pitch(m_relCursorY * 0.9f * dt);
     m_relCursorX = 0.0f;
     m_relCursorY = 0.0f;
 
