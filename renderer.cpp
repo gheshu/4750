@@ -94,7 +94,11 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 			continue;
 		}
 		for(int t = 0; t < 3; t++){
-			if(face[t].z > -2.0f){
+			if(face[t].z > 1.0){
+				badw = true;
+				break;
+			}
+			if(face[t].z < -1.0){
 				badw = true;
 				break;
 			}
