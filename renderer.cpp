@@ -99,7 +99,15 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 		if(badw || badz >= 3){
 			continue;
 		}
-		// assign extents
+		// check normal facing away
+		vec3 e1(face[1] - face[0]);
+		vec3 e2(face[2] - face[0]);
+		vec3 fnormal = cross(e1, e2);
+		if(fnormal.z <= 0.0f){
+			continue;
+		}
+		fnormal = normalize(fnormal);
+		// assign extents, minx maxx, miny, maxy
 		vec4 extents(face[0].x, face[0].x, face[0].y, face[0].y);
 		for(unsigned t = 1; t < 3; t++){
 			extents.x = clamp(0.0f, m_width - 1.0f, std::min(extents.x, face[t].x));
@@ -107,6 +115,16 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 			extents.z = clamp(0.0f, m_height -1.0f, std::min(extents.z, face[t].y));
 			extents.w = clamp(0.0f, m_height -1.0f, std::max(extents.w, face[t].y));
 		}
+		
+		//compute beta => y
+		
+		//loop over y
+			//loop over alpha => x
+			
+				//compute pixel lighting OR blend vertex lighting
+			
+				//draw to image if at top of zbuffer
+		
 	}
 }
 
