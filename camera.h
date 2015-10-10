@@ -6,9 +6,10 @@
 class Camera{
 	hlm::mat4 view;
 	hlm::vec3 eye;
-	float m_pitch, m_yaw;
+	hlm::vec3 forward;
 public:
 	void init();
+	void init(const hlm::vec3& eye, const hlm::vec3& center, const hlm::vec3& up);
 	void pitch(const float _pitch);
 	void yaw(const float _yaw);
 	void moveForward(const float amt);

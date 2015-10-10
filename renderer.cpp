@@ -20,14 +20,16 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	}
 	
 	fb.init(m_width, m_height);
+	db.init(m_width, m_height);
 	
-	screenQuadInit(m_vao, fb_id);
+	screenQuadInit();
 	res_man.init(1);
 	res_man.load("assets/sphere.obj", "sphere");
 }
 
 void Renderer::destroy(){
 	res_man.destroy();
+	db.destroy();
 	fb.destroy();
     delete m_window;
 	m_window = nullptr;
@@ -35,11 +37,11 @@ void Renderer::destroy(){
 	m_input = nullptr;
 }
 
-void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
+void Renderer::screenQuadInit(){
     GLuint vbo;
-    glGenVertexArrays(1, &vao);
+    glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &vbo);
-    glBindVertexArray(vao);
+    glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     static const GLfloat coords[] = {
         -1.0f, -1.0f,
@@ -54,8 +56,8 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glBindVertexArray(0);
 	
-	glGenTextures(1, &id0);
-	glBindTexture(GL_TEXTURE_2D, id0);
+	glGenTextures(1, &fb_id);
+	glBindTexture(GL_TEXTURE_2D, fb_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -64,17 +66,51 @@ void Renderer::screenQuadInit(GLuint& vao, GLuint& id0){
 	MYGLERRORMACRO
 }
 
-void Renderer::glPass(const Image& img, const GLuint vao, const GLuint fb_id){
+void Renderer::glPass(){
 	glBindTexture(GL_TEXTURE_2D, fb_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width, img.height, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, img.data);
-    glBindVertexArray(vao);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb.width, fb.height, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, fb.data);
+    glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	MYGLERRORMACRO
 }
 
-void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
+void Renderer::fillPass(const mat4& proj, Mesh* mesh){
+	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
+		vec4 face[3];
+		face[0] = proj * mesh->vertices[mesh->indices[i]].position;
+		face[1] = proj * mesh->vertices[mesh->indices[i+1]].position;
+		face[2] = proj * mesh->vertices[mesh->indices[i+2]].position;
+		// bounds checks and early exits
+		bool badw = false;
+		unsigned badz = 0;
+		for(unsigned t = 0; t < 3; t++){
+			// divide into correct perspective
+			if(face[t].w == 0.0f){
+				badw = true;
+				break;
+			}
+			face[t] = face[t] / face[t].w;
+			if(face[t].z < -1.0f || face[t].z > 1.0f){
+				badz++;
+			}
+		}
+		if(badw || badz >= 3){
+			continue;
+		}
+		// assign extents
+		vec4 extents(face[0].x, face[0].x, face[0].y, face[0].y);
+		for(unsigned t = 1; t < 3; t++){
+			extents.x = clamp(0.0f, m_width - 1.0f, std::min(extents.x, face[t].x));
+			extents.y = clamp(0.0f, m_width - 1.0f, std::max(extents.y, face[t].x));
+			extents.z = clamp(0.0f, m_height -1.0f, std::min(extents.z, face[t].y));
+			extents.w = clamp(0.0f, m_height -1.0f, std::max(extents.w, face[t].y));
+		}
+	}
+}
+
+void Renderer::DDAPass(const mat4& proj, Mesh* mesh){
 	const Pixel color(0xFF, 0xFF, 0xFF, 0xFF);
 	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
 		vec4 face[3];
@@ -94,14 +130,11 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 			continue;
 		}
 		for(int t = 0; t < 3; t++){
-			if(face[t].z > 1.0){
+			if(face[t].z < -1.0 || face[t].z > 1.0){
 				badw = true;
 				break;
 			}
-			if(face[t].z < -1.0){
-				badw = true;
-				break;
-			}
+			
 		}
 		if(badw){
 			continue;
@@ -141,7 +174,7 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 				int k = 0;
 				for(int x = (int)(x0); x < (int)(x1); x++){
 					int y = (int)(y0 + k * slope);
-					img.setPixel(y, x, color);
+					fb.setPixel(y, x, color);
 					k++;
 				}
 			}
@@ -149,7 +182,7 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 				int k = 0;
 				for(int x = (int)(x0); x < (int)(x1); x++){
 					int y = (int)(y0 + k * slope);
-					img.setPixel(x, y, color);
+					fb.setPixel(x, y, color);
 					k++;
 				}
 			}
@@ -158,6 +191,7 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh, Image& img){
 }
 
 void Renderer::draw(const BoshartParam& param) {
+	m_near = param.near; m_far = param.far;
 	//-----scenegraph code----------------------------
 	EntityGraph graph;
 	graph.init(4);
@@ -169,22 +203,8 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
 	//----end scenegraph code----------------------------
-	printf("W:\n");
 	mat4 W = Wmatrix((float)m_width, (float)m_height);
-	print(W);
-	printf("N:\n");
-	mat4 N = Nmatrix(param.near, param.far);
-	print(N);
-	printf("A:\n");
-	mat4 A = Amatrix((float)m_height / (float)m_width, param.fov);
-	print(A);
-	printf("C:\n");
-	mat4 C = lookAt(param.eye, param.at, param.up);
-	print(C);
-	printf("WNAC:\n");
-	const mat4 WNAC = W * N * A;// * C;
-	print(WNAC);
-	printf("\n");
+	const mat4 PW = W * GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
 	
@@ -192,26 +212,27 @@ void Renderer::draw(const BoshartParam& param) {
 	glfwSetTime(0.0);
 	bool insert = false;
 	Camera cam;
-	cam.init();
+	cam.init(param.eye, param.at, param.up);
 	glfwSetTime(0.0);
     while (!glfwWindowShouldClose(m_glwindow)) {
-		m_input->poll(glfwGetTime(), cam);
+		double dt = glfwGetTime();
 		glfwSetTime(0.0);
+		m_input->poll(dt, cam);
 		fb.clear(black);
+		db.clear();
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 WNACI = WNAC * cam.getViewMatrix() * mt.mat;
-			//mat4 WNACI = WNAC * mt.mat;
+			mat4 MVPW = PW * cam.getViewMatrix() * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				DDAPass(WNACI, mesh, fb);
+				DDAPass(MVPW, mesh);
 			}
 		}
 
 		// send framebuffer to opengl
-		glPass(fb, m_vao, fb_id);
+		glPass();
         glfwSwapBuffers(m_glwindow);
     }
 	//---------end draw loop--------------------------------

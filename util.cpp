@@ -198,27 +198,27 @@ void print(const mat4& mat){
 	printf("%6.3f, %6.3f, %6.3f, %6.3f\n", mat[3], mat[7], mat[11], mat[15]);
 }
 
-mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up){
+mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up){
 	mat4 m;
-	vec3 n(normalize(eye - at));
-	vec3 u(normalize(cross(up, n)));
-	vec3 v(cross(n, u));
+	vec3 f(normalize(center - eye));
+	vec3 s(normalize(cross(f, up)));
+	vec3 u(cross(s, f));
 	
-	m(0) = u.x;
-    m(4) = u.y;
-    m(8) = u.z;
+	m(0) = s.x;
+    m(4) = s.y;
+    m(8) = s.z;
 
-    m(1) = v.x;
-    m(5) = v.y;
-    m(9) = v.z;
+    m(1) = u.x;
+    m(5) = u.y;
+    m(9) = u.z;
 
-    m(2)  = n.x;
-    m(6)  = n.y;
-    m(10) = n.z;
+    m(2)  = -f.x;
+    m(6)  = -f.y;
+    m(10) = -f.z;
 	
-	m(12) = dot(u, eye);
-	m(13) = dot(v, eye);
-	m(14) = dot(n, eye);
+	m(12) = -dot(s, eye);
+	m(13) = -dot(u, eye);
+	m(14) = dot(f, eye);
 
 	return m;
 }
@@ -236,9 +236,6 @@ vec3 getRight(const mat4& mat){
 }
 vec3 getUp(const mat4& mat){
 	return vec3(mat[1], mat[5], mat[9]);
-}
-vec3 getPos(const mat4& mat){
-	return vec3(-mat[12], -mat[13], -mat[14]);
 }
 
 mat4 Wmatrix(const float width, const float height){
@@ -275,14 +272,18 @@ mat4 Nmatrix(const double near, const double far){
 	return m;
 }
 
+// aspect = w/h
 mat4 GLperspective(double fovy, double aspect, double near, double far){
 	mat4 m;
+	near = std::abs(near);
+	far = std::abs(far);
 	double ha = std::tan(radians(fovy / 2.0));
 	m(0) = 1.0 / (aspect * ha);
 	m(5) = 1.0 / ha;
 	m(10) = -(far + near) / (far - near);
-	m(11) = -(2.0 * far * near) / (far - near);
-	m(14) = -1.0;
+	m(14) = -(2.0 * far * near) / (far - near);
+	m(11) = -1.0;
+	m(15) = 0.0;
 	return m;
 }
 
@@ -316,6 +317,7 @@ vec3 cross(const vec3& lhs, const vec3& rhs){
 */
 
 // normalized matrix for rotations around the origin
+//http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
 mat4 rotate(const float _angle, const vec3& _v){
 	mat4 m;
 	if(_angle == 0.0f){
@@ -326,7 +328,7 @@ mat4 rotate(const float _angle, const vec3& _v){
 		return m;
 	}
 	const float angle = radians(_angle);
-	vec3 v = _v / len;
+	vec3 v(_v / len);
 	const float c = cos(angle);
 	const float cinv = 1.0f - c;
 	const float s = sin(angle);
@@ -353,7 +355,7 @@ mat4 rotate(const vec4& _v){
 	if(_v.w == 0.0f){
 		return m;
 	}
-	vec3 v = vec3(_v);
+	vec3 v(_v);
 	const float len = length(v);
 	if(len <= 0.0f){
 		return m;
@@ -378,7 +380,6 @@ mat4 rotate(const vec4& _v){
     m(2)  = v.x * v.z * cinv - v.y * s;
     m(6)  = v.y * v.z * cinv + v.x * s;
     m(10) = w2 + (1.0f - w2) * c;
-	
 	return m;
 }
 mat4 scale(const vec3& v){

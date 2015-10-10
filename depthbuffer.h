@@ -3,11 +3,13 @@
 
 class DepthBuffer{
 	double* data = nullptr;
+	unsigned width, height;
 public:
-	inline void init(const unsigned width, const unsigned height){
+	inline void init(const unsigned _width, const unsigned _height){
 		if(data != nullptr){
 			return;
 		}
+		width = _width; height = _height;
 		data = (double*)malloc(sizeof(double) * width * height);
 		for(unsigned i = 0; i < width * height; i++){
 			*(data + i) = -1.0;
@@ -34,6 +36,11 @@ public:
 			return;
 		}
 		*(data + x + y * width) = val;
+	}
+	inline void clear(){
+		for(unsigned i = 0; i < width * height; i++){
+			*(data + i) = -1.0;
+		}
 	}
 };
 

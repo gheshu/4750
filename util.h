@@ -58,7 +58,9 @@ mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up);	// side = m0,1,2, 
 vec3 getForward(const mat4& mat);
 vec3 getRight(const mat4& mat);
 vec3 getUp(const mat4& mat);
-vec3 getPos(const mat4& mat);
+float getPitch(const mat4& mat);
+float getYaw(const mat4& mat);
+float getRoll(const mat4& mat);
 
 mat4 Wmatrix(const float width, const float height);
 mat4 Amatrix(const float hwratio = 9.0f / 16.0f, const float fov = 90.0f);

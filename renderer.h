@@ -10,6 +10,7 @@
 #include "mesh.h"
 #include "resourcemanager.h"
 #include "camera.h"
+#include "depthbuffer.h"
 
 struct BoshartParam{
 	hlm::vec3 t, r, s;
@@ -22,6 +23,7 @@ class Renderer
 private:
 	GLSLProgram m_prog;
 	Image fb;
+	DepthBuffer db;
 	ResourceManager res_man;
 	Window* m_window;
 	GLFWwindow* m_glwindow;
@@ -29,10 +31,12 @@ private:
 
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
+	float m_near, m_far;
 	
-	void DDAPass(const hlm::mat4& proj, Mesh* verts, Image& img);
-	void glPass(const Image& img, const GLuint vao, const GLuint fb_id);
-	void screenQuadInit(GLuint& vao, GLuint& id0);
+	void fillPass(const hlm::mat4& proj, Mesh* mesh);
+	void DDAPass(const hlm::mat4& proj, Mesh* verts);
+	void glPass();
+	void screenQuadInit();
 public:
     void init(const int width, const int height, const int msaa);
 	void destroy();
