@@ -1,6 +1,9 @@
 #ifndef DEPTHBUFFER_H
 #define DEPTHBUFFER_H
 
+#define FAR -1.0
+#define NEAR 1.0
+
 class DepthBuffer{
 	double* data = nullptr;
 	unsigned width, height;
@@ -11,9 +14,7 @@ public:
 		}
 		width = _width; height = _height;
 		data = (double*)malloc(sizeof(double) * width * height);
-		for(unsigned i = 0; i < width * height; i++){
-			*(data + i) = -1.0;
-		}
+		clear();
 	}
 	inline void destroy(){
 		free(data);
@@ -21,25 +22,30 @@ public:
 	}
 	inline double get(const unsigned x, const unsigned y){
 		if(x >= width){
-			return 1.0;
+			return NEAR;
 		}
 		if(y >= height){
-			return 1.0;
+			return NEAR;
 		}
 		return *(data + x + y*width);
 	}
-	inline void set(const unsigned x, const unsigned y, const double val){
+	inline bool set(const unsigned x, const unsigned y, const double val){
 		if(x >= width){
-			return;
+			return false;
 		}
 		if(y >= height){
-			return;
+			return false;
 		}
-		*(data + x + y * width) = val;
+		double *i = (data + x + y * width);
+		if(val > NEAR || val > *i){
+			return false;
+		}
+		*i = val;
+		return true;
 	}
 	inline void clear(){
 		for(unsigned i = 0; i < width * height; i++){
-			*(data + i) = -1.0;
+			*(data + i) = FAR;
 		}
 	}
 };

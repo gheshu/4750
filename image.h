@@ -2,6 +2,9 @@
 #define IMAGE_H
 
 typedef unsigned char uint_8;
+namespace hlm{
+	class vec3;
+};
 
 struct Pixel{
 	uint_8 r, g, b, a;
@@ -15,6 +18,7 @@ struct Image{
 	void init(const int width, const int height);
 	void destroy();
 	void setPixel(int x, int y, const Pixel& p);
+	void setPixel(int x, int y, const hlm::vec3& v);
 	void orPixel(int x, int y, const Pixel& p);
 	void clear(const Pixel& p);
 };

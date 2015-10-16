@@ -44,6 +44,23 @@ float clamp(const float low, const float high, const float val){
 	return std::min(high, std::max(low, val));
 }
 
+float lerp(const float a, const float b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+vec2 lerp(const vec2& a, const vec2& b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+vec3 lerp(const vec3& a, const vec3& b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+vec4 lerp(const vec4& a, const vec4& b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+
 mat3 inverse(const mat3& m){
 	mat3 inv;
 	float det = m[0] * (m[4] * m[8] - m[5] * m[7]) -

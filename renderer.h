@@ -22,8 +22,8 @@ class Renderer
 {
 private:
 	GLSLProgram m_prog;
-	Image fb;
-	DepthBuffer db;
+	Image framebuffer;
+	DepthBuffer depthbuffer;
 	ResourceManager res_man;
 	Window* m_window;
 	GLFWwindow* m_glwindow;

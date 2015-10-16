@@ -1,6 +1,7 @@
 #ifndef HLM_UTIL_H
 #define HLM_UTIL_H
 
+#include "vec2.h"
 #include "vec3.h"
 #include "vec4.h"
 #include "mat3.h"
@@ -19,6 +20,11 @@ float distance(const vec4& lhs, const vec4& rhs);
 
 float length(const vec3& v);
 float length(const vec4& v);
+
+float lerp(const float a, const float b, float alpha);
+vec2 lerp(const vec2& a, const vec2& b, float alpha);
+vec3 lerp(const vec3& a, const vec3& b, float alpha);
+vec4 lerp(const vec4& a, const vec4& b, float alpha);
 
 mat3 inverse(const mat3& in);
 mat3 transpose( const mat3& mat);

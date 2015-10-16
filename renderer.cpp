@@ -19,8 +19,8 @@ void Renderer::init(const int width, const int height, const int msaa) {
 		exit(1);
 	}
 	
-	fb.init(m_width, m_height);
-	db.init(m_width, m_height);
+	framebuffer.init(m_width, m_height);
+	depthbuffer.init(m_width, m_height);
 	
 	screenQuadInit();
 	res_man.init(1);
@@ -29,8 +29,8 @@ void Renderer::init(const int width, const int height, const int msaa) {
 
 void Renderer::destroy(){
 	res_man.destroy();
-	db.destroy();
-	fb.destroy();
+	depthbuffer.destroy();
+	framebuffer.destroy();
     delete m_window;
 	m_window = nullptr;
 	delete m_input;
@@ -68,8 +68,8 @@ void Renderer::screenQuadInit(){
 
 void Renderer::glPass(){
 	glBindTexture(GL_TEXTURE_2D, fb_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb.width, fb.height, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, fb.data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, framebuffer.width, framebuffer.height, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, framebuffer.data);
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -97,33 +97,45 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 			}
 		}
 		if(badw || badz >= 3){
+			//badz == 3 means all vertices of face are clipped leaving nothing to draw.
 			continue;
 		}
-		// check normal facing away
-		vec3 e1(face[1] - face[0]);
-		vec3 e2(face[2] - face[0]);
-		vec3 fnormal = cross(e1, e2);
-		if(fnormal.z <= 0.0f){
-			continue;
+		{
+			// check normal facing away
+			vec3 e1(face[1] - face[0]);
+			vec3 e2(face[2] - face[0]);
+			vec3 fnormal = cross(e1, e2);
+			if(fnormal.z <= 0.0f){
+				// z component of normal must not face away (musn't be negative)
+				// negative z is is 'away' in camera space.
+				continue;
+			}
 		}
-		fnormal = normalize(fnormal);
-		// assign extents, minx maxx, miny, maxy
-		vec4 extents(face[0].x, face[0].x, face[0].y, face[0].y);
-		for(unsigned t = 1; t < 3; t++){
-			extents.x = clamp(0.0f, m_width - 1.0f, std::min(extents.x, face[t].x));
-			extents.y = clamp(0.0f, m_width - 1.0f, std::max(extents.y, face[t].x));
-			extents.z = clamp(0.0f, m_height -1.0f, std::min(extents.z, face[t].y));
-			extents.w = clamp(0.0f, m_height -1.0f, std::max(extents.w, face[t].y));
+		// clamp the vertices to the screen.
+		for(unsigned t = 0; t < 3; t++){
+			face[t].x = clamp(0.0f, m_width - 1.0f, face[t].x);
+			face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
 		}
-		
-		//compute beta => y
-		
-		//loop over y
-			//loop over alpha => x
-			
-				//compute pixel lighting OR blend vertex lighting
-			
-				//draw to image if at top of zbuffer
+		//consider a the mix between vert0 and vert1, and b the mix between edge0 and vert2.
+		// delta a is how far in a to produce one pixel of change in position from v0 to v1.
+		// delta b is how far in b to produce one pixel of change in position from e1 to v2.
+		const float da = 1.0f / max(1.0f / (m_width + m_height), length(face[1] - face[0]));
+		const float db = 1.0f / max(1.0f / (m_width + m_height), length(face[1] - face[0]));
+		for(float b = 0.0f; b <= 1.0f; b += db){
+			for(float a = 0.0f; a <= 1.0f; a += da){
+				if(a + b > 1.0f){
+					continue;
+				}
+				vec3 point = lerp(lerp(face[0], face[1], a), face[2], b);
+				if(depthbuffer.set(point.x, point.y, point.z)){
+					const vec3 c0 = mesh->vertices[mesh->indices[i]].color;
+					const vec3 c1 = mesh->vertices[mesh->indices[i+1]].color;
+					const vec3 c2 = mesh->vertices[mesh->indices[i+2]].color;
+					vec3 color(normalize(lerp(lerp(c0, c1, a), c2, b)));
+					framebuffer.setPixel(point.x, point.y, color);
+				}
+			}
+		}
 		
 	}
 }
@@ -192,7 +204,7 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh){
 				int k = 0;
 				for(int x = (int)(x0); x < (int)(x1); x++){
 					int y = (int)(y0 + k * slope);
-					fb.setPixel(y, x, color);
+					framebuffer.setPixel(y, x, color);
 					k++;
 				}
 			}
@@ -200,7 +212,7 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh){
 				int k = 0;
 				for(int x = (int)(x0); x < (int)(x1); x++){
 					int y = (int)(y0 + k * slope);
-					fb.setPixel(x, y, color);
+					framebuffer.setPixel(x, y, color);
 					k++;
 				}
 			}
@@ -236,8 +248,8 @@ void Renderer::draw(const BoshartParam& param) {
 		double dt = glfwGetTime();
 		glfwSetTime(0.0);
 		m_input->poll(dt, cam);
-		fb.clear(black);
-		db.clear();
+		framebuffer.clear(black);
+		depthbuffer.clear();
 	
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
@@ -245,7 +257,7 @@ void Renderer::draw(const BoshartParam& param) {
 			mat4 MVPW = PW * cam.getViewMatrix() * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				DDAPass(MVPW, mesh);
+				fillPass(MVPW, mesh);
 			}
 		}
 

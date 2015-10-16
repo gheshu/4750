@@ -1,6 +1,7 @@
 #include "image.h"
 #include <string>
 #include <algorithm>
+#include "vec3.h"
 
 void Image::init(const int _width, const int _height){
 	if(data != nullptr){return;}
@@ -21,6 +22,14 @@ void Image::setPixel(int x, int y, const Pixel& p){
 		return;
 	}
 	*(data + x + y * width) = p;
+}
+
+void Image::setPixel(int x, int y, const hlm::vec3& v){
+	Pixel *i = (data + x + y * width);
+	i->r = (uint_8)(255 * v.x);
+	i->g = (uint_8)(255 * v.y);
+	i->b = (uint_8)(255 * v.z);
+	i->a = 255;
 }
 
 void Image::orPixel(int x, int y, const Pixel& p){
