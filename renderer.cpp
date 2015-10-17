@@ -6,6 +6,10 @@
 #include "objimporter.h"
 #include "entitygraph.h"
 
+#ifdef OMP_PARALLEL
+	#include "omp.h"
+#endif
+
 using namespace std;
 using namespace hlm;
 
@@ -14,6 +18,8 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
+	
+	num_threads = 4;
 	
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
@@ -74,6 +80,73 @@ void Renderer::glPass(){
     glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	MYGLERRORMACRO
+}
+
+void Renderer::parFillPass(const mat4& proj, Mesh* mesh, const unsigned i){
+	vec4 face[3];
+	face[0] = proj * mesh->at(i).position;
+	face[1] = proj * mesh->at(i + 1).position;
+	face[2] = proj * mesh->at(i + 2).position;
+	// bounds checks and early exits
+	unsigned badz = 0;
+	for(unsigned t = 0; t < 3; t++){
+		// divide into correct perspective
+		if(face[t].w == 0.0f){
+			return;
+		}
+		face[t] = face[t] / face[t].w;
+		if(face[t].z < -1.0f || face[t].z > 1.0f){
+			badz++;
+		}
+	}
+	if(badz >= 3){
+		//badz == 3 means all vertices of face are clipped leaving nothing to draw.
+		return;
+	}
+	{
+		// do back face culling
+		const vec3 e1(face[1] - face[0]);
+		const vec3 e2(face[2] - face[0]);
+		const vec3 fnormal = cross(e1, e2);
+		if(fnormal.z <= 0.0f){
+			// z component of normal must not face away (musn't be negative)
+			// negative z is 'away' in camera space.
+			return;
+		}
+	}
+	// clamp the vertices to the screen.
+	for(unsigned t = 0; t < 3; t++){
+		face[t].x = clamp(0.0f, m_width - 1.0f, face[t].x);
+		face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
+	}
+	// retrieve the vertex colors.
+	const vec3& c0 = mesh->at(i).color;
+	const vec3 ce1 = mesh->at(i+1).color - c0;
+	const vec3 ce2 = mesh->at(i+2).color - c0;
+	// determine edges
+	const vec3 e1(face[1] - face[0]);
+	const vec3 e2(face[2] - face[0]);
+	// calculate deltas
+	const float da = 1.0f / max(1.0f, length(e1));
+	const float db = 1.0f / max(1.0f, length(e2));
+	// draw loop
+	const vec3 v0(face[0]);
+	for(float b = 0.0f; b <= 1.0f; b += db){
+		for(float a = 0.0f; a <= 1.0f; a += da){
+			if(a + b > 1.0f){
+				continue;
+			}
+			const vec3 point(v0 + a * e1 + b * e2);
+			if(depthbuffer.set(point)){
+			#if 1
+				vec3 color(normalize(c0 + a * ce1 + b * ce2));
+			#else
+				vec3 color(1.0f, 0.5f, 0.5f);
+			#endif
+				framebuffer.setPixel(point, color);
+			}
+		}
+	}
 }
 
 void Renderer::fillPass(const mat4& proj, Mesh* mesh){
@@ -144,7 +217,6 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 				}
 			}
 		}
-		
 	}
 }
 
@@ -273,8 +345,15 @@ void Renderer::draw(const BoshartParam& param) {
 			mat4 MVPW = PW * cam.getViewMatrix() * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				fillPass(MVPW, mesh);
-				//DDAPass(MVPW, mesh);
+				#ifdef OMP_PARALLEL
+					#pragma omp parallel for
+						for(unsigned k = 0; k < mesh->size() - 2; k++){
+							parFillPass(MVPW, mesh, k);
+						}
+				#else
+					fillPass(MVPW, mesh);
+					//DDAPass(MVPW, mesh);
+				#endif
 			}
 		}
 
