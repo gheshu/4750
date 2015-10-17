@@ -259,20 +259,26 @@ void Renderer::draw(const BoshartParam& param) {
 	cam.init(param.eye, param.at, param.up);
 	glfwSetTime(0.0);
     while (!glfwWindowShouldClose(m_glwindow)) {
+		// update frame time
 		double dt = glfwGetTime();
 		glfwSetTime(0.0);
 		frame_i++;
 		if(frame_i % 60 == 0){
 			printf("FPS: %f\n", 1.0 / dt);
 		}
+		
+		// update camera and poll glfw events
 		m_input->poll(dt, cam);
+		const mat4 PWV = PW * cam.getViewMatrix();
+		
+		// clear frame
 		framebuffer.clear(black);
 		depthbuffer.clear();
-	
+		
 		// draw each mesh instance
 		for(int i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 MVPW = PW * cam.getViewMatrix() * mt.mat;
+			mat4 MVPW = PWV * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				#pragma omp parallel for schedule(dynamic, 4)
@@ -284,7 +290,7 @@ void Renderer::draw(const BoshartParam& param) {
 
 		// send framebuffer to opengl
 		glPass();
-        glfwSwapBuffers(m_glwindow);
+		glfwSwapBuffers(m_glwindow);
     }
 	//---------end draw loop--------------------------------
 	instance_xforms = nullptr;
