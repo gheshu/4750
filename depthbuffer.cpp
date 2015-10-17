@@ -12,6 +12,7 @@ void DepthBuffer::init(const unsigned _width, const unsigned _height){
 	width = _width; height = _height;
 	data = new float[width * height];
 	clear();
+	locked = false;
 }
 void DepthBuffer::destroy(){
 	delete[] data;
@@ -26,6 +27,28 @@ float DepthBuffer::get(const unsigned x, const unsigned y){
 	}
 	return *(data + x + y*width);
 }
+
+bool DepthBuffer::top(const hlm::vec3& v){
+	if(v.x >= width){
+		return false;
+	}
+	if(v.y >= height){
+		return false;
+	}
+	float *i = (data + (int)v.x + (int)v.y * width);
+	if(v.z > NEAR || v.z < *i){
+		return false;
+	}
+	return true;
+}
+
+void DepthBuffer::parSet(const hlm::vec3& v){
+	while(locked){};
+	locked = true;
+	*(data + (int)v.x + (int)v.y * width) = v.z;
+	locked = false;
+}
+
 bool DepthBuffer::set(const unsigned x, const unsigned y, const float val){
 	if(x >= width){
 		return false;

@@ -15,11 +15,13 @@ struct Pixel{
 struct Image{
 	int width, height;
 	Pixel* data = nullptr;
+	bool locked;
 	void init(const int width, const int height);
 	void destroy();
 	void setPixel(int x, int y, const Pixel& p);
 	void setPixel(int x, int y, const hlm::vec3& v);
 	void setPixel(const hlm::vec3& pos, const hlm::vec3& color);
+	void parSetPixel(const hlm::vec3& pos, const hlm::vec3& color);
 	void orPixel(int x, int y, const Pixel& p);
 	void clear(const Pixel& p);
 };

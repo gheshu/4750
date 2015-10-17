@@ -137,13 +137,14 @@ void Renderer::parFillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 				continue;
 			}
 			const vec3 point(v0 + a * e1 + b * e2);
-			if(depthbuffer.set(point)){
+			if(depthbuffer.top(point)){
 			#if 1
 				vec3 color(normalize(c0 + a * ce1 + b * ce2));
 			#else
 				vec3 color(1.0f, 0.5f, 0.5f);
 			#endif
-				framebuffer.setPixel(point, color);
+				framebuffer.parSetPixel(point, color);
+				depthbuffer.parSet(point);
 			}
 		}
 	}
