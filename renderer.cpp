@@ -19,8 +19,6 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
 	
-	num_threads = 4;
-	
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
 	}
@@ -306,7 +304,6 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh){
 }
 
 void Renderer::draw(const BoshartParam& param) {
-	m_near = param.near; m_far = param.far;
 	//-----scenegraph code----------------------------
 	EntityGraph graph;
 	graph.init(4);
