@@ -77,11 +77,11 @@ void Renderer::glPass(){
 }
 
 void Renderer::fillPass(const mat4& proj, Mesh* mesh){
-	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
+	for(unsigned i = 0; i < mesh->size() - 2; i += 3){
 		vec4 face[3];
-		face[0] = proj * mesh->vertices[mesh->indices[i]].position;
-		face[1] = proj * mesh->vertices[mesh->indices[i+1]].position;
-		face[2] = proj * mesh->vertices[mesh->indices[i+2]].position;
+		face[0] = proj * mesh->at(i).position;
+		face[1] = proj * mesh->at(i + 1).position;
+		face[2] = proj * mesh->at(i + 2).position;
 		// bounds checks and early exits
 		bool badw = false;
 		unsigned badz = 0;
@@ -117,11 +117,9 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 			face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
 		}
 		// retrieve the vertex colors.
-		const vec3& c0 = mesh->vertices[mesh->indices[i]].color;
-		const vec3& c1 = mesh->vertices[mesh->indices[i+1]].color;
-		const vec3& c2 = mesh->vertices[mesh->indices[i+2]].color;
-		const vec3 ce1 = c1 - c0;
-		const vec3 ce2 = c2 - c0;
+		const vec3& c0 = mesh->at(i).color;
+		const vec3 ce1 = mesh->at(i+1).color - c0;
+		const vec3 ce2 = mesh->at(i+2).color - c0;
 		// determine edges
 		const vec3 e1(face[1] - face[0]);
 		const vec3 e2(face[2] - face[0]);

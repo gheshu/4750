@@ -16,6 +16,11 @@ struct MeshVertex{
 struct Mesh{
 	std::vector<MeshVertex> vertices;
 	std::vector<unsigned> indices;
+	
+	inline MeshVertex& at(const unsigned i){
+		return vertices[indices[i]];
+	}
+	inline unsigned size(){ return indices.size(); }
 };
 
 #endif
