@@ -32,6 +32,14 @@ void Image::setPixel(int x, int y, const hlm::vec3& v){
 	i->a = 255;
 }
 
+void Image::setPixel(const hlm::vec3& pos, const hlm::vec3& color){
+	Pixel *i = (data + (int)pos.x + (int)pos.y * width);
+	i->r = (uint_8)(255 * color.x);
+	i->g = (uint_8)(255 * color.y);
+	i->b = (uint_8)(255 * color.z);
+	i->a = 255;
+}
+
 void Image::orPixel(int x, int y, const Pixel& p){
 	x = std::min(width - 1, std::max(0, x));
 	y = std::min(height - 1, std::max(0, y));

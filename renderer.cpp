@@ -101,13 +101,13 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 			continue;
 		}
 		{
-			// check normal facing away
-			vec3 e1(face[1] - face[0]);
-			vec3 e2(face[2] - face[0]);
-			vec3 fnormal = cross(e1, e2);
+			// do back face culling
+			const vec3 e1(face[1] - face[0]);
+			const vec3 e2(face[2] - face[0]);
+			const vec3 fnormal = cross(e1, e2);
 			if(fnormal.z <= 0.0f){
 				// z component of normal must not face away (musn't be negative)
-				// negative z is is 'away' in camera space.
+				// negative z is 'away' in camera space.
 				continue;
 			}
 		}
@@ -124,22 +124,23 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 		const vec3 e1(face[1] - face[0]);
 		const vec3 e2(face[2] - face[0]);
 		// calculate deltas
-		const float da = 0.999f / max(1.0f, length(e1));
-		const float db = 0.999f / max(1.0f, length(e2));
+		const float da = 1.0f / max(1.0f, length(e1));
+		const float db = 1.0f / max(1.0f, length(e2));
 		// draw loop
+		const vec3 v0(face[0]);
 		for(float b = 0.0f; b <= 1.0f; b += db){
 			for(float a = 0.0f; a <= 1.0f; a += da){
 				if(a + b > 1.0f){
 					continue;
 				}
-				const vec3 point(vec3(face[0]) + a * e1 + b * e2);
-				if(depthbuffer.set(point.x, point.y, point.z)){
-				#if 0
+				const vec3 point(v0 + a * e1 + b * e2);
+				if(depthbuffer.set(point)){
+				#if 1
 					vec3 color(normalize(c0 + a * ce1 + b * ce2));
 				#else
 					vec3 color(1.0f, 0.5f, 0.5f);
 				#endif
-					framebuffer.setPixel(point.x, point.y, color);
+					framebuffer.setPixel(point, color);
 				}
 			}
 		}
