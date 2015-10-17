@@ -15,7 +15,6 @@ struct Pixel{
 struct Image{
 	int width, height;
 	Pixel* data = nullptr;
-	bool locked;
 	void init(const int width, const int height);
 	void destroy();
 	void setPixel(int x, int y, const Pixel& p);

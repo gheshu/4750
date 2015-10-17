@@ -7,7 +7,6 @@ void Image::init(const int _width, const int _height){
 	if(data != nullptr){return;}
 	width = _width; height = _height;
 	data = (Pixel*)malloc(sizeof(Pixel) * width * height);
-	locked = false;
 }
 
 void Image::destroy(){
@@ -42,14 +41,11 @@ void Image::setPixel(const hlm::vec3& pos, const hlm::vec3& color){
 }
 
 void Image::parSetPixel(const hlm::vec3& pos, const hlm::vec3& color){
-	while(locked){};
-	locked = true;
 	Pixel *i = (data + (int)pos.x + (int)pos.y * width);
 	i->r = (uint_8)(255 * color.x);
 	i->g = (uint_8)(255 * color.y);
 	i->b = (uint_8)(255 * color.z);
 	i->a = 255;
-	locked = false;
 }
 
 void Image::orPixel(int x, int y, const Pixel& p){

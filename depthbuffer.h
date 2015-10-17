@@ -8,7 +8,6 @@ namespace hlm{
 class DepthBuffer{
 	float* data = nullptr;
 	unsigned width, height;
-	bool locked;
 public:
 	void init(const unsigned _width, const unsigned _height);
 	void destroy();

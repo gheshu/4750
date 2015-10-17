@@ -32,8 +32,7 @@ private:
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
 	
-	void parFillPass(const hlm::mat4& proj, Mesh* mesh, const unsigned i);
-	void fillPass(const hlm::mat4& proj, Mesh* mesh);
+	void fillPass(const hlm::mat4& proj, Mesh* mesh, const unsigned i);
 	void DDAPass(const hlm::mat4& proj, Mesh* verts);
 	void glPass();
 	void screenQuadInit();
