@@ -16,8 +16,6 @@ void Camera::init(const hlm::vec3& _eye, const hlm::vec3& center, const hlm::vec
 
 void Camera::pitch(const float amt){
 	forward += sin(hlm::radians(amt)) * hlm::getUp(view);
-    hlm::normalize (forward);
-    forward.y = hlm::clamp (-0.9f, 0.9f, forward.y);
 }
 void Camera::yaw(const float amt){
 	forward += sin(hlm::radians(amt)) * hlm::getRight(view);

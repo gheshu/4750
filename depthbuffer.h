@@ -37,7 +37,7 @@ public:
 			return false;
 		}
 		double *i = (data + x + y * width);
-		if(val > NEAR || val > *i){
+		if(val > NEAR || val < *i){
 			return false;
 		}
 		*i = val;

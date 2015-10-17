@@ -33,11 +33,26 @@ bool objload(const std::string& filename, Mesh& out){
 		out.indices.clear();
 		out.indices.reserve(icount);
 		string line;
+		unsigned ci = 0;
 		while(getline(stream, line)){
 			if(line.substr(0, 2) == "v "){
 				istringstream s(line.substr(2));
 				MeshVertex v;
 				s >> v.position.x; s >> v.position.y; s >> v.position.z; v.position.w = 1.0f;
+				switch(ci){
+					case 0:
+						v.color = vec3(255.0f, 0.0f, 0.0f);
+						break;
+					case 1:
+						v.color = vec3(0.0f, 255.0f, 0.0f);
+						break;
+					case 2:
+						v.color = vec3(0.0f, 0.0f, 255.0f);
+						break;
+					default:
+						break;
+				}
+				ci = (ci + 1) % 3;
 				out.vertices.push_back(v);
 			} 
 			else if(line.substr(0, 2) == "f "){

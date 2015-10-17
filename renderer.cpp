@@ -116,22 +116,31 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh){
 			face[t].x = clamp(0.0f, m_width - 1.0f, face[t].x);
 			face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
 		}
-		//consider a the mix between vert0 and vert1, and b the mix between edge0 and vert2.
-		// delta a is how far in a to produce one pixel of change in position from v0 to v1.
-		// delta b is how far in b to produce one pixel of change in position from e1 to v2.
-		const float da = 1.0f / max(1.0f / (m_width + m_height), length(face[1] - face[0]));
-		const float db = 1.0f / max(1.0f / (m_width + m_height), length(face[1] - face[0]));
+		// retrieve the vertex colors.
+		const vec3& c0 = mesh->vertices[mesh->indices[i]].color;
+		const vec3& c1 = mesh->vertices[mesh->indices[i+1]].color;
+		const vec3& c2 = mesh->vertices[mesh->indices[i+2]].color;
+		const vec3 ce1 = c1 - c0;
+		const vec3 ce2 = c2 - c0;
+		// determine edges
+		const vec3 e1(face[1] - face[0]);
+		const vec3 e2(face[2] - face[0]);
+		// calculate deltas
+		const float da = 0.999f / max(1.0f, length(e1));
+		const float db = 0.999f / max(1.0f, length(e2));
+		// draw loop
 		for(float b = 0.0f; b <= 1.0f; b += db){
 			for(float a = 0.0f; a <= 1.0f; a += da){
 				if(a + b > 1.0f){
 					continue;
 				}
-				vec3 point = lerp(lerp(face[0], face[1], a), face[2], b);
+				const vec3 point(vec3(face[0]) + a * e1 + b * e2);
 				if(depthbuffer.set(point.x, point.y, point.z)){
-					const vec3 c0 = mesh->vertices[mesh->indices[i]].color;
-					const vec3 c1 = mesh->vertices[mesh->indices[i+1]].color;
-					const vec3 c2 = mesh->vertices[mesh->indices[i+2]].color;
-					vec3 color(normalize(lerp(lerp(c0, c1, a), c2, b)));
+				#if 0
+					vec3 color(normalize(c0 + a * ce1 + b * ce2));
+				#else
+					vec3 color(1.0f, 0.5f, 0.5f);
+				#endif
 					framebuffer.setPixel(point.x, point.y, color);
 				}
 			}
@@ -168,6 +177,10 @@ void Renderer::DDAPass(const mat4& proj, Mesh* mesh){
 		}
 		if(badw){
 			continue;
+		}
+		for(int t = 0; t < 3; t++){
+			face[t].x = clamp(0.0f, m_width - 1.0f, face[t].x);
+			face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
 		}
 		for(int t = 0; t < 3; t++){
 			const vec4& v1 = face[t%3];
@@ -240,13 +253,17 @@ void Renderer::draw(const BoshartParam& param) {
 	
 	//------------draw loop-----------------------------
 	glfwSetTime(0.0);
-	bool insert = false;
+	unsigned frame_i = 0;
 	Camera cam;
 	cam.init(param.eye, param.at, param.up);
 	glfwSetTime(0.0);
     while (!glfwWindowShouldClose(m_glwindow)) {
 		double dt = glfwGetTime();
 		glfwSetTime(0.0);
+		frame_i++;
+		if(frame_i % 60 == 0){
+			printf("FPS: %f\n", 1.0 / dt);
+		}
 		m_input->poll(dt, cam);
 		framebuffer.clear(black);
 		depthbuffer.clear();
@@ -258,6 +275,7 @@ void Renderer::draw(const BoshartParam& param) {
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				fillPass(MVPW, mesh);
+				//DDAPass(MVPW, mesh);
 			}
 		}
 
