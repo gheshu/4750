@@ -70,7 +70,7 @@ float getRoll(const mat4& mat);
 
 mat4 Wmatrix(const float width, const float height);
 mat4 Amatrix(const float hwratio = 9.0f / 16.0f, const float fov = 90.0f);
-mat4 Nmatrix(const double znear, const double zfar);
+mat4 Nmatrix(double znear, double zfar);
 
 // aspect here is width / height of the window.
 // must divide by 4th element of vec4 to normalize your points if using this matrix.

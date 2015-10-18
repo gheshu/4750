@@ -29,6 +29,9 @@ void doTRS(const string& file, BoshartParam& param){
 			else if(line.substr(0, 3) == "tra"){
 				fillvec3(trs, param.t);
 			}
+			else if(line.substr(0, 3) == "mat"){
+				fillvec3(trs, param.mat);
+			}
 		}
 		trs.close();
 	}

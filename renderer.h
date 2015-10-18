@@ -13,7 +13,7 @@
 #include "depthbuffer.h"
 
 struct BoshartParam{
-	hlm::vec3 t, r, s;
+	hlm::vec3 t, r, s, mat;
 	hlm::vec3 eye, at, up;
 	float fov, near, far;
 };
@@ -32,8 +32,10 @@ private:
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
 	
+	BoshartParam m_param;
+	bool vertex_shading;
+	
 	void fillPass(const hlm::mat4& proj, Mesh* mesh, const unsigned i);
-	void DDAPass(const hlm::mat4& proj, Mesh* verts);
 	void glPass();
 	void screenQuadInit();
 public:

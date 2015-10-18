@@ -279,13 +279,14 @@ mat4 Amatrix(const float hwratio, const float fov){
 2,6,10,14
 3,7,11,15
 */
-mat4 Nmatrix(const double near, const double far){
+mat4 Nmatrix(double near, double far){
 	mat4 m;
-	const double denom = far - near;
-	m(10) = (far + near) / denom;
-	m(14) = -(2.0 * far * near) / denom;
-	m(11) = -1.0f;
-	m(15) = 0.0f;
+	near = std::abs(near);
+	far = std::abs(far);
+	m(10) = -(far + near) / (far - near);
+	m(14) = -(2.0 * far * near) / (far - near);
+	m(11) = -1.0;
+	m(15) = 0.0;
 	return m;
 }
 

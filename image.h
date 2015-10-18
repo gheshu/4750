@@ -23,6 +23,7 @@ struct Image{
 	void parSetPixel(const hlm::vec3& pos, const hlm::vec3& color);
 	void orPixel(int x, int y, const Pixel& p);
 	void clear(const Pixel& p);
+	void clear();
 };
 
 #endif

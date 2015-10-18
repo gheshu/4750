@@ -28,7 +28,7 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	
 	screenQuadInit();
 	res_man.init(1);
-	res_man.load("assets/sphere.obj", "sphere");
+	res_man.loadNoIndices("assets/sphere.obj", "sphere");
 }
 
 void Renderer::destroy(){
@@ -89,9 +89,6 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	unsigned badz = 0;
 	for(unsigned t = 0; t < 3; t++){
 		// divide into correct perspective
-		if(face[t].w == 0.0f){
-			return;
-		}
 		face[t] = face[t] / face[t].w;
 		if(face[t].z < -1.0f || face[t].z > 1.0f){
 			badz++;
@@ -136,11 +133,15 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			}
 			const vec3 point(v0 + a * e1 + b * e2);
 			if(depthbuffer.top(point)){
-			#if 1
-				vec3 color(normalize(c0 + a * ce1 + b * ce2));
-			#else
-				vec3 color(1.0f, 0.5f, 0.5f);
-			#endif
+				vec3 color;
+				
+				if(vertex_shading){
+					color = normalize(c0 + a * ce1 + b * ce2);
+				}
+				else{
+					color = m_param.mat;
+				}
+				
 				#pragma omp critical
 				{
 					framebuffer.setPixel(point, color);
@@ -151,92 +152,11 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	}
 }
 
-void Renderer::DDAPass(const mat4& proj, Mesh* mesh){
-	const Pixel color(0xFF, 0xFF, 0xFF, 0xFF);
-	for(unsigned i = 0; i < mesh->indices.size() - 2; i += 3){
-		vec4 face[3];
-		face[0] = proj * mesh->vertices[mesh->indices[i]].position;
-		face[1] = proj * mesh->vertices[mesh->indices[i+1]].position;
-		face[2] = proj * mesh->vertices[mesh->indices[i+2]].position;
-		bool badw = false;
-		for(unsigned t = 0; t < 3; t++){
-			// divide into correct perspective
-			if(face[t].w == 0.0f){
-				badw = true;
-				break;
-			}
-			face[t] = face[t] / face[t].w;
-		}
-		if(badw){
-			continue;
-		}
-		for(int t = 0; t < 3; t++){
-			if(face[t].z < -1.0 || face[t].z > 1.0){
-				badw = true;
-				break;
-			}
-			
-		}
-		if(badw){
-			continue;
-		}
-		for(int t = 0; t < 3; t++){
-			face[t].x = clamp(0.0f, m_width - 1.0f, face[t].x);
-			face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
-		}
-		for(int t = 0; t < 3; t++){
-			const vec4& v1 = face[t%3];
-			const vec4& v2 = face[(t + 1)%3];
-			
-			const bool steep = abs(v2.y - v1.y) > abs(v2.x - v1.x);
-			float x0, x1, y0, y1;
-			if(steep){
-				x0 = v1.y;
-				x1 = v2.y;
-				y0 = v1.x;
-				y1 = v2.x;
-			} 
-			else{
-				x0 = v1.x;
-				x1 = v2.x;
-				y0 = v1.y;
-				y1 = v2.y;
-			} 
-			if(x0 > x1){
-				std::swap(x0, x1);
-				std::swap(y0, y1);
-			}
-			const float dx = x1 - x0;
-			const float dy = y1 - y0;
-			float slope;
-			if(dx == 0.0f){
-				slope = 9999999.0f;
-			}
-			else {
-				slope = dy / dx;
-			}
-			if(steep){
-				int k = 0;
-				for(int x = (int)(x0); x < (int)(x1); x++){
-					int y = (int)(y0 + k * slope);
-					framebuffer.setPixel(y, x, color);
-					k++;
-				}
-			}
-			else {
-				int k = 0;
-				for(int x = (int)(x0); x < (int)(x1); x++){
-					int y = (int)(y0 + k * slope);
-					framebuffer.setPixel(x, y, color);
-					k++;
-				}
-			}
-		}
-	}
-}
-
 void Renderer::draw(const BoshartParam& param) {
+	m_param = param;
+	vertex_shading = true;
 	//-----scenegraph code----------------------------
+	
 	EntityGraph graph;
 	graph.init(4);
 	Transform t;
@@ -246,18 +166,21 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.insert("sphere", "root", "sphere", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
+	
 	//----end scenegraph code----------------------------
-	const mat4 W = Wmatrix((float)m_width, (float)m_height);
-	const mat4 PW = W * GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
-	const Pixel black(0, 0, 0, 0xFF);
+	
+	const mat4 PW = Wmatrix((float)m_width, (float)m_height) 
+		* GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	m_prog.bind();
 	
 	//------------draw loop-----------------------------
+	
 	glfwSetTime(0.0);
 	unsigned frame_i = 0;
 	Camera cam;
 	cam.init(param.eye, param.at, param.up);
 	glfwSetTime(0.0);
+	
     while (!glfwWindowShouldClose(m_glwindow)) {
 		// update frame time
 		double dt = glfwGetTime();
@@ -269,10 +192,19 @@ void Renderer::draw(const BoshartParam& param) {
 		
 		// update camera and poll glfw events
 		m_input->poll(dt, cam);
+		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
+			cam.init(param.eye, param.at, param.up);
+		}
+		if(glfwGetKey(m_glwindow, GLFW_KEY_C)){
+			vertex_shading = false;
+		}
+		else if(glfwGetKey(m_glwindow, GLFW_KEY_V)){
+			vertex_shading = true;
+		}
 		const mat4 VPW = PW * cam.getViewMatrix();
 		
 		// clear frame
-		framebuffer.clear(black);
+		framebuffer.clear();
 		depthbuffer.clear();
 		
 		// draw each mesh instance
@@ -282,7 +214,7 @@ void Renderer::draw(const BoshartParam& param) {
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				#pragma omp parallel for schedule(dynamic, 4)
-				for(unsigned k = 0; k < mesh->size() / 3; k++){
+				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(MVPW, mesh, k * 3);
 				}
 			}

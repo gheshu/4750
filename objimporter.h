@@ -5,5 +5,6 @@
 class Mesh;
 
 bool objload(const std::string& filename, Mesh& out);
+bool objloadNoIndices(const std::string& filename, Mesh& out);
 
 #endif

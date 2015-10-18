@@ -7,9 +7,23 @@ Build instructions:
 			run: runs the program after building with default flags
 			debug: builds with debug flags
 			release: builds with optimization flags (-O3)
+			parallel: builds (on compilers with openmp support) with threading and optimization
 			
 	clean.bat removes .o and .exe files.
 
-default build uses 29,620KB on win7 and has no leaks.
-release build uses 33,724KB on win7 and has no leaks.
-debug   build uses 29,620KB on win7 and has no leaks.
+Controls:
+	W: move forward
+	A: move left
+	S: move backward
+	D: move right
+	
+	Spacebar: move up
+	Left Shift: move down
+	
+	Mouse: look around
+	
+	R: reset camera
+	C: use uniform color
+	V: use vertex colors
+	
+	Escape: close program

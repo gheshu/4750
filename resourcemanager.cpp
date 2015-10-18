@@ -19,6 +19,12 @@ void ResourceManager::load(const std::string& filename, const std::string& name)
 		keys.insert({name, m});
 	}
 }
+void ResourceManager::loadNoIndices(const std::string& filename, const std::string& name){
+	Mesh m;
+	if(objloadNoIndices(filename, m)){
+		keys.insert({name, m});
+	}
+}
 
 Mesh* ResourceManager::get(const std::string& name){
 	auto a = keys.find(name);

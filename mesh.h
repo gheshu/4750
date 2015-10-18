@@ -17,10 +17,14 @@ struct Mesh{
 	std::vector<MeshVertex> vertices;
 	std::vector<unsigned> indices;
 	
-	inline MeshVertex& at(const unsigned i){
+	inline MeshVertex& atIndex(const unsigned i){
 		return vertices[indices[i]];
 	}
-	inline unsigned size(){ return indices.size(); }
+	inline MeshVertex& at(const unsigned i){
+		return vertices[i];
+	}
+	inline unsigned num_indices(){ return indices.size(); }
+	inline unsigned num_verts() {return vertices.size(); }
 };
 
 #endif
