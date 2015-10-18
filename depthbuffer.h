@@ -13,9 +13,7 @@ public:
 	void destroy();
 	float get(const unsigned x, const unsigned y);
 	bool top(const hlm::vec3& v);
-	bool set(const unsigned x, const unsigned y, const float val);
-	bool set(const hlm::vec3& v);
-	void parSet(const hlm::vec3& v);
+	void set(const hlm::vec3& v);
 	void clear();
 };
 

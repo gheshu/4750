@@ -156,6 +156,8 @@ bool GLSLProgram::compileShader(GLSLShaderTypes type, const std::string& filePat
 	case ShaderType_Fragment:
 		glShaderType = GL_FRAGMENT_SHADER;
 		break;
+	default:
+		return false;
 	}
 
 	const GLuint shader = glCreateShader(glShaderType);

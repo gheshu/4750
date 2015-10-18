@@ -18,22 +18,10 @@ void DepthBuffer::destroy(){
 	data = nullptr;
 }
 float DepthBuffer::get(const unsigned x, const unsigned y){
-	if(x >= width){
-		return NEAR;
-	}
-	if(y >= height){
-		return NEAR;
-	}
 	return *(data + x + y*width);
 }
 
 bool DepthBuffer::top(const hlm::vec3& v){
-	if(v.x >= width){
-		return false;
-	}
-	if(v.y >= height){
-		return false;
-	}
 	float *i = (data + (int)v.x + (int)v.y * width);
 	if(v.z > NEAR || v.z < *i){
 		return false;
@@ -41,37 +29,8 @@ bool DepthBuffer::top(const hlm::vec3& v){
 	return true;
 }
 
-void DepthBuffer::parSet(const hlm::vec3& v){
+void DepthBuffer::set(const hlm::vec3& v){
 	*(data + (int)v.x + (int)v.y * width) = v.z;
-}
-
-bool DepthBuffer::set(const unsigned x, const unsigned y, const float val){
-	if(x >= width){
-		return false;
-	}
-	if(y >= height){
-		return false;
-	}
-	float *i = (data + x + y * width);
-	if(val > NEAR || val < *i){
-		return false;
-	}
-	*i = val;
-	return true;
-}
-bool DepthBuffer::set(const hlm::vec3& v){
-	if(v.x >= width){
-		return false;
-	}
-	if(v.y >= height){
-		return false;
-	}
-	float *i = (data + (int)v.x + (int)v.y * width);
-	if(v.z > NEAR || v.z < *i){
-		return false;
-	}
-	*i = v.z;
-	return true;
 }
 void DepthBuffer::clear(){
 	for(unsigned i = 0; i < width * height; i++){
