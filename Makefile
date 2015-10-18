@@ -2,7 +2,7 @@ CXX = g++
 EXE = Renderer.exe
  
 INC_DIRS = -I./include
-CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors #-fopenmp -DOMP_PARALLEL
+CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall #-fopenmp -DOMP_PARALLEL
 LDFLAGS = -L./lib
 LDLIBS = .\glfw3.dll -lglew32 -lopengl32 #-fopenmp
  

@@ -19,7 +19,7 @@ struct TransOp{
 	hlm::vec4 data;
 	TRANSFORM_TYPE type;
 	TransOp(const TRANSFORM_TYPE _type, const hlm::vec4& _data) 
-		: type(_type), data(_data){};
+		: data(_data), type(_type) {};
 };
 
 struct Transform{
@@ -50,7 +50,7 @@ struct Transform{
 struct MeshTransform{
 	hlm::mat4 mat;
 	std::string mesh_id;
-	MeshTransform(const std::string& id, const hlm::mat4& inmat) : mesh_id(id), mat(inmat){};
+	MeshTransform(const std::string& id, const hlm::mat4& inmat) : mat(inmat), mesh_id(id) {};
 };
 
 struct Entity{

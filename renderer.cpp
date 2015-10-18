@@ -247,7 +247,7 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
 	//----end scenegraph code----------------------------
-	mat4 W = Wmatrix((float)m_width, (float)m_height);
+	const mat4 W = Wmatrix((float)m_width, (float)m_height);
 	const mat4 PW = W * GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	const Pixel black(0, 0, 0, 0xFF);
 	m_prog.bind();
@@ -269,16 +269,16 @@ void Renderer::draw(const BoshartParam& param) {
 		
 		// update camera and poll glfw events
 		m_input->poll(dt, cam);
-		const mat4 PWV = PW * cam.getViewMatrix();
+		const mat4 VPW = PW * cam.getViewMatrix();
 		
 		// clear frame
 		framebuffer.clear(black);
 		depthbuffer.clear();
 		
 		// draw each mesh instance
-		for(int i = 0; i < instance_xforms->size(); i++){
+		for(unsigned i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 MVPW = PWV * mt.mat;
+			mat4 MVPW = VPW * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				#pragma omp parallel for schedule(dynamic, 4)
