@@ -134,14 +134,12 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			const vec3 point(v0 + a * e1 + b * e2);
 			if(depthbuffer.top(point)){
 				vec3 color;
-				
 				if(vertex_shading){
 					color = normalize(c0 + a * ce1 + b * ce2);
 				}
 				else{
 					color = m_param.mat;
 				}
-				
 				#pragma omp critical
 				{
 					framebuffer.setPixel(point, color);
