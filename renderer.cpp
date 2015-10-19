@@ -122,8 +122,8 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	const vec3 e1(face[1] - face[0]);
 	const vec3 e2(face[2] - face[0]);
 	// calculate deltas
-	const float da = 1.0f / max(1.0f, length(e1));
-	const float db = 1.0f / max(1.0f, length(e2));
+	const float da = 1.0f / max(0.5f, length(e1));
+	const float db = 1.0f / max(0.5f, length(e2));
 	// draw loop
 	const vec3 v0(face[0]);
 	for(float b = 0.0f; b <= 1.0f; b += db){
@@ -178,14 +178,16 @@ void Renderer::draw(const BoshartParam& param) {
 	Camera cam;
 	cam.init(param.eye, param.at, param.up);
 	glfwSetTime(0.0);
-	
+	double dtavg = 0.0;
     while (!glfwWindowShouldClose(m_glwindow)) {
 		// update frame time
 		double dt = glfwGetTime();
 		glfwSetTime(0.0);
+		dtavg += dt;
 		frame_i++;
 		if(frame_i % 60 == 0){
-			printf("FPS: %f\n", 1.0 / dt);
+			printf("FPS: %f\n", 60.0 / dtavg);
+			dtavg = 0.0;
 		}
 		
 		// update camera and poll glfw events
