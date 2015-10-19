@@ -121,9 +121,10 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	// determine edges
 	const vec3 e1(face[1] - face[0]);
 	const vec3 e2(face[2] - face[0]);
-	// calculate deltas
-	const float da = 1.0f / max(0.5f, length(e1));
-	const float db = 1.0f / max(0.5f, length(e2));
+	// calculate deltas                          ||||||
+	// YAY FOR BRUTE FORCE FUDGE FACTOR!         vvvvvv
+	const float da = 1.0f / max(0.5f, length(e1) * 1.5f);
+	const float db = 1.0f / max(0.5f, length(e2) * 1.5f);
 	// draw loop
 	const vec3 v0(face[0]);
 	for(float b = 0.0f; b <= 1.0f; b += db){
