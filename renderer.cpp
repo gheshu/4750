@@ -121,8 +121,7 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	// determine edges
 	const vec3 e1(face[1] - face[0]);
 	const vec3 e2(face[2] - face[0]);
-	// calculate deltas                          ||||||
-	// YAY FOR BRUTE FORCE FUDGE FACTOR!         vvvvvv
+	// calculate deltas
 	const float da = 1.0f / max(0.5f, length(e1) * 1.5f);
 	const float db = 1.0f / max(0.5f, length(e2) * 1.5f);
 	// draw loop
@@ -134,13 +133,8 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			}
 			const vec3 point(v0 + a * e1 + b * e2);
 			if(depthbuffer.top(point)){
-				vec3 color;
-				if(vertex_shading){
-					color = normalize(c0 + a * ce1 + b * ce2);
-				}
-				else{
-					color = m_param.mat;
-				}
+				vec3 color = vertex_shading ? 
+					normalize(c0 + a * ce1 + b * ce2) : m_param.mat;
 				#pragma omp critical
 				{
 					framebuffer.setPixel(point, color);
@@ -169,7 +163,7 @@ void Renderer::draw(const BoshartParam& param) {
 	//----end scenegraph code----------------------------
 	
 	const mat4 PW = Wmatrix((float)m_width, (float)m_height) 
-		* GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
+		* GLperspective(param.fov, (double)m_width / (double)m_height, m_param.near, m_param.far);
 	m_prog.bind();
 	
 	//------------draw loop-----------------------------
