@@ -22,12 +22,6 @@ float DepthBuffer::get(const unsigned x, const unsigned y){
 }
 
 bool DepthBuffer::top(const hlm::vec3& v){
-	if(v.x < 0.0f || v.x >= width){
-		return false;
-	}
-	if(v.y < 0.0f || v.y >= height){
-		return false;
-	}
 	float *i = (data + (int)v.x + (int)v.y * width);
 	if(v.z > NEAR || v.z < *i){
 		return false;

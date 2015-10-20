@@ -117,18 +117,22 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 		v[s].y = clamp(0.0f, m_height - 1.0f, v[s].y);
 	}
 	const vec3 e1(v[1] - v[0]);
-	const vec3 e2(v[2] - v[1]);
+	const vec3 e2(v[2] - v[0]);
 	// do lighting calculations
 	const vec3 normal = normalize(cross(e1, e2));
 	for(int s = 0; s < 3; s++){
 		float d2 = dot(v[s], v[s]);
+		printf("%f\n", d2);
 		const vec3 light = normalize(m_light_pos - v[s]);
+		print(light);
 		const float diffuse = max(0.0f, dot(light, normal));
-		const float specular = max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light));
+		printf("%f\n", diffuse);
+		const float specular = pow(max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light)), m_param.spec_power);
+		printf("%f\n", specular);
 		c[s] = m_param.ambient + (m_param.mat * diffuse + vec3(1.0f) * specular) / (m_param.lin_atten + d2);
-		c[s] = normalize(c[s]);
+		print(c[s]);
 	}
-		
+	return;
 	// determine edges
 	const vec3 ce1(c[1] - c[0]);
 	const vec3 ce2(c[2] - c[0]);
