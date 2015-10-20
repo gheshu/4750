@@ -327,6 +327,11 @@ vec3 cross(const vec3& lhs, const vec3& rhs){
 	return v;
 }
 
+// convention of a pointing away from normal b
+vec3 reflect(const vec3& a, const vec3& b){
+	return vec3(a - 2.0f * dot(a, b) * b);
+}
+
 /*
 0,4,8 ,12
 1,5,9 ,13

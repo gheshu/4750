@@ -12,7 +12,7 @@ public:
 	mat3(float* array);
 	mat3(const float s);
 	mat3();
-	mat3(mat4& m);
+	mat3(const mat4& m);
 	
 	const mat3 operator+(const float s) const;
 	const mat3 operator+(const mat3& mat) const;

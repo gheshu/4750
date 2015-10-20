@@ -15,7 +15,8 @@
 struct BoshartParam{
 	hlm::vec3 t, r, s, mat;
 	hlm::vec3 eye, at, up;
-	float fov, near, far;
+	hlm::vec3 light_pos, ambient;
+	float fov, near, far, lin_atten, spec_power;
 };
 
 class Renderer
@@ -33,7 +34,7 @@ private:
 	GLuint fb_id;
 	
 	BoshartParam m_param;
-	bool vertex_shading;
+	hlm::vec3 m_light_pos;
 	
 	void fillPass(const hlm::mat4& proj, Mesh* mesh, const unsigned i);
 	void glPass();

@@ -83,6 +83,8 @@ vec4 radians(const vec4& v);
 
 vec3 cross(const vec3& lhs, const vec3& rhs);
 
+vec3 reflect(const vec3& a, const vec3& b);
+
 const float * value_ptr(vec3& v);
 const float * value_ptr(vec4& v);
 const float * value_ptr(mat3& m);

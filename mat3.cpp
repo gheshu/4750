@@ -21,7 +21,7 @@ mat3::mat3(float* array){
 	std::copy(array, array + 9, &data[0]);
 }
 
-mat3::mat3(mat4& m){
+mat3::mat3(const mat4& m){
 	data[0] = m[0]; data[1] = m[1]; data[2] = m[2];
 	data[3] = m[4]; data[4] = m[5]; data[5] = m[6];
 	data[6] = m[8]; data[7] = m[9]; data[8] = m[10];

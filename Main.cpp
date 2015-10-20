@@ -37,6 +37,30 @@ void doTRS(const string& file, BoshartParam& param){
 	}
 }
 
+void doLight(const string& file, BoshartParam& param){
+	ifstream trs(file);
+	if(trs.is_open()){
+		string line;
+		while(getline(trs, line)){
+			if(line.substr(0, 3) == "poi"){
+				fillvec3(trs, param.light_pos);
+			}
+			else if(line.substr(0, 3) == "amb"){
+				fillvec3(trs, param.ambient);
+			}
+			else if(line.substr(0, 3) == "lin"){
+				getline(trs, line);
+				param.lin_atten = stof(line);
+			}
+			else if(line.substr(0, 3) == "shi"){
+				getline(trs, line);
+				param.spec_power = stof(line);
+			}
+		}
+		trs.close();
+	}
+}
+
 void doCamera(const string& file, BoshartParam& param){
 	ifstream trs(file);
 	if(trs.is_open()){
@@ -87,6 +111,7 @@ int main()
 		doTRS("trs.txt", param);
 		doCamera("camera.txt", param);
 		doFOV("fov.txt", param);
+		doLight("shade.txt", param);
 		renderer.draw(param);
 		renderer.destroy();
 	}

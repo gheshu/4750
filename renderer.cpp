@@ -109,32 +109,41 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			return;
 		}
 	}
-	// clamp the vertices to the screen.
-	for(unsigned t = 0; t < 3; t++){
-		face[t].x = clamp(0.0f, m_width - 1.0f, face[t].x);
-		face[t].y = clamp(0.0f, m_height - 1.0f, face[t].y);
+	vec3 c[3];
+	vec3 v[3];
+	for(int s = 0; s < 3; s++){
+		v[s] = vec3(face[s]);
+		v[s].x = clamp(0.0f, m_width - 1.0f, v[s].x);
+		v[s].y = clamp(0.0f, m_height - 1.0f, v[s].y);
 	}
-	// retrieve the vertex colors.
-	const vec3& c0 = mesh->at(i).color;
-	const vec3 ce1 = mesh->at(i+1).color - c0;
-	const vec3 ce2 = mesh->at(i+2).color - c0;
+	const vec3 e1(v[1] - v[0]);
+	const vec3 e2(v[2] - v[1]);
+	// do lighting calculations
+	const vec3 normal = normalize(cross(e1, e2));
+	for(int s = 0; s < 3; s++){
+		float d2 = dot(v[s], v[s]);
+		const vec3 light = normalize(m_light_pos - v[s]);
+		const float diffuse = max(0.0f, dot(light, normal));
+		const float specular = max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light));
+		c[s] = m_param.ambient + (m_param.mat * diffuse + vec3(1.0f) * specular) / (m_param.lin_atten + d2);
+		c[s] = normalize(c[s]);
+	}
+		
 	// determine edges
-	const vec3 e1(face[1] - face[0]);
-	const vec3 e2(face[2] - face[0]);
+	const vec3 ce1(c[1] - c[0]);
+	const vec3 ce2(c[2] - c[0]);
 	// calculate deltas
 	const float da = 1.0f / max(0.5f, length(e1) * 1.5f);
 	const float db = 1.0f / max(0.5f, length(e2) * 1.5f);
 	// draw loop
-	const vec3 v0(face[0]);
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
 			if(a + b > 1.0f){
 				continue;
 			}
-			const vec3 point(v0 + a * e1 + b * e2);
+			const vec3 point(v[0] + a * e1 + b * e2);
 			if(depthbuffer.top(point)){
-				vec3 color = vertex_shading ? 
-					normalize(c0 + a * ce1 + b * ce2) : m_param.mat;
+				const vec3 color = normalize(c[0] + a * ce1 + b * ce2);
 				#pragma omp critical
 				{
 					framebuffer.setPixel(point, color);
@@ -147,7 +156,6 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 
 void Renderer::draw(const BoshartParam& param) {
 	m_param = param;
-	vertex_shading = true;
 	//-----scenegraph code----------------------------
 	
 	EntityGraph graph;
@@ -163,7 +171,7 @@ void Renderer::draw(const BoshartParam& param) {
 	//----end scenegraph code----------------------------
 	
 	const mat4 PW = Wmatrix((float)m_width, (float)m_height) 
-		* GLperspective(param.fov, (double)m_width / (double)m_height, m_param.near, m_param.far);
+		* GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	m_prog.bind();
 	
 	//------------draw loop-----------------------------
@@ -190,12 +198,6 @@ void Renderer::draw(const BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up);
 		}
-		if(glfwGetKey(m_glwindow, GLFW_KEY_C)){
-			vertex_shading = false;
-		}
-		else if(glfwGetKey(m_glwindow, GLFW_KEY_V)){
-			vertex_shading = true;
-		}
 		const mat4 VPW = PW * cam.getViewMatrix();
 		
 		// clear frame
@@ -205,9 +207,10 @@ void Renderer::draw(const BoshartParam& param) {
 		// draw each mesh instance
 		for(unsigned i = 0; i < instance_xforms->size(); i++){
 			MeshTransform& mt = instance_xforms->at(i);
-			mat4 MVPW = VPW * mt.mat;
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
+				const mat4 MVPW = VPW * mt.mat;
+				m_light_pos = inverse(transpose(mat3(MVPW))) * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(MVPW, mesh, k * 3);
