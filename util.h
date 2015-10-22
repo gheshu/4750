@@ -12,8 +12,12 @@ namespace hlm{
 constexpr float PI = 3.14159265358979f;
 constexpr float PI80 = PI / 180.0f;
 
-float dot(const vec3& lhs, const vec3& rhs);
-float dot(const vec4& lhs, const vec4& rhs);
+inline float dot(const vec3& lhs, const vec3& rhs){
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+inline float dot(const vec4& lhs, const vec4& rhs){
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
+}
 
 float distance(const vec3& lhs, const vec3& rhs);
 float distance(const vec4& lhs, const vec4& rhs);
@@ -21,10 +25,49 @@ float distance(const vec4& lhs, const vec4& rhs);
 float length(const vec3& v);
 float length(const vec4& v);
 
-float lerp(const float a, const float b, float alpha);
-vec2 lerp(const vec2& a, const vec2& b, float alpha);
-vec3 lerp(const vec3& a, const vec3& b, float alpha);
-vec4 lerp(const vec4& a, const vec4& b, float alpha);
+inline int min(const int a, const int b){
+	return a < b ? a : b;
+}
+
+inline int max(const int a, const int b){
+	return a > b ? a : b;
+}
+
+inline float min(const float a, const float b){
+	return a < b ? a : b;
+}
+
+inline float max(const float a, const float b){
+	return a > b ? a : b;
+}
+
+inline int clamp(const int low, const int high, const int val){
+	return min(high, max(low, val));
+}
+inline float clamp(const float low, const float high, const float val){
+	return min(high, max(low, val));
+}
+
+vec2 clamp(const float low, const float high, const vec2& v);
+vec3 clamp(const float low, const float high, const vec3& v);
+vec4 clamp(const float low, const float high, const vec4& v);
+
+inline float lerp(const float a, const float b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+inline vec2 lerp(const vec2& a, const vec2& b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+inline vec3 lerp(const vec3& a, const vec3& b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
+inline vec4 lerp(const vec4& a, const vec4& b, float alpha){
+	alpha = clamp(0.0f, 1.0f, alpha);
+	return (1.0f - alpha) * a + alpha * b;
+}
 
 mat3 inverse(const mat3& in);
 mat3 transpose( const mat3& mat);
@@ -48,9 +91,6 @@ vec4 round( const vec4& v);
 vec3 abs( const vec3& v);
 vec4 abs( const vec4& v);
 
-int clamp(const int low, const int high, const int val);
-float clamp(const float low, const float high, const float val);
-
 vec3 normalize( const vec3& v);
 vec4 normalize( const vec4& v);
 
@@ -61,12 +101,15 @@ void print(const mat4& mat);
 
 mat4 lookAt(const vec3& eye, const vec3& at, const vec3& up);	// side = m0,1,2, up = m4,5,6, -forward = m8,9,10
 
-vec3 getForward(const mat4& mat);
-vec3 getRight(const mat4& mat);
-vec3 getUp(const mat4& mat);
-float getPitch(const mat4& mat);
-float getYaw(const mat4& mat);
-float getRoll(const mat4& mat);
+inline vec3 getForward(const mat4& mat){
+	return vec3(-mat[2], -mat[6], -mat[10]);
+}
+inline vec3 getRight(const mat4& mat){
+	return vec3(mat[0], mat[4], mat[8]);
+}
+inline vec3 getUp(const mat4& mat){
+	return vec3(mat[1], mat[5], mat[9]);
+}
 
 mat4 Wmatrix(const float width, const float height);
 mat4 Amatrix(const float hwratio = 9.0f / 16.0f, const float fov = 90.0f);

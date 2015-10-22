@@ -38,6 +38,11 @@ void Entity::addChild(Entity* ent){
 
 void Entity::removeChild(Entity* ent){
 	children.insert(ent->children.begin(), ent->children.end());
+	// need to remove ent from its children's parent set.
+	for(auto i : ent->children){
+		i->parents.erase(ent);
+		i->parents.insert(this);
+	}
 	children.erase(ent);
 }
 void Entity::rotate(const hlm::vec4& v){

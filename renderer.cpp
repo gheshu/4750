@@ -113,26 +113,23 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	vec3 v[3];
 	for(int s = 0; s < 3; s++){
 		v[s] = vec3(face[s]);
-		v[s].x = clamp(0.0f, m_width - 1.0f, v[s].x);
+		v[s].x = clamp(0.0f, m_width  - 1.0f, v[s].x);
 		v[s].y = clamp(0.0f, m_height - 1.0f, v[s].y);
 	}
 	const vec3 e1(v[1] - v[0]);
 	const vec3 e2(v[2] - v[0]);
 	// do lighting calculations
 	const vec3 normal = normalize(cross(e1, e2));
+	if(rand() % 251 == 0){
+		print(normal);
+	}
 	for(int s = 0; s < 3; s++){
 		float d2 = dot(v[s], v[s]);
-		printf("%f\n", d2);
-		const vec3 light = normalize(m_light_pos - v[s]);
-		print(light);
+		const vec3 light = normalize(vec3(1.0f));//normalize(m_light_pos - v[s]);
 		const float diffuse = max(0.0f, dot(light, normal));
-		printf("%f\n", diffuse);
-		const float specular = pow(max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light)), m_param.spec_power);
-		printf("%f\n", specular);
-		c[s] = m_param.ambient + (m_param.mat * diffuse + vec3(1.0f) * specular) / (m_param.lin_atten + d2);
-		print(c[s]);
+		c[s] = m_param.ambient + (m_param.mat * diffuse) / (m_param.lin_atten + d2);
+		c[s] = clamp(0.0f, 1.0f, c[s]);
 	}
-	return;
 	// determine edges
 	const vec3 ce1(c[1] - c[0]);
 	const vec3 ce2(c[2] - c[0]);
@@ -147,7 +144,7 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			}
 			const vec3 point(v[0] + a * e1 + b * e2);
 			if(depthbuffer.top(point)){
-				const vec3 color = normalize(c[0] + a * ce1 + b * ce2);
+				const vec3 color(c[0] + a * ce1 + b * ce2);
 				#pragma omp critical
 				{
 					framebuffer.setPixel(point, color);

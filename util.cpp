@@ -1,17 +1,9 @@
 #include "util.h"
 
 #include <cmath>
-#include <algorithm>
 #include "stdio.h"
 
 namespace hlm{
-	
-float dot(const vec3& lhs, const vec3& rhs){
-	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
-}
-float dot(const vec4& lhs, const vec4& rhs){
-	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
-}
 
 float distance(const vec3& lhs, const vec3& rhs){
 	const vec3 v = lhs - rhs;
@@ -37,28 +29,16 @@ vec4 abs(const vec4& v){
 	return vec4(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w));
 }
 
-int clamp(const int low, const int high, const int val){
-	return std::min(high, std::max(low, val));
+vec2 clamp(const float low, const float high, const vec2& v){
+	return vec2(clamp(low, high, v.x), clamp(low, high, v.y));
 }
-float clamp(const float low, const float high, const float val){
-	return std::min(high, std::max(low, val));
+vec3 clamp(const float low, const float high, const vec3& v){
+	return vec3(clamp(low, high, v.x), clamp(low, high, v.y), 
+		clamp(low, high, v.z));
 }
-
-float lerp(const float a, const float b, float alpha){
-	alpha = clamp(0.0f, 1.0f, alpha);
-	return (1.0f - alpha) * a + alpha * b;
-}
-vec2 lerp(const vec2& a, const vec2& b, float alpha){
-	alpha = clamp(0.0f, 1.0f, alpha);
-	return (1.0f - alpha) * a + alpha * b;
-}
-vec3 lerp(const vec3& a, const vec3& b, float alpha){
-	alpha = clamp(0.0f, 1.0f, alpha);
-	return (1.0f - alpha) * a + alpha * b;
-}
-vec4 lerp(const vec4& a, const vec4& b, float alpha){
-	alpha = clamp(0.0f, 1.0f, alpha);
-	return (1.0f - alpha) * a + alpha * b;
+vec4 clamp(const float low, const float high, const vec4& v){
+	return vec4(clamp(low, high, v.x), clamp(low, high, v.y), 
+		clamp(low, high, v.z), clamp(low, high, v.w));
 }
 
 mat3 inverse(const mat3& m){
@@ -245,15 +225,7 @@ mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up){
 2,6,10,14
 3,7,11,15
 */
-vec3 getForward(const mat4& mat){
-	return vec3(-mat[2], -mat[6], -mat[10]);
-}
-vec3 getRight(const mat4& mat){
-	return vec3(mat[0], mat[4], mat[8]);
-}
-vec3 getUp(const mat4& mat){
-	return vec3(mat[1], mat[5], mat[9]);
-}
+
 
 mat4 Wmatrix(const float width, const float height){
 	mat4 m;
