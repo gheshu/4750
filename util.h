@@ -141,7 +141,7 @@ inline vec4 lerp(const vec4& a, const vec4& b, float alpha){
 	return (1.0f - alpha) * a + alpha * b;
 }
 
-mat3 inverse(const mat3& in);
+mat3 inverseTranspose(const mat3& in);
 mat3 transpose( const mat3& mat);
 
 mat4 inverse(const mat4& in);
@@ -193,12 +193,12 @@ inline vec3 cross(const vec3& lhs, const vec3& rhs){
 	return v;
 }
 
-// convention of a pointing away from normal b
-inline vec3 reflect(const vec3& a, const vec3& b){
-	return vec3(a - 2.0f * dot(a, b) * b);
+// convention of direction vector pointing towards normal
+// returned vector points away from normal.
+inline vec3 reflect(const vec3& d, const vec3& n){
+	return vec3(d - 2.0f * dot(d, n) * n);
 }
 
-mat4 rotate(const float angle, const vec3& v);
 mat4 rotate(const vec4& v);
 
 inline mat4 scale(const vec3& v){
@@ -242,6 +242,8 @@ inline const float* value_ptr(mat3& m){
 inline const float* value_ptr(mat4& m){
 	return &m(0);
 }
+
+vec4 eulerToAxisAngle(const vec3& in);
 
 };
 

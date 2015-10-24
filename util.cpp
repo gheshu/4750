@@ -3,31 +3,13 @@
 
 namespace hlm{
 
-mat3 inverse(const mat3& m){
-	mat3 inv;
-	float det = m[0] * (m[4] * m[8] - m[5] * m[7]) -
-			 m[3] * (m[1] * m[8] - m[7] * m[2]) +
-			 m[6] * (m[1] * m[5] - m[4] * m[2]);
 
-	if(det == 0){
-		return inv;
-	}
-	det = 1.0f / det;
-	inv(0) = (m[4] * m[8] - m[5] * m[7]) * det;
-	inv(3) = (m[6] * m[5] - m[3] * m[8]) * det;
-	inv(6) = (m[3] * m[7] - m[6] * m[4]) * det;
-	inv(1) = (m[7] * m[2] - m[1] * m[8]) * det;
-	inv(4) = (m[0] * m[8] - m[6] * m[2]) * det;
-	inv(7) = (m[1] * m[6] - m[0] * m[7]) * det;
-	inv(2) = (m[1] * m[5] - m[2] * m[4]) * det;
-	inv(5) = (m[2] * m[3] - m[0] * m[5]) * det;
-	inv(8) = (m[0] * m[4] - m[1] * m[3]) * det;
-    return inv;
-}
 /*
 0, 3, 6
 1, 4, 7
 2, 5, 8
+I use linear, column major, array.
+glm uses x, y convention rather than row-column.
 */
 mat3 transpose(const mat3& mat){
 	mat3 m;
@@ -37,6 +19,28 @@ mat3 transpose(const mat3& mat){
 	m(0) = mat[0]; m(4) = mat[4];
 	m(8) = mat[8];
 	return m;
+}
+
+mat3 inverseTranspose(const mat3& m){
+	mat3 inv;
+	float det = m[0] * (m[4] * m[8] - m[5] * m[7]) 
+			  - m[1] * (m[3] * m[8] - m[5] * m[6])
+			  + m[2] * (m[3] * m[7] - m[4] * m[6]);
+
+	if(det == 0.0f){
+		return inv;
+	}
+	det = 1.0f / det;
+	inv(0) =  (m[4] * m[8] - m[7] * m[5]) * det;
+	inv(1) = -(m[3] * m[8] - m[6] * m[5]) * det;
+	inv(2) =  (m[3] * m[7] - m[6] * m[4]) * det;
+	inv(3) = -(m[1] * m[4] - m[7] * m[2]) * det;
+	inv(4) =  (m[0] * m[8] - m[6] * m[2]) * det;
+	inv(5) = -(m[0] * m[7] - m[6] * m[1]) * det;
+	inv(6) =  (m[1] * m[5] - m[4] * m[2]) * det;
+	inv(7) = -(m[0] * m[5] - m[3] * m[2]) * det;
+	inv(8) =  (m[0] * m[4] - m[3] * m[1]) * det;
+    return inv;
 }
 
 /*
@@ -211,20 +215,14 @@ mat4 GLperspective(double fovy, double aspect, double near, double far){
 
 // normalized matrix for rotations around the origin
 //http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
-mat4 rotate(const float _angle, const vec3& _v){
+mat4 rotate(const vec4& v){
 	mat4 m;
-	if(_angle == 0.0f){
+	if(v.w == 0.0f){
 		return m;
 	}
-	const float len = length(_v);
-	if(len <= 0.0f){
-		return m;
-	}
-	const float angle = radians(_angle);
-	vec3 v(_v / len);
-	const float c = cos(angle);
+	const float c = cos(v.w);
 	const float cinv = 1.0f - c;
-	const float s = sin(angle);
+	const float s = sin(v.w);
 	const float u2 = v.x*v.x;
 	const float v2 = v.y*v.y;
 	const float w2 = v.z*v.z;
@@ -240,40 +238,33 @@ mat4 rotate(const float _angle, const vec3& _v){
     m(2)  = v.x * v.z * cinv - v.y * s;
     m(6)  = v.y * v.z * cinv + v.x * s;
     m(10) = w2 + (1.0f - w2) * c;
-	
 	return m;
 }
-mat4 rotate(const vec4& _v){
-	mat4 m;
-	if(_v.w == 0.0f){
-		return m;
+
+//http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToAngle/
+vec4 eulerToAxisAngle(const vec3& in){
+	vec4 v;
+	vec3 c, s;
+	c.x = cos(radians(in.x * 0.5f));
+	c.y = cos(radians(in.y * 0.5f));
+	c.z = cos(radians(in.z * 0.5f));
+	s.x = sin(radians(in.x * 0.5f));
+	s.y = sin(radians(in.y * 0.5f));
+	s.z = sin(radians(in.z * 0.5f));
+	v.w = 2.0f * acos(c.x*c.y*c.z - s.x*s.y*s.z);
+	v.x = s.x*s.y*c.z + c.x*c.y*s.z;
+	v.y = s.x*c.y*c.z + c.x*s.y*s.z;
+	v.z = c.x*s.y*c.z - s.x*c.y*s.z;
+	float len = length(vec3(v));
+	if(len != 0.0f){
+		v.x = v.x / len;
+		v.y = v.y / len;
+		v.z = v.z / len;
 	}
-	vec3 v(_v);
-	const float len = length(v);
-	if(len <= 0.0f){
-		return m;
+	else {
+		v.w = 0.0f;
 	}
-	const float angle = radians(_v.w);
-	v = v / len;
-	const float c = cos(angle);
-	const float cinv = 1.0f - c;
-	const float s = sin(angle);
-	const float u2 = v.x*v.x;
-	const float v2 = v.y*v.y;
-	const float w2 = v.z*v.z;
-	
-	m(0)  = u2 + (1.0f - u2) * c;
-    m(4)  = v.x * v.y * cinv - v.z * s;
-    m(8)  = v.x * v.z * cinv + v.y * s;
- 
-    m(1)  = v.x * v.y * cinv + v.z * s;
-    m(5)  = v2 + (1.0f - v2) * c;
-    m(9)  = v.y * v.z * cinv - v.x * s;
- 
-    m(2)  = v.x * v.z * cinv - v.y * s;
-    m(6)  = v.y * v.z * cinv + v.x * s;
-    m(10) = w2 + (1.0f - w2) * c;
-	return m;
+	return v;
 }
 
 

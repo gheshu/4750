@@ -121,8 +121,10 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 		float d2 = dot(v[s], v[s]);
 		const vec3 light = normalize(m_light_pos - v[s]);
 		const float diffuse = max(0.0f, dot(light, normal));
-		const float specular = pow(max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light)), m_param.spec_power);
-		c[s] = m_param.ambient + (m_param.mat * diffuse + specular * vec3(1.0f)) / (m_param.lin_atten + d2);
+		const float specular = pow(
+			max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light)),
+			m_param.spec_power);
+		c[s] = m_param.ambient + (m_param.mat * diffuse + specular) / (m_param.lin_atten + d2);
 		c[s] = clamp(0.0f, 1.0f, c[s]);
 	}
 	// determine edges
@@ -163,7 +165,7 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.init(4);
 	Transform t;
 	t.add(T, param.t);
-	t.add(R, param.r, length(param.r));
+	t.add(R, eulerToAxisAngle(param.r));
 	t.add(S, param.s);
 	graph.insert("sphere", "root", "sphere", t);
 	graph.update();
@@ -211,7 +213,7 @@ void Renderer::draw(const BoshartParam& param) {
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				const mat4 MVP = VP * mt.mat;
-				m_light_pos = inverse(transpose(mat3(MVP))) * param.light_pos;
+				m_light_pos = inverseTranspose(mat3(MVP)) * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(MVP, mesh, k * 3);

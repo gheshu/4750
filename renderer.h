@@ -25,6 +25,7 @@ private:
 	hlm::mat4 m_wmatrix;
 	BoshartParam m_param;
 	hlm::vec3 m_light_pos;
+	
 	GLSLProgram m_prog;
 	Image framebuffer;
 	DepthBuffer depthbuffer;
@@ -35,8 +36,6 @@ private:
 
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
-	
-	
 	
 	void fillPass(const hlm::mat4& proj, Mesh* mesh, const unsigned i);
 	void glPass();

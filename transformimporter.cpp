@@ -41,8 +41,7 @@ void transformLoad(const std::string& filename, hlm::mat4& mat){
 		v.y = atof(line.c_str());
 		getline(stream, line);
 		v.z = atof(line.c_str());
-		float angle = max(v.x, max(v.y, v.z));
-		r = rotate(angle, v);
+		r = rotate(eulerToAxisAngle(v));
 		getline(stream, line);
 	}
 	else {
