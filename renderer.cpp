@@ -113,36 +113,36 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	vec3 v[3];
 	for(int s = 0; s < 3; s++){
 		v[s] = vec3(face[s]);
-		v[s].x = clamp(0.0f, m_width  - 1.0f, v[s].x);
-		v[s].y = clamp(0.0f, m_height - 1.0f, v[s].y);
 	}
-	const vec3 e1(v[1] - v[0]);
-	const vec3 e2(v[2] - v[0]);
 	// do lighting calculations
-	const vec3 normal = normalize(cross(e1, e2));
-	if(rand() % 251 == 0){
-		print(normal);
-	}
+	const vec3 normal = normalize(cross(v[1] - v[0], v[2] - v[0]));
+
 	for(int s = 0; s < 3; s++){
 		float d2 = dot(v[s], v[s]);
-		const vec3 light = normalize(vec3(1.0f));//normalize(m_light_pos - v[s]);
+		const vec3 light = normalize(m_light_pos - v[s]);
 		const float diffuse = max(0.0f, dot(light, normal));
-		c[s] = m_param.ambient + (m_param.mat * diffuse) / (m_param.lin_atten + d2);
+		const float specular = pow(max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light)), m_param.spec_power);
+		c[s] = m_param.ambient + (m_param.mat * diffuse + specular * vec3(1.0f)) / (m_param.lin_atten + d2);
 		c[s] = clamp(0.0f, 1.0f, c[s]);
 	}
 	// determine edges
 	const vec3 ce1(c[1] - c[0]);
 	const vec3 ce2(c[2] - c[0]);
+	face[0] = m_wmatrix * face[0];
+	face[1] = m_wmatrix * face[1];
+	face[2] = m_wmatrix * face[2];
+	const vec4 scre1(face[1] - face[0]);
+	const vec4 scre2(face[2] - face[0]);
 	// calculate deltas
-	const float da = 1.0f / max(0.5f, length(e1) * 1.5f);
-	const float db = 1.0f / max(0.5f, length(e2) * 1.5f);
+	const float da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y + scre1.z*scre1.z) * 1.5f);
+	const float db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y + scre2.z*scre2.z) * 1.5f);
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
 			if(a + b > 1.0f){
 				continue;
 			}
-			const vec3 point(v[0] + a * e1 + b * e2);
+			vec4 point(face[0] + (a * scre1) + (b * scre2));
 			if(depthbuffer.top(point)){
 				const vec3 color(c[0] + a * ce1 + b * ce2);
 				#pragma omp critical
@@ -171,8 +171,8 @@ void Renderer::draw(const BoshartParam& param) {
 	
 	//----end scenegraph code----------------------------
 	
-	const mat4 PW = Wmatrix((float)m_width, (float)m_height) 
-		* GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
+	m_wmatrix = Wmatrix((float)m_width, (float)m_height);
+	const mat4 P = GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	m_prog.bind();
 	
 	//------------draw loop-----------------------------
@@ -199,7 +199,7 @@ void Renderer::draw(const BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up);
 		}
-		const mat4 VPW = PW * cam.getViewMatrix();
+		const mat4 VP = P * cam.getViewMatrix();
 		
 		// clear frame
 		framebuffer.clear();
@@ -210,11 +210,11 @@ void Renderer::draw(const BoshartParam& param) {
 			MeshTransform& mt = instance_xforms->at(i);
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				const mat4 MVPW = VPW * mt.mat;
-				m_light_pos = inverse(transpose(mat3(MVPW))) * param.light_pos;
+				const mat4 MVP = VP * mt.mat;
+				m_light_pos = inverse(transpose(mat3(MVP))) * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
-					fillPass(MVPW, mesh, k * 3);
+					fillPass(MVP, mesh, k * 3);
 				}
 			}
 		}

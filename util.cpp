@@ -1,45 +1,7 @@
 #include "util.h"
-
-#include <cmath>
 #include "stdio.h"
 
 namespace hlm{
-
-float distance(const vec3& lhs, const vec3& rhs){
-	const vec3 v = lhs - rhs;
-	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-}
-float distance(const vec4& lhs, const vec4& rhs){
-	const vec4 v = lhs - rhs;
-	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
-}
-
-float length(const vec3& v){
-	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-}
-float length(const vec4& v){
-	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
-}
-
-vec3 abs(const vec3& v){
-	return vec3(std::abs(v.x), std::abs(v.y), std::abs(v.z));
-}
-
-vec4 abs(const vec4& v){
-	return vec4(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w));
-}
-
-vec2 clamp(const float low, const float high, const vec2& v){
-	return vec2(clamp(low, high, v.x), clamp(low, high, v.y));
-}
-vec3 clamp(const float low, const float high, const vec3& v){
-	return vec3(clamp(low, high, v.x), clamp(low, high, v.y), 
-		clamp(low, high, v.z));
-}
-vec4 clamp(const float low, const float high, const vec4& v){
-	return vec4(clamp(low, high, v.x), clamp(low, high, v.y), 
-		clamp(low, high, v.z), clamp(low, high, v.w));
-}
 
 mat3 inverse(const mat3& m){
 	mat3 inv;
@@ -131,50 +93,6 @@ mat4 transpose(const mat4& mat){
 	m(0) = mat[0]; m(5) = mat[5];
 	m(10) = mat[10]; m(15) = mat[15];
 	return m;
-}
-
-float fract(const float f){
-	float i;
-	return std::modf(f, &i);
-}
-
-vec3 fract(const vec3& v){
-	float i;
-	return vec3(std::modf(v.x, &i),std::modf(v.y, &i),std::modf(v.z, &i));
-}
-vec4 fract(const vec4& v){
-	float i;
-	return vec4(std::modf(v.x, &i),std::modf(v.y, &i),std::modf(v.z, &i),std::modf(v.w, &i));
-}
-
-vec3 floor(const vec3& v){
-	return vec3(std::floor(v.x),std::floor(v.y),std::floor(v.z));
-}
-vec4 floor(const vec4& v){
-	return vec4(std::floor(v.x),std::floor(v.y),std::floor(v.z), std::floor(v.w));
-}
-
-vec3 ceil(const vec3& v){
-	return vec3(std::ceil(v.x),std::ceil(v.y),std::ceil(v.z));
-}
-vec4 ceil(const vec4& v){
-	return vec4(std::ceil(v.x),std::ceil(v.y),std::ceil(v.z),std::ceil(v.w));
-}
-
-vec3 round(const vec3& v){
-	return vec3(std::round(v.x),std::round(v.y),std::round(v.z));
-}
-vec4 round(const vec4& v){
-	return vec4(std::round(v.x),std::round(v.y),std::round(v.z),std::round(v.w));
-}
-
-vec3 normalize(const vec3& v){
-	float len = length(v);
-	return vec3(v.x / len, v.y / len, v.z / len);
-}
-vec4 normalize(const vec4& v){
-	float len = length(v);
-	return vec4(v.x / len, v.y / len, v.z / len, v.w / len);
 }
 
 void print(const vec3& v){
@@ -284,26 +202,6 @@ mat4 GLperspective(double fovy, double aspect, double near, double far){
 3,7,11,15
 */
 
-vec3 radians(const vec3& v){
-	return vec3(radians(v.x), radians(v.y), radians(v.z));
-}
-vec4 radians(const vec4& v){
-	return vec4(radians(v.x), radians(v.y), radians(v.z), radians(v.w));
-}
-
-vec3 cross(const vec3& lhs, const vec3& rhs){
-	vec3 v;
-	v.x = lhs.y * rhs.z - lhs.z * rhs.y;
-	v.y = lhs.z * rhs.x - lhs.x * rhs.z;
-	v.z = lhs.x * rhs.y - lhs.y * rhs.x;
-	return v;
-}
-
-// convention of a pointing away from normal b
-vec3 reflect(const vec3& a, const vec3& b){
-	return vec3(a - 2.0f * dot(a, b) * b);
-}
-
 /*
 0,4,8 ,12
 1,5,9 ,13
@@ -377,46 +275,6 @@ mat4 rotate(const vec4& _v){
     m(10) = w2 + (1.0f - w2) * c;
 	return m;
 }
-mat4 scale(const vec3& v){
-	mat4 m;
-	m(0) = v.x;
-	m(5) = v.y;
-	m(10) = v.z;
-	return m;
-}
-mat4 scale(const vec4& v){
-	mat4 m;
-	m(0) = v.x;
-	m(5) = v.y;
-	m(10) = v.z;
-	return m;
-}
-mat4 translate(const vec3& v){
-	mat4 m;
-	m(12) = v.x;
-	m(13) = v.y;
-	m(14) = v.z;
-	return m;
-}
-mat4 translate(const vec4& v){
-	mat4 m;
-	m(12) = v.x;
-	m(13) = v.y;
-	m(14) = v.z;
-	return m;
-}
 
-const float* value_ptr(vec3& v){
-	return &v.x;
-}
-const float* value_ptr(vec4& v){
-	return &v.x;
-}
-const float* value_ptr(mat3& m){
-	return &m(0);
-}
-const float* value_ptr(mat4& m){
-	return &m(0);
-}
 
 }; // hlm

@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include "vec3.h"
+#include "vec4.h"
 
 void Image::init(const int _width, const int _height){
 	if(data != nullptr){return;}
@@ -26,7 +27,7 @@ void Image::setPixel(int x, int y, const hlm::vec3& v){
 	i->a = 255;
 }
 
-void Image::setPixel(const hlm::vec3& pos, const hlm::vec3& color){
+void Image::setPixel(const hlm::vec4& pos, const hlm::vec3& color){
 	Pixel *i = (data + (int)pos.x + (int)pos.y * width);
 	i->r = (uint_8)(255 * color.x);
 	i->g = (uint_8)(255 * color.y);
