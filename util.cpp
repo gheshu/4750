@@ -206,12 +206,7 @@ mat4 GLperspective(double fovy, double aspect, double near, double far){
 3,7,11,15
 */
 
-/*
-0,4,8 ,12
-1,5,9 ,13
-2,6,10,14
-3,7,11,15
-*/
+
 
 // normalized matrix for rotations around the origin
 //http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
@@ -241,31 +236,60 @@ mat4 rotate(const vec4& v){
 	return m;
 }
 
-//http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToAngle/
-vec4 eulerToAxisAngle(const vec3& in){
-	vec4 v;
-	vec3 c, s;
-	c.x = cos(radians(in.x * 0.5f));
-	c.y = cos(radians(in.y * 0.5f));
-	c.z = cos(radians(in.z * 0.5f));
-	s.x = sin(radians(in.x * 0.5f));
-	s.y = sin(radians(in.y * 0.5f));
-	s.z = sin(radians(in.z * 0.5f));
-	v.w = 2.0f * acos(c.x*c.y*c.z - s.x*s.y*s.z);
-	v.x = s.x*s.y*c.z + c.x*c.y*s.z;
-	v.y = s.x*c.y*c.z + c.x*s.y*s.z;
-	v.z = c.x*s.y*c.z - s.x*c.y*s.z;
-	float len = length(vec3(v));
-	if(len != 0.0f){
-		v.x = v.x / len;
-		v.y = v.y / len;
-		v.z = v.z / len;
-	}
-	else {
-		v.w = 0.0f;
-	}
-	return v;
+/*
+0,4,8 ,12
+1,5,9 ,13
+2,6,10,14
+3,7,11,15
+*/
+
+mat4 rotateX(float angle){
+	mat4 m;
+	angle = radians(angle);
+	float c = cos(angle);
+	float s = sin(angle);
+	m(5) = c;
+	m(6) = s;
+	m(9) = -s;
+	m(10) = c;
+	return m;
+}
+mat4 rotateY(float angle){
+	mat4 m;
+	angle = radians(angle);
+	float c = cos(angle);
+	float s = sin(angle);
+	m(0) = c;
+	m(2) = -s;
+	m(8) = s;
+	m(10) = c;
+	return m;
+}
+mat4 rotateZ(float angle){
+	mat4 m;
+	angle = radians(angle);
+	float c = cos(angle);
+	float s = sin(angle);
+	m(0) = c;
+	m(1) = s;
+	m(4) = -s;
+	m(5) = c;
+	return m;
 }
 
+// p205-206 Angle-Shrier's Interactive Computer Graphics 7th ed.
+mat4 rotateEuler(const vec4& v){
+	/*
+	mat4 m;
+	m(1) = radians(v.z);
+	m(2) = -radians(v.y);
+	m(4) = -radians(v.z);
+	m(6) = radians(v.x);
+	m(8) = radians(v.y);
+	m(9) = -radians(v.x);
+	return m;
+	*/
+	return rotateZ(v.z) * rotateY(v.y) * rotateX(v.x);
+}
 
 }; // hlm

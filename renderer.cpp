@@ -165,7 +165,7 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.init(4);
 	Transform t;
 	t.add(T, param.t);
-	t.add(R, eulerToAxisAngle(param.r));
+	t.add(R, param.r);
 	t.add(S, param.s);
 	graph.insert("sphere", "root", "sphere", t);
 	graph.update();

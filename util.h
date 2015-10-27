@@ -243,7 +243,10 @@ inline const float* value_ptr(mat4& m){
 	return &m(0);
 }
 
-vec4 eulerToAxisAngle(const vec3& in);
+mat4 rotateX(float angle);
+mat4 rotateY(float angle);
+mat4 rotateZ(float angle);
+mat4 rotateEuler(const vec4& angles);
 
 };
 

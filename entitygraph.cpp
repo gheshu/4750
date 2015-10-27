@@ -14,7 +14,7 @@ Entity::Entity(const std::string& _id, Entity* parent_ptr, const std::string& _m
 				transform = transform * hlm::translate(i.data);
 				break;
 			case R:
-				transform = transform * hlm::rotate(i.data);
+				transform = transform * hlm::rotateEuler(i.data);
 				break;
 			case S:
 				transform = transform * hlm::scale(i.data);

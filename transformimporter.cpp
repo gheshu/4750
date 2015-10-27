@@ -34,14 +34,14 @@ void transformLoad(const std::string& filename, hlm::mat4& mat){
 		cout << "No scale in " << filename << endl;
 	}
 	if(line.substr(0, 3) == "rot"){
-		vec3 v;
+		vec4 v;
 		getline(stream, line);
 		v.x = atof(line.c_str());
 		getline(stream, line);
 		v.y = atof(line.c_str());
 		getline(stream, line);
 		v.z = atof(line.c_str());
-		r = rotate(eulerToAxisAngle(v));
+		r = rotateEuler(v);
 		getline(stream, line);
 	}
 	else {
