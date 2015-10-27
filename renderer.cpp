@@ -116,14 +116,12 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 	}
 	// do lighting calculations
 	const vec3 normal = normalize(cross(v[1] - v[0], v[2] - v[0]));
-
 	for(int s = 0; s < 3; s++){
 		float d2 = dot(v[s], v[s]);
 		const vec3 light = normalize(m_light_pos - v[s]);
 		const float diffuse = max(0.0f, dot(light, normal));
-		const float specular = pow(
-			max(0.0f, dot(reflect(vec3(0.0f, 0.0f, -1.0f), normal), light)),
-			m_param.spec_power);
+		const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
+		const float specular = pow( max(0.0f, dot(ref, light)), m_param.spec_power);
 		c[s] = m_param.ambient + (m_param.mat * diffuse + specular) / (m_param.lin_atten + d2);
 		c[s] = clamp(0.0f, 1.0f, c[s]);
 	}
@@ -213,7 +211,7 @@ void Renderer::draw(const BoshartParam& param) {
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				const mat4 MVP = VP * mt.mat;
-				m_light_pos = inverseTranspose(mat3(MVP)) * param.light_pos;
+				m_light_pos = transpose(inverse(mat3(MVP))) * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(MVP, mesh, k * 3);

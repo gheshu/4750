@@ -8,8 +8,7 @@ namespace hlm{
 0, 3, 6
 1, 4, 7
 2, 5, 8
-I use linear, column major, array.
-glm uses x, y convention rather than row-column.
+I use 1 dimensional, column major, array.
 */
 mat3 transpose(const mat3& mat){
 	mat3 m;
@@ -20,26 +19,26 @@ mat3 transpose(const mat3& mat){
 	m(8) = mat[8];
 	return m;
 }
-
-mat3 inverseTranspose(const mat3& m){
+//https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3.C3.973_matrices
+mat3 inverse(const mat3& m){
 	mat3 inv;
-	float det = m[0] * (m[4] * m[8] - m[5] * m[7]) 
-			  - m[1] * (m[3] * m[8] - m[5] * m[6])
-			  + m[2] * (m[3] * m[7] - m[4] * m[6]);
-
+	float A =   m[4]*m[8] - m[7]*m[5];
+	float B = -(m[1]*m[8] - m[7]*m[2]);
+	float C =   m[1]*m[5] - m[4]*m[2];
+	float det = m[0]*A + m[3]*B + m[6]*C;
 	if(det == 0.0f){
 		return inv;
 	}
 	det = 1.0f / det;
-	inv(0) =  (m[4] * m[8] - m[7] * m[5]) * det;
-	inv(1) = -(m[3] * m[8] - m[6] * m[5]) * det;
-	inv(2) =  (m[3] * m[7] - m[6] * m[4]) * det;
-	inv(3) = -(m[1] * m[4] - m[7] * m[2]) * det;
-	inv(4) =  (m[0] * m[8] - m[6] * m[2]) * det;
-	inv(5) = -(m[0] * m[7] - m[6] * m[1]) * det;
-	inv(6) =  (m[1] * m[5] - m[4] * m[2]) * det;
-	inv(7) = -(m[0] * m[5] - m[3] * m[2]) * det;
-	inv(8) =  (m[0] * m[4] - m[3] * m[1]) * det;
+	inv(0) = A * det;
+	inv(1) = B * det;
+	inv(2) = C * det;
+	inv(3) = -(m[3]*m[8] - m[6]*m[5]) * det;
+	inv(4) =  (m[0]*m[8] - m[6]*m[2]) * det;
+	inv(5) = -(m[0]*m[5] - m[3]*m[2]) * det;
+	inv(6) =  (m[3]*m[7] - m[6]*m[4]) * det;
+	inv(7) = -(m[0]*m[7] - m[6]*m[1]) * det;
+	inv(8) =  (m[0]*m[4] - m[1]*m[1]) * det;
     return inv;
 }
 

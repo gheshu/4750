@@ -141,7 +141,7 @@ inline vec4 lerp(const vec4& a, const vec4& b, float alpha){
 	return (1.0f - alpha) * a + alpha * b;
 }
 
-mat3 inverseTranspose(const mat3& in);
+mat3 inverse(const mat3& in);
 mat3 transpose( const mat3& mat);
 
 mat4 inverse(const mat4& in);
