@@ -193,6 +193,14 @@ inline vec3 cross(const vec3& lhs, const vec3& rhs){
 	return v;
 }
 
+inline vec3 cross(const vec4& lhs, const vec4& rhs){
+	vec3 v;
+	v.x = lhs.y * rhs.z - lhs.z * rhs.y;
+	v.y = lhs.z * rhs.x - lhs.x * rhs.z;
+	v.z = lhs.x * rhs.y - lhs.y * rhs.x;
+	return v;
+}
+
 // convention of direction vector pointing towards normal
 // returned vector points away from normal.
 inline vec3 reflect(const vec3& d, const vec3& n){

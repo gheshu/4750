@@ -85,38 +85,25 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	face[0] = data.mvp * data.mesh->at(i).position;
 	face[1] = data.mvp * data.mesh->at(i + 1).position;
 	face[2] = data.mvp * data.mesh->at(i + 2).position;
-	// bounds checks and early exits
 	unsigned badz = 0;
 	for(unsigned t = 0; t < 3; t++){
-		// divide into correct perspective
 		face[t] = face[t] / face[t].w;
 		if(face[t].z < -1.0f || face[t].z > 1.0f){
 			badz++;
 		}
 	}
 	if(badz >= 3){
-		//badz == 3 means all vertices of face are clipped leaving nothing to draw.
 		return;
 	}
-	{
-		// do back face culling
-		const vec3 e1(face[1] - face[0]);
-		const vec3 e2(face[2] - face[0]);
-		const vec3 fnormal = cross(e1, e2);
-		if(fnormal.z <= 0.0f){
-			// z component of normal must not face away (musn't be negative)
-			// negative z is 'away' in camera space.
-			return;
-		}
+	const vec4 e1(face[1] - face[0]);
+	const vec4 e2(face[2] - face[0]);
+	vec3 fnormal = cross(e1, e2);
+	if(fnormal.z <= 0.0f){
+		return;
 	}
-	
-	vec3 v[3];
 	vec3 normals[3]; vec3 ne1, ne2;
 	if(data.face_normals){
-		for(unsigned s = 0; s < 3; s++){
-			v[s] = vec3(face[s]);
-		}
-		normals[0] = normalize(cross(v[1] - v[0], v[2] - v[0]));
+		fnormal = normalize(fnormal);
 	}
 	else {
 		normals[0] = data.imvp * data.mesh->at(i).normal;
@@ -129,12 +116,13 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	vec3 c[3]; vec3 ce1, ce2;
 	if(data.vertex_shading){
 		for(int s = 0; s < 3; s++){
-			float d2 = dot(v[s], v[s]);
-			const vec3 light = normalize(data.light_pos - v[s]);
+			const vec3 vert_pos(face[s]);
+			float d2 = dot(vert_pos, vert_pos);
+			const vec3 light = normalize(data.light_pos - vert_pos);
 			float diffuse; vec3 ref;
 			if(data.face_normals){
-				diffuse = max(0.0f, dot(light, normals[0]));
-				ref = reflect(vec3(0.0f, 0.0f, -1.0f), normals[0]);
+				diffuse = max(0.0f, dot(light, fnormal));
+				ref = reflect(vec3(0.0f, 0.0f, -1.0f), fnormal);
 			}
 			else {
 				diffuse = max(0.0f, dot(light, normals[s]));
@@ -149,8 +137,6 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	}
 	const vec4 scre1(data.w_matrix * face[1] - data.w_matrix * face[0]);
 	const vec4 scre2(data.w_matrix * face[2] - data.w_matrix * face[0]);
-	const vec4 e1 = face[1] - face[0];
-	const vec4 e2 = face[2] - face[0];
 	// calculate deltas
 	const float da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y + scre1.z*scre1.z) * 1.5f);
 	const float db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y + scre2.z*scre2.z) * 1.5f);
