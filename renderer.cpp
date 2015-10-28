@@ -247,6 +247,9 @@ void Renderer::draw(const BoshartParam& param) {
 		if(!drawdata.vertex_shading){
 			drawdata.face_normals = false;
 		}
+		if(drawdata.face_normals){
+			drawdata.vertex_shading = true;
+		}
 		const mat4 VP = P * cam.getViewMatrix();
 		
 		// clear frame

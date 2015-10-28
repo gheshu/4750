@@ -114,6 +114,7 @@ bool objloadNoIndices(const std::string& filename, Mesh& out){
 			out.vertices.push_back(mv);
 			neighbors.clear();
 		}
+
 		return true;
 	} 
 	else {
