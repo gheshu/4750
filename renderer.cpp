@@ -135,11 +135,14 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 		ce1 = c[1] - c[0];
 		ce2 = c[2] - c[0];
 	}
-	const vec4 scre1(data.w_matrix * face[1] - data.w_matrix * face[0]);
-	const vec4 scre2(data.w_matrix * face[2] - data.w_matrix * face[0]);
-	// calculate deltas
-	const float da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y + scre1.z*scre1.z) * 1.5f);
-	const float db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y + scre2.z*scre2.z) * 1.5f);
+	float da, db;
+	{
+		const vec4 scre1(data.w_matrix * face[1] - data.w_matrix * face[0]);
+		const vec4 scre2(data.w_matrix * face[2] - data.w_matrix * face[0]);
+		// calculate deltas
+		da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y + scre1.z*scre1.z) * 1.5f);
+		db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y + scre2.z*scre2.z) * 1.5f);
+	}
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
