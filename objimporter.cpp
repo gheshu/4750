@@ -52,22 +52,6 @@ bool objload(const std::string& filename, Mesh& out){
 			}
 		}
 		stream.close();
-		for(unsigned i = 0; i < out.indices.size(); i++){
-			vec3& v = out.at(i).color;
-			switch(i%3){
-				case 0:
-					v = vec3(255.0f, 0.0f, 0.0f);
-					break;
-				case 1:
-					v = vec3(0.0f, 255.0f, 0.0f);
-					break;
-				case 2:
-					v = vec3(0.0f, 0.0f, 255.0f);
-					break;
-				default:
-					break;
-			}
-		}
 		return true;
 	} 
 	else {
@@ -103,22 +87,32 @@ bool objloadNoIndices(const std::string& filename, Mesh& out){
 		out.vertices.clear();
 		out.vertices.reserve(temp.indices.size());
 		out.indices.clear();
+		std::vector<int> neighbors;
 		for(unsigned i = 0; i < temp.indices.size(); i++){
 			MeshVertex& mv = temp.atIndex(i);
-			switch(i%3){
-				case 0:
-					mv.color = vec3(255.0f, 0.0f, 0.0f);
-					break;
-				case 1:
-					mv.color = vec3(0.0f, 255.0f, 0.0f);
-					break;
-				case 2:
-					mv.color = vec3(0.0f, 0.0f, 255.0f);
-					break;
-				default:
-					break;
+			for(unsigned j = 0; j < temp.indices.size() - 2; j+=3){
+				// for each face
+				for(unsigned k = 0; k < 3; k++){
+					// for each vertex in the face
+					if(temp.indices[j + k] == temp.indices[i]){
+						// if one of the indices in the face
+						// matches the current index it is a neighbor.
+						// insert j representing the face index and break from face loop
+						neighbors.push_back(j);
+						break;
+					}
+				}
 			}
+			for(int j : neighbors){
+				vec4& j1 = temp.atIndex(j).position;
+				vec4& j2 = temp.atIndex(j+1).position;
+				vec4& j3 = temp.atIndex(j+2).position;
+				vec3 jnormal = cross(vec3(j2 - j1), vec3(j3 - j1));
+				mv.normal += jnormal;
+			}
+			mv.normal = normalize(mv.normal);
 			out.vertices.push_back(mv);
+			neighbors.clear();
 		}
 		return true;
 	} 

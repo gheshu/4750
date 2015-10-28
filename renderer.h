@@ -19,13 +19,22 @@ struct BoshartParam{
 	float fov, near, far, lin_atten, spec_power;
 };
 
+struct DrawData{
+	hlm::mat4 w_matrix;
+	hlm::mat4 mvp;
+	hlm::mat3 imvp;
+	hlm::vec3 light_pos;
+	hlm::vec3 mat, ambient;
+	float spec_power;
+	float lin_atten;
+	Mesh* mesh;
+	bool face_normals = true;
+	bool vertex_shading = true;
+};
+
 class Renderer
 {
 private:
-	hlm::mat4 m_wmatrix;
-	BoshartParam m_param;
-	hlm::vec3 m_light_pos;
-	
 	GLSLProgram m_prog;
 	Image framebuffer;
 	DepthBuffer depthbuffer;
@@ -37,7 +46,7 @@ private:
 	GLuint m_width, m_height, m_vao;
 	GLuint fb_id;
 	
-	void fillPass(const hlm::mat4& proj, Mesh* mesh, const unsigned i);
+	void fillPass(const DrawData& data, const unsigned i);
 	void glPass();
 	void screenQuadInit();
 public:

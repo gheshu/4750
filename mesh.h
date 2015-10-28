@@ -9,7 +9,7 @@
 
 struct MeshVertex{
 	hlm::vec4 position;
-	hlm::vec3 normal, color;
+	hlm::vec3 normal;
 	hlm::vec2 uv;
 };
 

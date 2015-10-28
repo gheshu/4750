@@ -80,11 +80,11 @@ void Renderer::glPass(){
 	MYGLERRORMACRO
 }
 
-void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
+void Renderer::fillPass(const DrawData& data, const unsigned i){
 	vec4 face[3];
-	face[0] = proj * mesh->at(i).position;
-	face[1] = proj * mesh->at(i + 1).position;
-	face[2] = proj * mesh->at(i + 2).position;
+	face[0] = data.mvp * data.mesh->at(i).position;
+	face[1] = data.mvp * data.mesh->at(i + 1).position;
+	face[2] = data.mvp * data.mesh->at(i + 2).position;
 	// bounds checks and early exits
 	unsigned badz = 0;
 	for(unsigned t = 0; t < 3; t++){
@@ -109,30 +109,48 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			return;
 		}
 	}
-	vec3 c[3];
+	
 	vec3 v[3];
-	for(int s = 0; s < 3; s++){
-		v[s] = vec3(face[s]);
+	vec3 normals[3]; vec3 ne1, ne2;
+	if(data.face_normals){
+		for(unsigned s = 0; s < 3; s++){
+			v[s] = vec3(face[s]);
+		}
+		normals[0] = normalize(cross(v[1] - v[0], v[2] - v[0]));
 	}
-	// do lighting calculations
-	const vec3 normal = normalize(cross(v[1] - v[0], v[2] - v[0]));
-	for(int s = 0; s < 3; s++){
-		float d2 = dot(v[s], v[s]);
-		const vec3 light = normalize(m_light_pos - v[s]);
-		const float diffuse = max(0.0f, dot(light, normal));
-		const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
-		const float specular = pow( max(0.0f, dot(ref, light)), m_param.spec_power);
-		c[s] = m_param.ambient + (m_param.mat * diffuse + specular) / (m_param.lin_atten + d2);
-		c[s] = clamp(0.0f, 1.0f, c[s]);
+	else {
+		normals[0] = data.imvp * data.mesh->at(i).normal;
+		normals[1] = data.imvp * data.mesh->at(i+1).normal;
+		normals[2] = data.imvp * data.mesh->at(i+2).normal;
+		ne1 = normals[1] - normals[0];
+		ne2 = normals[2] - normals[0];
 	}
-	// determine edges
-	const vec3 ce1(c[1] - c[0]);
-	const vec3 ce2(c[2] - c[0]);
-	face[0] = m_wmatrix * face[0];
-	face[1] = m_wmatrix * face[1];
-	face[2] = m_wmatrix * face[2];
-	const vec4 scre1(face[1] - face[0]);
-	const vec4 scre2(face[2] - face[0]);
+	
+	vec3 c[3]; vec3 ce1, ce2;
+	if(data.vertex_shading){
+		for(int s = 0; s < 3; s++){
+			float d2 = dot(v[s], v[s]);
+			const vec3 light = normalize(data.light_pos - v[s]);
+			float diffuse; vec3 ref;
+			if(data.face_normals){
+				diffuse = max(0.0f, dot(light, normals[0]));
+				ref = reflect(vec3(0.0f, 0.0f, -1.0f), normals[0]);
+			}
+			else {
+				diffuse = max(0.0f, dot(light, normals[s]));
+				ref = reflect(vec3(0.0f, 0.0f, -1.0f), normals[s]);
+			}
+			const float specular = pow( max(0.0f, dot(ref, light)), data.spec_power);
+			c[s] = data.ambient + (data.mat * diffuse + specular) / (data.lin_atten + d2);
+			c[s] = clamp(0.0f, 1.0f, c[s]);
+		}
+		ce1 = c[1] - c[0];
+		ce2 = c[2] - c[0];
+	}
+	const vec4 scre1(data.w_matrix * face[1] - data.w_matrix * face[0]);
+	const vec4 scre2(data.w_matrix * face[2] - data.w_matrix * face[0]);
+	const vec4 e1 = face[1] - face[0];
+	const vec4 e2 = face[2] - face[0];
 	// calculate deltas
 	const float da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y + scre1.z*scre1.z) * 1.5f);
 	const float db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y + scre2.z*scre2.z) * 1.5f);
@@ -142,9 +160,25 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 			if(a + b > 1.0f){
 				continue;
 			}
-			vec4 point(face[0] + (a * scre1) + (b * scre2));
+			vec4 point(face[0] + a * e1 + b * e2);
+			const vec3 frag_pos(point);
+			point = data.w_matrix * point;
 			if(depthbuffer.top(point)){
-				const vec3 color(c[0] + a * ce1 + b * ce2);
+				vec3 color;
+				if(data.vertex_shading){
+					color = c[0] + a * ce1 + b * ce2;
+				}
+				else {
+					const vec3 normal(normals[0] + a * ne1 + b * ne2);
+					const vec3 frag_pos(point);
+					float d2 = dot(frag_pos, frag_pos);
+					const vec3 light = normalize(data.light_pos - frag_pos);
+					const float diffuse = max(0.0f, dot(light, normal));
+					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
+					const float specular = pow( max(0.0f, dot(ref, light)), data.spec_power);
+					color = data.ambient + (data.mat * diffuse + specular) / (data.lin_atten + d2);
+				}
+				color = clamp(0.0f, 1.0f, color);
 				#pragma omp critical
 				{
 					framebuffer.setPixel(point, color);
@@ -156,7 +190,12 @@ void Renderer::fillPass(const mat4& proj, Mesh* mesh, const unsigned i){
 }
 
 void Renderer::draw(const BoshartParam& param) {
-	m_param = param;
+	DrawData drawdata;
+	drawdata.ambient = param.ambient;
+	drawdata.mat = param.mat;
+	drawdata.lin_atten = param.lin_atten;
+	drawdata.spec_power = param.spec_power;
+	
 	//-----scenegraph code----------------------------
 	
 	EntityGraph graph;
@@ -171,7 +210,7 @@ void Renderer::draw(const BoshartParam& param) {
 	
 	//----end scenegraph code----------------------------
 	
-	m_wmatrix = Wmatrix((float)m_width, (float)m_height);
+	drawdata.w_matrix = Wmatrix((float)m_width, (float)m_height);
 	const mat4 P = GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	m_prog.bind();
 	
@@ -199,6 +238,15 @@ void Renderer::draw(const BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up);
 		}
+		if(glfwGetKey(m_glwindow, GLFW_KEY_F)){
+			drawdata.face_normals = !drawdata.face_normals;
+		}
+		if(glfwGetKey(m_glwindow, GLFW_KEY_V)){
+			drawdata.vertex_shading = !drawdata.vertex_shading;
+		}
+		if(!drawdata.vertex_shading){
+			drawdata.face_normals = false;
+		}
 		const mat4 VP = P * cam.getViewMatrix();
 		
 		// clear frame
@@ -210,11 +258,13 @@ void Renderer::draw(const BoshartParam& param) {
 			MeshTransform& mt = instance_xforms->at(i);
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				const mat4 MVP = VP * mt.mat;
-				m_light_pos = transpose(inverse(mat3(MVP))) * param.light_pos;
+				drawdata.mvp = VP * mt.mat;
+				drawdata.imvp = transpose(inverse(mat3(drawdata.mvp)));
+				drawdata.mesh = mesh;
+				drawdata.light_pos = drawdata.imvp * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
-					fillPass(MVP, mesh, k * 3);
+					fillPass(drawdata, k * 3);
 				}
 			}
 		}
