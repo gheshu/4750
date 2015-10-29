@@ -88,7 +88,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	face[2] = data.mv * data.mesh->at(i + 2).position;
 	float da, db;
 	{
-		// check screen-space normal culling
+		// check screen-space culling
 		vec4 scr[3]; unsigned badz = 0;
 		for(int s = 0; s < 3; s++){
 			scr[s] = face[s];
@@ -131,7 +131,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	if(data.vertex_shading){
 		for(int s = 0; s < 3; s++){
 			const vec3 vert_pos(face[s]);
-			float d2 = dot(vert_pos, vert_pos);
+			float d2 = 0.05f * dot(vert_pos, vert_pos);
 			const vec3 light = normalize(data.light_pos - vert_pos);
 			float diffuse; vec3 ref;
 			if(data.face_normals){
@@ -157,8 +157,8 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				continue;
 			}
 			vec4 point(face[0] + a * e1 + b * e2);
-			point.w = 1.0f;
 			const vec3 frag_pos(point);
+			point.w = 1.0f;
 			point = data.pw * point;
 			point = point / point.w;
 			if(depthbuffer.top(point)){
@@ -168,7 +168,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				}
 				else {
 					const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
-					float d2 = dot(frag_pos, frag_pos);
+					float d2 = 0.05f * dot(frag_pos, frag_pos);
 					const vec3 light = normalize(data.light_pos - frag_pos);
 					const float diffuse = max(0.0f, dot(light, normal));
 					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
