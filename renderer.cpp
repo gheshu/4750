@@ -106,9 +106,9 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 		fnormal = normalize(fnormal);
 	}
 	else {
-		normals[0] = data.imvp * data.mesh->at(i).normal;
-		normals[1] = data.imvp * data.mesh->at(i+1).normal;
-		normals[2] = data.imvp * data.mesh->at(i+2).normal;
+		normals[0] = normalize(data.norm_mat * data.mesh->at(i).normal);
+		normals[1] = normalize(data.norm_mat * data.mesh->at(i+1).normal);
+		normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
 		ne1 = normals[1] - normals[0];
 		ne2 = normals[2] - normals[0];
 	}
@@ -117,7 +117,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	if(data.vertex_shading){
 		for(int s = 0; s < 3; s++){
 			const vec3 vert_pos(face[s]);
-			float d2 = dot(vert_pos, vert_pos);
+			float d2 = 1.0f + dot(vert_pos, vert_pos);
 			const vec3 light = normalize(data.light_pos - vert_pos);
 			float diffuse; vec3 ref;
 			if(data.face_normals){
@@ -140,8 +140,8 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 		const vec4 scre1(data.w_matrix * face[1] - data.w_matrix * face[0]);
 		const vec4 scre2(data.w_matrix * face[2] - data.w_matrix * face[0]);
 		// calculate deltas
-		da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y + scre1.z*scre1.z) * 1.5f);
-		db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y + scre2.z*scre2.z) * 1.5f);
+		da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y) * 1.5f);
+		db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y) * 1.5f);
 	}
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
@@ -158,9 +158,8 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 					color = c[0] + a * ce1 + b * ce2;
 				}
 				else {
-					const vec3 normal(normals[0] + a * ne1 + b * ne2);
-					const vec3 frag_pos(point);
-					float d2 = dot(frag_pos, frag_pos);
+					const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
+					float d2 = 1.0f + dot(frag_pos, frag_pos);
 					const vec3 light = normalize(data.light_pos - frag_pos);
 					const float diffuse = max(0.0f, dot(light, normal));
 					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
@@ -227,17 +226,17 @@ void Renderer::draw(const BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up);
 		}
-		if(glfwGetKey(m_glwindow, GLFW_KEY_F)){
-			drawdata.face_normals = !drawdata.face_normals;
-		}
-		if(glfwGetKey(m_glwindow, GLFW_KEY_V)){
-			drawdata.vertex_shading = !drawdata.vertex_shading;
-		}
-		if(!drawdata.vertex_shading){
-			drawdata.face_normals = false;
-		}
-		if(drawdata.face_normals){
+		if(glfwGetKey(m_glwindow, GLFW_KEY_1)){
+			drawdata.face_normals = true;
 			drawdata.vertex_shading = true;
+		}
+		if(glfwGetKey(m_glwindow, GLFW_KEY_2)){
+			drawdata.face_normals = false;
+			drawdata.vertex_shading = true;
+		}
+		if(glfwGetKey(m_glwindow, GLFW_KEY_3)){
+			drawdata.face_normals = false;
+			drawdata.vertex_shading = false;
 		}
 		const mat4 VP = P * cam.getViewMatrix();
 		
@@ -251,9 +250,9 @@ void Renderer::draw(const BoshartParam& param) {
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
 				drawdata.mvp = VP * mt.mat;
-				drawdata.imvp = transpose(inverse(mat3(drawdata.mvp)));
+				drawdata.norm_mat = transpose(inverse(mat3(mt.mat)));
 				drawdata.mesh = mesh;
-				drawdata.light_pos = drawdata.imvp * param.light_pos;
+				drawdata.light_pos = drawdata.norm_mat * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(drawdata, k * 3);

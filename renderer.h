@@ -22,7 +22,7 @@ struct BoshartParam{
 struct DrawData{
 	hlm::mat4 w_matrix;
 	hlm::mat4 mvp;
-	hlm::mat3 imvp;
+	hlm::mat3 norm_mat;
 	hlm::vec3 light_pos;
 	hlm::vec3 mat, ambient;
 	float spec_power;
