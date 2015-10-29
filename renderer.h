@@ -20,8 +20,8 @@ struct BoshartParam{
 };
 
 struct DrawData{
-	hlm::mat4 w_matrix;
-	hlm::mat4 mvp;
+	hlm::mat4 pw;
+	hlm::mat4 mv;
 	hlm::mat3 norm_mat;
 	hlm::vec3 light_pos;
 	hlm::vec3 mat, ambient;

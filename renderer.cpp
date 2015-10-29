@@ -81,34 +81,48 @@ void Renderer::glPass(){
 }
 
 void Renderer::fillPass(const DrawData& data, const unsigned i){
+	// move to view-space
 	vec4 face[3];
-	face[0] = data.mvp * data.mesh->at(i).position;
-	face[1] = data.mvp * data.mesh->at(i + 1).position;
-	face[2] = data.mvp * data.mesh->at(i + 2).position;
-	unsigned badz = 0;
-	for(unsigned t = 0; t < 3; t++){
-		face[t] = face[t] / face[t].w;
-		if(face[t].z < -1.0f || face[t].z > 1.0f){
-			badz++;
+	face[0] = data.mv * data.mesh->at(i).position;
+	face[1] = data.mv * data.mesh->at(i + 1).position;
+	face[2] = data.mv * data.mesh->at(i + 2).position;
+	float da, db;
+	{
+		// check screen-space normal culling
+		vec4 scr[3]; unsigned badz = 0;
+		for(int s = 0; s < 3; s++){
+			scr[s] = face[s];
+			scr[s].w = 1.0f;
+			scr[s] = data.pw * face[s];
+			scr[s] = scr[s] / scr[s].w;
+			if(scr[s].z > 1.0f || scr[s].z < -1.0f){
+				badz++;
+			}
 		}
+		if(badz >= 3){
+			return;
+		}
+		const vec4 scre1(scr[1] - scr[0]);
+		const vec4 scre2(scr[2] - scr[0]);
+		const vec3 fnormal = cross(scre1, scre2);
+		if(fnormal.z <= 0.0f){
+			return;
+		}
+		// calculate deltas
+		da = 1.0f / (length(scre1) * 1.5f);
+		db = 1.0f / (length(scre2) * 1.5f);
 	}
-	if(badz >= 3){
-		return;
-	}
+
 	const vec4 e1(face[1] - face[0]);
 	const vec4 e2(face[2] - face[0]);
-	vec3 fnormal = cross(e1, e2);
-	if(fnormal.z <= 0.0f){
-		return;
-	}
 	vec3 normals[3]; vec3 ne1, ne2;
 	if(data.face_normals){
-		fnormal = normalize(fnormal);
+		normals[0] = normalize(cross(e1, e2));
 	}
 	else {
-		normals[0] = data.norm_mat * data.mesh->at(i).normal;
-		normals[1] = data.norm_mat * data.mesh->at(i+1).normal;
-		normals[2] = data.norm_mat * data.mesh->at(i+2).normal;
+		normals[0] = normalize(data.norm_mat * data.mesh->at(i).normal);
+		normals[1] = normalize(data.norm_mat * data.mesh->at(i+1).normal);
+		normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
 		ne1 = normals[1] - normals[0];
 		ne2 = normals[2] - normals[0];
 	}
@@ -117,12 +131,12 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	if(data.vertex_shading){
 		for(int s = 0; s < 3; s++){
 			const vec3 vert_pos(face[s]);
-			float d2 = 1.0f + vert_pos.z;
+			float d2 = dot(vert_pos, vert_pos);
 			const vec3 light = normalize(data.light_pos - vert_pos);
 			float diffuse; vec3 ref;
 			if(data.face_normals){
-				diffuse = max(0.0f, dot(light, fnormal));
-				ref = reflect(vec3(0.0f, 0.0f, -1.0f), fnormal);
+				diffuse = max(0.0f, dot(light, normals[0]));
+				ref = reflect(vec3(0.0f, 0.0f, -1.0f), normals[0]);
 			}
 			else {
 				diffuse = max(0.0f, dot(light, normals[s]));
@@ -135,14 +149,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 		ce1 = c[1] - c[0];
 		ce2 = c[2] - c[0];
 	}
-	float da, db;
-	{
-		const vec4 scre1(data.w_matrix * face[1] - data.w_matrix * face[0]);
-		const vec4 scre2(data.w_matrix * face[2] - data.w_matrix * face[0]);
-		// calculate deltas
-		da = 1.0f / (sqrt(scre1.x*scre1.x + scre1.y*scre1.y) * 1.5f);
-		db = 1.0f / (sqrt(scre2.x*scre2.x + scre2.y*scre2.y) * 1.5f);
-	}
+
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
@@ -150,8 +157,10 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				continue;
 			}
 			vec4 point(face[0] + a * e1 + b * e2);
+			point.w = 1.0f;
 			const vec3 frag_pos(point);
-			point = data.w_matrix * point;
+			point = data.pw * point;
+			point = point / point.w;
 			if(depthbuffer.top(point)){
 				vec3 color;
 				if(data.vertex_shading){
@@ -159,7 +168,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				}
 				else {
 					const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
-					float d2 = frag_pos.z + 1.0f;
+					float d2 = dot(frag_pos, frag_pos);
 					const vec3 light = normalize(data.light_pos - frag_pos);
 					const float diffuse = max(0.0f, dot(light, normal));
 					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
@@ -198,8 +207,8 @@ void Renderer::draw(const BoshartParam& param) {
 	
 	//----end scenegraph code----------------------------
 	
-	drawdata.w_matrix = Wmatrix((float)m_width, (float)m_height);
-	const mat4 P = GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
+	drawdata.pw = Wmatrix((float)m_width, (float)m_height) 
+		* GLperspective(param.fov, (double)m_width / (double)m_height, param.near, param.far);
 	m_prog.bind();
 	
 	//------------draw loop-----------------------------
@@ -238,7 +247,10 @@ void Renderer::draw(const BoshartParam& param) {
 			drawdata.face_normals = false;
 			drawdata.vertex_shading = false;
 		}
-		const mat4 VP = P * cam.getViewMatrix();
+		vec4 l_pos(param.light_pos);
+		l_pos.w = 1.0f;
+		l_pos = cam.getViewMatrix() * l_pos;
+		drawdata.light_pos = vec3(l_pos);
 		
 		// clear frame
 		framebuffer.clear();
@@ -249,10 +261,9 @@ void Renderer::draw(const BoshartParam& param) {
 			MeshTransform& mt = instance_xforms->at(i);
 			Mesh* mesh = res_man.get(mt.mesh_id);
 			if(mesh){
-				drawdata.mvp = VP * mt.mat;
-				drawdata.norm_mat = transpose(inverse(mat3(mt.mat)));
+				drawdata.mv = cam.getViewMatrix() * mt.mat;
+				drawdata.norm_mat = transpose(inverse(mat3(drawdata.mv)));
 				drawdata.mesh = mesh;
-				drawdata.light_pos = drawdata.norm_mat * param.light_pos;
 				#pragma omp parallel for schedule(dynamic, 4)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(drawdata, k * 3);
