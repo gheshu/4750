@@ -99,7 +99,7 @@ bool objloadNoIndices(const std::string& filename, Mesh& out){
 						vec4& j1 = temp.atIndex(j).position;
 						vec4& j2 = temp.atIndex(j+1).position;
 						vec4& j3 = temp.atIndex(j+2).position;
-						vec3 jnormal = cross(vec3(j2 - j1), vec3(j3 - j1));
+						vec3 jnormal = normalize(cross(vec3(j2 - j1), vec3(j3 - j1)));
 						mv.normal += jnormal;
 						break;
 					}

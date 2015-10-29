@@ -106,9 +106,9 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 		fnormal = normalize(fnormal);
 	}
 	else {
-		normals[0] = normalize(data.norm_mat * data.mesh->at(i).normal);
-		normals[1] = normalize(data.norm_mat * data.mesh->at(i+1).normal);
-		normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
+		normals[0] = data.norm_mat * data.mesh->at(i).normal;
+		normals[1] = data.norm_mat * data.mesh->at(i+1).normal;
+		normals[2] = data.norm_mat * data.mesh->at(i+2).normal;
 		ne1 = normals[1] - normals[0];
 		ne2 = normals[2] - normals[0];
 	}
@@ -117,7 +117,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	if(data.vertex_shading){
 		for(int s = 0; s < 3; s++){
 			const vec3 vert_pos(face[s]);
-			float d2 = 1.0f + dot(vert_pos, vert_pos);
+			float d2 = 1.0f + vert_pos.z;
 			const vec3 light = normalize(data.light_pos - vert_pos);
 			float diffuse; vec3 ref;
 			if(data.face_normals){
@@ -159,7 +159,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				}
 				else {
 					const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
-					float d2 = 1.0f + dot(frag_pos, frag_pos);
+					float d2 = frag_pos.z + 1.0f;
 					const vec3 light = normalize(data.light_pos - frag_pos);
 					const float diffuse = max(0.0f, dot(light, normal));
 					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
