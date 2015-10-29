@@ -23,7 +23,8 @@ Controls:
 	Mouse: look around
 	
 	R: reset camera
-	C: use uniform color
-	V: use vertex colors
+	1: Interpolative Shading
+	2: Gouraud Shading
+	3: Phong Shading
 	
 	Escape: close program
