@@ -21,6 +21,7 @@ struct Image{
 	void setPixel(int x, int y, const Pixel& p);
 	void setPixel(int x, int y, const hlm::vec3& color);
 	void setPixel(const hlm::vec4& pos, const hlm::vec3& color);
+	hlm::vec3 texelW(const hlm::vec3& pos);
 	void orPixel(int x, int y, const Pixel& p);
 	void clear(const Pixel& p);
 	void clear();

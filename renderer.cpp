@@ -247,10 +247,7 @@ void Renderer::draw(const BoshartParam& param) {
 			drawdata.face_normals = false;
 			drawdata.vertex_shading = false;
 		}
-		vec4 l_pos(param.light_pos);
-		l_pos.w = 1.0f;
-		l_pos = cam.getViewMatrix() * l_pos;
-		drawdata.light_pos = vec3(l_pos);
+		drawdata.light_pos = param.light_pos - cam.getEye();
 		
 		// clear frame
 		framebuffer.clear();

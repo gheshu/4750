@@ -256,6 +256,16 @@ mat4 rotateY(float angle);
 mat4 rotateZ(float angle);
 mat4 rotateEuler(const vec4& angles);
 
+inline vec2 texLerp(const vec2& p0, const vec2& p1, const vec2& p2, const float a, const float b, const vec3& z){
+	const vec2 p(p0/z.x);
+	const vec2 e1(p1/z.y - p);
+	const vec2 e2(p2/z.z - p);
+	const float ze1 = z.y - z.x;
+	const float ze2 = z.z - z.x;
+	const float inv = 1.0f / (z.x + a*ze1 + b*ze2);
+	return vec2 ( (p + a*e1 + b*e2) / inv );
+}
+
 };
 
 #endif // HLM_UTIL_H

@@ -35,6 +35,13 @@ void Image::setPixel(const hlm::vec4& pos, const hlm::vec3& color){
 	i->a = 255;
 }
 
+hlm::vec3 Image::texelW(const hlm::vec3& pos){
+	const int x = fmod(abs(pos.x), 1.0f) * (width  - 1);
+	const int y = fmod(abs(pos.y), 1.0f) * (height - 1);
+	Pixel* i = (data + x + y*width);
+	return hlm::vec3(i->r / 255.0f, i->g / 255.0f, i->b / 255.0f);
+}
+
 void Image::orPixel(int x, int y, const Pixel& p){
 	x = std::min(width - 1, std::max(0, x));
 	y = std::min(height - 1, std::max(0, y));
