@@ -264,7 +264,7 @@ void Renderer::draw(const BoshartParam& param) {
 				drawdata.mv = cam.getViewMatrix() * mt.mat;
 				drawdata.norm_mat = transpose(inverse(mat3(drawdata.mv)));
 				drawdata.mesh = mesh;
-				#pragma omp parallel for schedule(dynamic, 4)
+				#pragma omp parallel for schedule(dynamic, 8)
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(drawdata, k * 3);
 				}
