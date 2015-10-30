@@ -131,8 +131,8 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	if(data.vertex_shading){
 		for(int s = 0; s < 3; s++){
 			const vec3 vert_pos(face[s]);
-			float d2 = 0.05f * dot(vert_pos, vert_pos);
 			const vec3 light = normalize(data.light_pos - vert_pos);
+			float d2 = dot(light, light);
 			float diffuse; vec3 ref;
 			if(data.face_normals){
 				diffuse = max(0.0f, dot(light, normals[0]));
@@ -168,8 +168,8 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				}
 				else {
 					const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
-					float d2 = 0.05f * dot(frag_pos, frag_pos);
 					const vec3 light = normalize(data.light_pos - frag_pos);
+					float d2 = dot(light, light);
 					const float diffuse = max(0.0f, dot(light, normal));
 					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
 					const float specular = pow( max(0.0f, dot(ref, light)), data.spec_power);
