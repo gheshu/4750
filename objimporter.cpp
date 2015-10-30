@@ -106,6 +106,12 @@ bool objloadNoIndices(const std::string& filename, Mesh& out){
 				}
 			}
 			mv.normal = normalize(mv.normal);
+			// figure out the polar texture mapping of this vertex.
+			const float r = length(mv.position);
+			const float theta = acos(mv.position.z / r);
+			const float phi = atan2(mv.position.y, mv.position.x);
+			mv.uv.y = fmod(theta / PI, 1.0f);
+			mv.uv.x = fmod(0.5f + 0.5f * ( phi / PI), 1.0f);
 			out.vertices.push_back(mv);
 		}
 
