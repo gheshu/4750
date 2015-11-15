@@ -115,40 +115,12 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 
 	const vec4 e1(face[1] - face[0]);
 	const vec4 e2(face[2] - face[0]);
-	vec3 normals[3]; vec3 ne1, ne2;
-	if(data.face_normals){
-		normals[0] = normalize(cross(e1, e2));
-	}
-	else {
-		normals[0] = normalize(data.norm_mat * data.mesh->at(i).normal);
-		normals[1] = normalize(data.norm_mat * data.mesh->at(i+1).normal);
-		normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
-		ne1 = normals[1] - normals[0];
-		ne2 = normals[2] - normals[0];
-	}
-	
-	vec3 c[3]; vec3 ce1, ce2;
-	if(data.vertex_shading){
-		for(int s = 0; s < 3; s++){
-			const vec3 vert_pos(face[s]);
-			const vec3 light = normalize(data.light_pos - vert_pos);
-			float d2 = dot(light, light);
-			float diffuse; vec3 ref;
-			if(data.face_normals){
-				diffuse = max(0.0f, dot(light, normals[0]));
-				ref = reflect(vec3(0.0f, 0.0f, -1.0f), normals[0]);
-			}
-			else {
-				diffuse = max(0.0f, dot(light, normals[s]));
-				ref = reflect(vec3(0.0f, 0.0f, -1.0f), normals[s]);
-			}
-			const float specular = pow( max(0.0f, dot(ref, light)), data.spec_power);
-			c[s] = data.ambient + (data.mat * diffuse + specular) / (data.lin_atten + d2);
-			c[s] = clamp(0.0f, 1.0f, c[s]);
-		}
-		ce1 = c[1] - c[0];
-		ce2 = c[2] - c[0];
-	}
+	vec3 normals[3];
+	normals[0] = normalize(data.norm_mat * data.mesh->at(i).normal);
+	normals[1] = normalize(data.norm_mat * data.mesh->at(i+1).normal);
+	normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
+	vec3 ne1(normals[1] - normals[0]);
+	vec3 ne2(normals[2] - normals[0]);
 
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
@@ -162,19 +134,14 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 			point = data.pw * point;
 			point = point / point.w;
 			if(depthbuffer.top(point)){
-				vec3 color;
-				if(data.vertex_shading){
-					color = c[0] + a * ce1 + b * ce2;
-				}
-				else {
-					const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
-					const vec3 light = normalize(data.light_pos - frag_pos);
-					float d2 = dot(light, light);
-					const float diffuse = max(0.0f, dot(light, normal));
-					const vec3 ref = reflect(vec3(0.0f, 0.0f, -1.0f), normal);
-					const float specular = pow( max(0.0f, dot(ref, light)), data.spec_power);
-					color = data.ambient + (data.mat * diffuse + specular) / (data.lin_atten + d2);
-				}
+				vec3 color;	//blinn-phong shading model
+				const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
+				const vec3 light = normalize(data.light_pos - frag_pos);
+				float d2 = dot(light, light);
+				const float diffuse = max(0.0f, dot(light, normal));
+				const vec3 H = normalize(light + vec3(0.0f, 0.0f, 1.0f));
+				const float specular = pow( max(0.0f, dot(normal, H)), data.spec_power*4);
+				color = data.ambient + (data.mat * diffuse + specular) / (data.lin_atten + d2);
 				color = clamp(0.0f, 1.0f, color);
 				#pragma omp critical
 				{
