@@ -60,11 +60,12 @@ bool objload(const std::string& filename, Mesh& out){
 	}
 }
 
-bool objloadNoIndices(const std::string& filename, Mesh& out){
+bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool project){
 	Mesh temp;
 	ifstream stream(filename);
 	if(stream.is_open()){
 		string line;
+		int uv_index = 0;
 		while(getline(stream, line)){
 			if(line.substr(0, 2) == "v "){
 				istringstream s(line.substr(2));
@@ -82,6 +83,14 @@ bool objloadNoIndices(const std::string& filename, Mesh& out){
 				temp.indices.push_back(i2 - 1);
 				temp.indices.push_back(i3 - 1);
 			}
+			else if(!project && line.substr(0, 2) == "vt"){
+				istringstream s(line.substr(2));
+				for(int i = 0; i < 3; i++){
+					s >> temp.vertices[uv_index].uv.x;
+					s >> temp.vertices[uv_index].uv.y;
+					uv_index++;
+				}
+			}
 		}
 		stream.close();
 		out.vertices.clear();
@@ -89,32 +98,41 @@ bool objloadNoIndices(const std::string& filename, Mesh& out){
 		out.indices.clear();
 		for(unsigned i = 0; i < temp.indices.size(); i++){
 			MeshVertex& mv = temp.atIndex(i);
-			const unsigned index = temp.indices[i];
-			for(unsigned j = 0; j < temp.indices.size() - 2; j+=3){
-				// for each face
-				for(unsigned k = 0; k < 3; k++){
-					// for each vertex in the face
-					if(temp.indices[j + k] == index){
-						// if jth face has the ith vertex in it, add jth face normal to ith normal.
-						vec4& j1 = temp.atIndex(j).position;
-						vec4& j2 = temp.atIndex(j+1).position;
-						vec4& j3 = temp.atIndex(j+2).position;
-						vec3 jnormal = normalize(cross(vec3(j2 - j1), vec3(j3 - j1)));
-						mv.normal += jnormal;
-						break;
+			if(smooth){
+				const unsigned index = temp.indices[i];
+				for(unsigned j = 0; j < temp.indices.size() - 2; j+=3){
+					// for each face
+					for(unsigned k = 0; k < 3; k++){
+						// for each vertex in the face
+						if(temp.indices[j + k] == index){
+							// if jth face has the ith vertex in it, add jth face normal to ith normal.
+							vec4& j1 = temp.atIndex(j).position;
+							vec4& j2 = temp.atIndex(j+1).position;
+							vec4& j3 = temp.atIndex(j+2).position;
+							vec3 jnormal = normalize(cross(vec3(j2 - j1), vec3(j3 - j1)));
+							mv.normal += jnormal;
+							break;
+						}
 					}
 				}
+				mv.normal = normalize(mv.normal);
 			}
-			mv.normal = normalize(mv.normal);
-			// figure out the polar texture mapping of this vertex.
-			const float r = length(mv.position);
-			const float theta = acos(mv.position.z / r);
-			const float phi = atan2(mv.position.y, mv.position.x);
-			mv.uv.y = fmod(theta / PI, 1.0f);
-			mv.uv.x = fmod(0.5f + 0.5f * ( phi / PI), 1.0f);
+			else {
+				int ind = i - (i%3);
+				vec3 e1(temp.atIndex(ind+1).position - temp.atIndex(ind).position);
+				vec3 e2(temp.atIndex(ind+2).position - temp.atIndex(ind).position);
+				mv.normal = normalize(cross(e1, e2));
+			}
+			if(project){
+				// figure out the polar texture mapping of this vertex.
+				const float r = length(mv.position);
+				const float theta = acos(mv.position.z / r);
+				const float phi = atan2(mv.position.y, mv.position.x);
+				mv.uv.y = fmod(theta / PI, 1.0f);
+				mv.uv.x = fmod(0.5f + 0.5f * ( phi / PI), 1.0f);
+			}
 			out.vertices.push_back(mv);
 		}
-
 		return true;
 	} 
 	else {

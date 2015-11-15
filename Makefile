@@ -22,12 +22,11 @@ debug:	$(EXE)
 release: CXXFLAGS += -O3
 release: $(EXE)
 
-parallel: CXXFLAGS += -O3 -fopenmp -DOMP_PARALLEL
-parallel: LDLIBS += -fopenmp
-parallel: $(EXE)
-
 run:	$(EXE)
 	./$(EXE)
+
+clean:
+	rm *.o $(EXE)
 
 $(EXE):		$(OBJ_FILES)
 	$(LINK) $(EXE) $(OBJ_FILES) $(LDFLAGS) $(LDLIBS) 
