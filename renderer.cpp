@@ -18,14 +18,11 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
 	m_input = new Input(m_glwindow);
-	
 	if(!m_prog.build("shader.vert", "shader.frag")){
 		exit(1);
 	}
-	
 	framebuffer.init(m_width, m_height);
 	depthbuffer.init(m_width, m_height);
-	
 	screenQuadInit();
 	res_man.init(2);
 	res_man.loadNoIndices("assets/cube_texture.obj", "cube", false, false);
@@ -124,7 +121,6 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	vec3 ne2(normals[2] - normals[0]);
 	TexLerpTri tlt;
 	texLerpInit(tlt, face[0], face[1], face[2]);
-	PRINTLINEMACRO
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
@@ -145,7 +141,6 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 					vec3 texNorm = normalize(data.normal->texelW(uv));
 					normal = normalize(vec3(normal.x + texNorm.x, normal.y + texNorm.y, normal.z * texNorm.z));
 				}
-				PRINTLINEMACRO
 				const vec3 light = normalize(data.light_pos - frag_pos);
 				float d2 = dot(light, light);
 				const float diffuse = max(0.0f, dot(light, normal));
@@ -178,8 +173,6 @@ void Renderer::draw(const BoshartParam& param) {
 	drawdata.normal = &normal;
 	drawdata.texture = &moon;
 	
-	PRINTLINEMACRO
-	
 	//-----scenegraph code----------------------------
 	
 	EntityGraph graph;
@@ -191,7 +184,6 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.insert("cube", "root", "cube", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
-	PRINTLINEMACRO
 	//----end scenegraph code----------------------------
 	
 	drawdata.pw = Wmatrix((float)m_width, (float)m_height) 
@@ -229,7 +221,6 @@ void Renderer::draw(const BoshartParam& param) {
 			graph.remove("cube");
 			graph.update();
 			instance_xforms = graph.getTransforms();
-			PRINTLINEMACRO
 		}
 		else if(glfwGetKey(m_glwindow, GLFW_KEY_2)){
 			drawdata.texture = &ttu;
@@ -238,7 +229,6 @@ void Renderer::draw(const BoshartParam& param) {
 			graph.remove("sphere");
 			graph.update();
 			instance_xforms = graph.getTransforms();
-			PRINTLINEMACRO
 		}
 		vec4 l_pos(param.light_pos);
 		l_pos.w = 1.0f;
@@ -261,7 +251,6 @@ void Renderer::draw(const BoshartParam& param) {
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(drawdata, k * 3);
 				}
-				PRINTLINEMACRO
 			}
 		}
 

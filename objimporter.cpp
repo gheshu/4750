@@ -6,6 +6,8 @@
 #include "hlm.h"
 #include "mesh.h"
 
+#include "debugmacro.h"
+
 using namespace std;
 using namespace hlm;
 
@@ -62,10 +64,10 @@ bool objload(const std::string& filename, Mesh& out){
 
 bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool project){
 	Mesh temp;
+	std::vector<vec2> uvs;
 	ifstream stream(filename);
 	if(stream.is_open()){
 		string line;
-		int uv_index = 0;
 		while(getline(stream, line)){
 			if(line.substr(0, 2) == "v "){
 				istringstream s(line.substr(2));
@@ -86,9 +88,10 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 			else if(!project && line.substr(0, 2) == "vt"){
 				istringstream s(line.substr(2));
 				for(int i = 0; i < 3; i++){
-					s >> temp.vertices[uv_index].uv.x;
-					s >> temp.vertices[uv_index].uv.y;
-					uv_index++;
+					vec2 uv;
+					s >> uv.x;
+					s >> uv.y;
+					uvs.push_back(uv);
 				}
 			}
 		}
@@ -98,8 +101,8 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 		out.indices.clear();
 		for(unsigned i = 0; i < temp.indices.size(); i++){
 			MeshVertex& mv = temp.atIndex(i);
+			const unsigned index = temp.indices[i];
 			if(smooth){
-				const unsigned index = temp.indices[i];
 				for(unsigned j = 0; j < temp.indices.size() - 2; j+=3){
 					// for each face
 					for(unsigned k = 0; k < 3; k++){
@@ -130,6 +133,9 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 				const float phi = atan2(mv.position.y, mv.position.x);
 				mv.uv.y = fmod(theta / PI, 1.0f);
 				mv.uv.x = fmod(0.5f + 0.5f * ( phi / PI), 1.0f);
+			}
+			else {
+				mv.uv = uvs[index];
 			}
 			out.vertices.push_back(mv);
 		}
