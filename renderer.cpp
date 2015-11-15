@@ -27,7 +27,8 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	depthbuffer.init(m_width, m_height);
 	
 	screenQuadInit();
-	res_man.init(1);
+	res_man.init(2);
+	res_man.loadNoIndices("assets/cube_texture.obj", "cube", false, false);
 	res_man.loadNoIndices("assets/sphere.obj", "sphere", true, true);
 }
 
@@ -121,7 +122,9 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
 	vec3 ne1(normals[1] - normals[0]);
 	vec3 ne2(normals[2] - normals[0]);
-
+	TexLerpTri tlt;
+	texLerpInit(tlt, face[0], face[1], face[2]);
+	PRINTLINEMACRO
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
@@ -134,14 +137,21 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 			point = data.pw * point;
 			point = point / point.w;
 			if(depthbuffer.top(point)){
+				vec2 uv = texLerp(tlt, a, b);
+				vec3 mat = data.texture->texelW(uv);
 				vec3 color;	//blinn-phong shading model
-				const vec3 normal(normalize(normals[0] + a * ne1 + b * ne2));
+				vec3 normal = normalize(normals[0] + a * ne1 + b * ne2);
+				if(data.normal){
+					vec3 texNorm = normalize(data.normal->texelW(uv));
+					normal = normalize(vec3(normal.x + texNorm.x, normal.y + texNorm.y, normal.z * texNorm.z));
+				}
+				PRINTLINEMACRO
 				const vec3 light = normalize(data.light_pos - frag_pos);
 				float d2 = dot(light, light);
 				const float diffuse = max(0.0f, dot(light, normal));
 				const vec3 H = normalize(light + vec3(0.0f, 0.0f, 1.0f));
 				const float specular = pow( max(0.0f, dot(normal, H)), data.spec_power*4);
-				color = data.ambient + (data.mat * diffuse + specular) / (data.lin_atten + d2);
+				color = data.ambient + (mat * diffuse + specular) / (data.lin_atten + d2);
 				color = clamp(0.0f, 1.0f, color);
 				#pragma omp critical
 				{
@@ -154,11 +164,21 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 }
 
 void Renderer::draw(const BoshartParam& param) {
+	Image ttu;
+	ttu.loadFile("assets/TTU.png");
+	Image moon;
+	moon.loadFile("assets/MoonMap.png");
+	Image normal;
+	normal.loadFile("assets/MoonNormal.png");
 	DrawData drawdata;
 	drawdata.ambient = param.ambient;
 	drawdata.mat = param.mat;
 	drawdata.lin_atten = param.lin_atten;
 	drawdata.spec_power = param.spec_power;
+	drawdata.normal = &normal;
+	drawdata.texture = &moon;
+	
+	PRINTLINEMACRO
 	
 	//-----scenegraph code----------------------------
 	
@@ -168,10 +188,10 @@ void Renderer::draw(const BoshartParam& param) {
 	t.add(T, param.t);
 	t.add(R, param.r);
 	t.add(S, param.s);
-	graph.insert("sphere", "root", "sphere", t);
+	graph.insert("cube", "root", "cube", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
-	
+	PRINTLINEMACRO
 	//----end scenegraph code----------------------------
 	
 	drawdata.pw = Wmatrix((float)m_width, (float)m_height) 
@@ -203,16 +223,22 @@ void Renderer::draw(const BoshartParam& param) {
 			cam.init(param.eye, param.at, param.up);
 		}
 		if(glfwGetKey(m_glwindow, GLFW_KEY_1)){
-			drawdata.face_normals = true;
-			drawdata.vertex_shading = true;
+			drawdata.texture = &moon;
+			drawdata.normal = &normal;
+			graph.insert("sphere", "root", "sphere", Transform());
+			graph.remove("cube");
+			graph.update();
+			instance_xforms = graph.getTransforms();
+			PRINTLINEMACRO
 		}
-		if(glfwGetKey(m_glwindow, GLFW_KEY_2)){
-			drawdata.face_normals = false;
-			drawdata.vertex_shading = true;
-		}
-		if(glfwGetKey(m_glwindow, GLFW_KEY_3)){
-			drawdata.face_normals = false;
-			drawdata.vertex_shading = false;
+		else if(glfwGetKey(m_glwindow, GLFW_KEY_2)){
+			drawdata.texture = &ttu;
+			drawdata.normal = nullptr;
+			graph.insert("cube", "root", "cube", t);
+			graph.remove("sphere");
+			graph.update();
+			instance_xforms = graph.getTransforms();
+			PRINTLINEMACRO
 		}
 		vec4 l_pos(param.light_pos);
 		l_pos.w = 1.0f;
@@ -235,6 +261,7 @@ void Renderer::draw(const BoshartParam& param) {
 				for(unsigned k = 0; k < mesh->num_verts() / 3; k++){
 					fillPass(drawdata, k * 3);
 				}
+				PRINTLINEMACRO
 			}
 		}
 
@@ -245,4 +272,7 @@ void Renderer::draw(const BoshartParam& param) {
 	//---------end draw loop--------------------------------
 	instance_xforms = nullptr;
 	graph.destroy();
+	ttu.unloadFile();
+	moon.unloadFile();
+	normal.unloadFile();
 }

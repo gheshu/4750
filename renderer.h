@@ -20,16 +20,15 @@ struct BoshartParam{
 };
 
 struct DrawData{
-	hlm::mat4 pw;
-	hlm::mat4 mv;
+	hlm::mat4 pw, mv;
 	hlm::mat3 norm_mat;
 	hlm::vec3 light_pos;
 	hlm::vec3 mat, ambient;
 	float spec_power;
 	float lin_atten;
+	Image* texture;
+	Image* normal;
 	Mesh* mesh;
-	bool face_normals = true;
-	bool vertex_shading = true;
 };
 
 class Renderer

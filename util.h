@@ -256,21 +256,21 @@ mat4 rotateY(float angle);
 mat4 rotateZ(float angle);
 mat4 rotateEuler(const vec4& angles);
 
-struct texLerpTri{
+struct TexLerpTri{
 	vec2 p0, e1, e2;
 	float ze1, ze2, z0;
 };
 
-inline void texLerpInit(const vec2& p0, const vec2& p1, const vec2& p2, const vec3& z, texLerpTri& t){
-	t.p0 = p0/z.x;
-	t.e1 = p1/z.y - t.p0;
-	t.e2 = p2/z.z - t.p0;
-	t.z0 = 1.0f/z.x;
-	t.ze1 = 1.0f/z.y - t.z0;
-	t.ze2 = 1.0f/z.z - t.z0;
+inline void texLerpInit(TexLerpTri& t, const vec4& p0, const vec4& p1, const vec4& p2){
+	t.p0  = vec2(p0.x/p0.z, p0.y/p0.z);
+	t.e1  = vec2(p1.x/p1.z, p1.y/p1.z) - t.p0;
+	t.e2  = vec2(p2.x/p2.z, p2.y/p2.z) - t.p0;
+	t.z0  = 1.0f/p0.z;
+	t.ze1 = 1.0f/p1.z - t.z0;
+	t.ze2 = 1.0f/p2.z - t.z0;
 }
 
-inline vec2 texLerpTri(const texLerpTri& t, const float a, const float b){
+inline vec2 texLerp(const TexLerpTri& t, const float a, const float b){
 	return vec2( (t.p0 + a*t.e1 + b*t.e2) / (t.z0 + a*t.ze1 + b*t.ze2) );
 }
 
