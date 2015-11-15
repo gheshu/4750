@@ -28,7 +28,7 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	
 	screenQuadInit();
 	res_man.init(1);
-	res_man.loadNoIndices("assets/sphere.obj", "sphere");
+	res_man.loadNoIndices("assets/sphere.obj", "sphere", true, true);
 }
 
 void Renderer::destroy(){

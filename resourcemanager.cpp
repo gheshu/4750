@@ -19,9 +19,9 @@ void ResourceManager::load(const std::string& filename, const std::string& name)
 		keys.insert({name, m});
 	}
 }
-void ResourceManager::loadNoIndices(const std::string& filename, const std::string& name){
+void ResourceManager::loadNoIndices(const std::string& filename, const std::string& name, bool smooth, bool project){
 	Mesh m;
-	if(objloadNoIndices(filename, m)){
+	if(objloadNoIndices(filename, m, smooth, project)){
 		keys.insert({name, m});
 	}
 }

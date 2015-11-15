@@ -14,7 +14,7 @@ public:
 	void remove(const std::string& name);
 	Mesh* get(const std::string& name);
 	void load(const std::string& filename, const std::string& name);
-	void loadNoIndices(const std::string& filename, const std::string& name);
+	void loadNoIndices(const std::string& filename, const std::string& name, bool smooth, bool project);
 };
 
 #endif
