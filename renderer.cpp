@@ -170,8 +170,8 @@ void Renderer::draw(const BoshartParam& param) {
 	drawdata.mat = param.mat;
 	drawdata.lin_atten = param.lin_atten;
 	drawdata.spec_power = param.spec_power;
-	drawdata.normal = &normal;
-	drawdata.texture = &moon;
+	drawdata.normal = nullptr;
+	drawdata.texture = &ttu;
 	
 	//-----scenegraph code----------------------------
 	
