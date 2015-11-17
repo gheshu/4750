@@ -42,8 +42,8 @@ void Image::setPixel(const hlm::vec4& pos, const hlm::vec3& color){
 
 // dont pass things larger than 512 as uv coords
 hlm::vec3 Image::texelW(const hlm::vec2& pos){
-	const int x = modf(pos.x + 512.0f, nullptr)*(width-1);
-	const int y = modf(pos.y + 512.0f, nullptr)*(height-1);
+	const int x = modf(-pos.x + 512.0f, nullptr)*(width-1);
+	const int y = modf(-pos.y + 512.0f, nullptr)*(height-1);
 	uint_8* i = (data + x*4 + y*4*width);
 	return hlm::vec3(*i / 255.0f, *(i+1) / 255.0f, *(i+2) / 255.0f);
 }

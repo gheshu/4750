@@ -91,7 +91,7 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 					vec2 uv;
 					s >> uv.x;
 					s >> uv.y;
-					uvs.push_back(uv - 1.0f);
+					uvs.push_back(uv);
 				}
 			}
 		}
@@ -130,9 +130,9 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 				// figure out the polar texture mapping of this vertex.
 				const float r = length(mv.position);
 				const float theta = acos(mv.position.y / r) / PI;
-				const float phi = atan2(-mv.position.z, mv.position.x) / (2.0f*PI);
+				const float phi = atan2(mv.position.z, mv.position.x) / (2.0f*PI);
 				mv.uv.y = theta;
-				mv.uv.x = phi;
+				mv.uv.x = phi + 0.5f;
 			}
 			else {
 				mv.uv = uvs[index];

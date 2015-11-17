@@ -11,7 +11,7 @@ Build instructions:
 			
 	clean.bat removes .o and .exe files.
 
-Controls:
+Controls (requires build release to be interactive):
 	W: move forward
 	A: move left
 	S: move backward
@@ -23,8 +23,7 @@ Controls:
 	Mouse: look around
 	
 	R: reset camera
-	1: Interpolative Shading
-	2: Gouraud Shading
-	3: Phong Shading
+	1: Moon
+	2: TTU Cube
 	
 	Escape: close program

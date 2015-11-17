@@ -122,8 +122,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	const vec2& uv0 = data.mesh->at(i).uv;
 	const vec2& uv1 = data.mesh->at(i+1).uv;
 	const vec2& uv2 = data.mesh->at(i+2).uv;
-	TexLerpTri tlt;
-	texLerpInit(tlt, uv0, uv1, uv2, vec3(scr[0].w, scr[1].w, scr[2].w));
+	TexLerpTri tlt(uv0, uv1, uv2, vec3(scr[0].w, scr[1].w, scr[2].w));
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
@@ -136,7 +135,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 			point = data.pw * point;
 			point = point / point.w;
 			if(depthbuffer.top(point)){
-				vec2 uv = texLerp(tlt, a, b);
+				vec2 uv = tlt.texLerp(a, b);
 				vec3 mat = data.texture->texelW(uv);
 				vec3 color;	//blinn-phong shading model
 				vec3 normal = normalize(normals[0] + a * ne1 + b * ne2);
