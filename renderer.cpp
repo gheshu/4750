@@ -85,7 +85,6 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	face[1] = data.mv * data.mesh->at(i + 1).position;
 	face[2] = data.mv * data.mesh->at(i + 2).position;
 	float da, db;
-	{
 		// check screen-space culling
 		vec4 scr[3]; unsigned badz = 0;
 		for(int s = 0; s < 3; s++){
@@ -97,6 +96,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				badz++;
 			}
 		}
+	{
 		if(badz >= 3){
 			return;
 		}
@@ -119,8 +119,11 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 	normals[2] = normalize(data.norm_mat * data.mesh->at(i+2).normal);
 	vec3 ne1(normals[1] - normals[0]);
 	vec3 ne2(normals[2] - normals[0]);
+	const vec2& uv0 = data.mesh->at(i).uv;
+	const vec2& uv1 = data.mesh->at(i+1).uv;
+	const vec2& uv2 = data.mesh->at(i+2).uv;
 	TexLerpTri tlt;
-	texLerpInit(tlt, face[0], face[1], face[2]);
+	texLerpInit(tlt, uv0, uv1, uv2, vec3(scr[0].w, scr[1].w, scr[2].w));
 	// draw loop
 	for(float b = 0.0f; b <= 1.0f; b += db){
 		for(float a = 0.0f; a <= 1.0f; a += da){
@@ -145,7 +148,7 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 				float d2 = dot(light, light);
 				const float diffuse = max(0.0f, dot(light, normal));
 				const vec3 H = normalize(light + vec3(0.0f, 0.0f, 1.0f));
-				const float specular = pow( max(0.0f, dot(normal, H)), data.spec_power*4);
+				const float specular = pow( max(0.0f, dot(normal, H)), data.spec_power*4.0f);
 				color = data.ambient + (mat * diffuse + specular) / (data.lin_atten + d2);
 				color = clamp(0.0f, 1.0f, color);
 				#pragma omp critical
@@ -184,6 +187,9 @@ void Renderer::draw(const BoshartParam& param) {
 	graph.insert("cube", "root", "cube", t);
 	graph.update();
 	std::vector<MeshTransform>* instance_xforms = graph.getTransforms();
+	Transform t2;
+	t2.add(R, vec3(0.0f, 180.0f, 0.0f));
+	t2.add(S, vec3(2.0f));
 	//----end scenegraph code----------------------------
 	
 	drawdata.pw = Wmatrix((float)m_width, (float)m_height) 
@@ -217,7 +223,7 @@ void Renderer::draw(const BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_1)){
 			drawdata.texture = &moon;
 			drawdata.normal = &normal;
-			graph.insert("sphere", "root", "sphere", Transform());
+			graph.insert("sphere", "root", "sphere", t2);
 			graph.remove("cube");
 			graph.update();
 			instance_xforms = graph.getTransforms();
