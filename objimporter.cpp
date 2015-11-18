@@ -68,12 +68,19 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 	ifstream stream(filename);
 	if(stream.is_open()){
 		string line;
+		vec3 min, max;
 		while(getline(stream, line)){
 			if(line.substr(0, 2) == "v "){
 				istringstream s(line.substr(2));
 				MeshVertex v;
 				s >> v.position.x; s >> v.position.y; s >> v.position.z; v.position.w = 1.0f;
 				temp.vertices.push_back(v);
+				min.x = std::min(min.x, v.position.x);
+				max.x = std::max(max.x, v.position.x);
+				min.y = std::min(min.y, v.position.y);
+				max.y = std::max(max.y, v.position.y);
+				min.z = std::min(min.z, v.position.z);
+				max.z = std::max(max.z, v.position.z);
 			} 
 			else if(line.substr(0, 2) == "f "){
 				char f[16];
@@ -135,7 +142,23 @@ bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool 
 				mv.uv.x = phi + 0.5f;
 			}
 			else {
-				mv.uv = uvs[index];
+				//mv.uv = uvs[index];	use cube mapping instead of imported uvs
+				vec3 absn = abs(mv.normal);
+				if(absn.y > absn.z && absn.y > absn.x){
+					//use x-z plane
+					mv.uv.x = (mv.normal.y < 0.0f) ? -mv.position.x / max.x : mv.position.x / max.x;
+					mv.uv.y = mv.position.z / max.z;
+				}
+				else if(absn.x > absn.z && absn.x > absn.y){
+					// use z-y plane
+					mv.uv.x = (mv.normal.x < 0.0f) ? -mv.position.z / max.z : mv.position.z / max.z;
+					mv.uv.y = mv.position.y / max.y;
+				}
+				else {
+					// use x-y plane
+					mv.uv.x = (mv.normal.z < 0.0f) ? mv.position.x / max.x : -mv.position.x / max.x;
+					mv.uv.y = mv.position.y / max.y;
+				}
 			}
 			out.vertices.push_back(mv);
 		}
