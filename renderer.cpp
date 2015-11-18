@@ -107,8 +107,8 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 			return;
 		}
 		// calculate deltas
-		da = 1.0f / (length(scre1) * 1.5f);
-		db = 1.0f / (length(scre2) * 1.5f);
+		da = 1.0f / (length(scre1) * 2.0f);
+		db = 1.0f / (length(scre2) * 2.0f);
 	}
 
 	const vec4 e1(face[1] - face[0]);
