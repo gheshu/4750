@@ -1,30 +1,25 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "vec4.h"
-#include "vec3.h"
-#include "vec2.h"
+#include "hlm.h"
 #include <vector>
-#include <string>
 
 struct MeshVertex{
-	hlm::vec4 position;
+	hlm::vec3 position;
 	hlm::vec3 normal;
 	hlm::vec2 uv;
 };
 
+typedef std::vector<MeshVertex> VertexBuffer;
+typedef std::vector<int> IndexBuffer;
+
 struct Mesh{
-	std::vector<MeshVertex> vertices;
-	std::vector<unsigned> indices;
-	
-	inline MeshVertex& atIndex(const unsigned i){
-		return vertices[indices[i]];
-	}
-	inline MeshVertex& at(const unsigned i){
-		return vertices[i];
-	}
-	inline unsigned num_indices(){ return indices.size(); }
-	inline unsigned num_verts() {return vertices.size(); }
+	hlm::mat4 transform;
+	unsigned vbo, vao, ibuf, num_indices;
+	Mesh();
+	~Mesh();
+	void uploadData(VertexBuffer& verts, IndexBuffer& indices);
+	void draw();
 };
 
 #endif
