@@ -11,59 +11,8 @@
 using namespace std;
 using namespace hlm;
 
-bool objload(const std::string& filename, Mesh& out){
-	ifstream count_stream(filename);
-	unsigned vcount = 0;
-	unsigned icount = 0;
-	if(count_stream.is_open()){
-		// count number of verts and indices in file to make a well sized buffer to load into.
-		string line;
-		while(getline(count_stream, line)){
-			if(line.substr(0, 2) == "v "){
-				vcount++;
-			}
-			else if(line.substr(0, 2) == "f "){
-				icount++;
-			}
-		}
-		count_stream.close();
-	}
-	ifstream stream(filename);
-	if(stream.is_open()){
-		out.vertices.clear();
-		out.vertices.reserve(vcount);
-		out.indices.clear();
-		out.indices.reserve(icount);
-		string line;
-		while(getline(stream, line)){
-			if(line.substr(0, 2) == "v "){
-				istringstream s(line.substr(2));
-				MeshVertex v;
-				s >> v.position.x; s >> v.position.y; s >> v.position.z; v.position.w = 1.0f;
-				out.vertices.push_back(v);
-			} 
-			else if(line.substr(0, 2) == "f "){
-				char f[16];
-				int i1, i2, i3, ivn1, ivn2, ivn3;
-				sscanf(line.c_str(), "%s %i//%i %i//%i %i//%i\n", 
-					f, &i1, &ivn1, &i2, &ivn2, &i3, &ivn3);
-				//cout << i1 << " " << i2 << " " << i3 << endl;
-				out.indices.push_back(i1 - 1);
-				out.indices.push_back(i2 - 1);
-				out.indices.push_back(i3 - 1);
-			}
-		}
-		stream.close();
-		return true;
-	} 
-	else {
-		printf("Could not find file %s\n", filename.c_str());
-		return false;
-	}
-}
-
-bool objloadNoIndices(const std::string& filename, Mesh& out, bool smooth, bool project){
-	Mesh temp;
+bool objload(const std::string& filename, MeshData& out, bool smooth, bool project){
+	MeshData temp;
 	std::vector<vec2> uvs;
 	ifstream stream(filename);
 	if(stream.is_open()){

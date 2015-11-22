@@ -19,25 +19,14 @@ struct BoshartParam{
 	float fov, near, far, lin_atten, spec_power;
 };
 
-struct DrawData{
-	hlm::mat4 pw, mv;
-	hlm::mat3 norm_mat;
-	hlm::vec3 light_pos;
-	hlm::vec3 mat, ambient;
-	float spec_power;
-	float lin_atten;
-	Image* texture;
-	Image* normal;
-	Mesh* mesh;
-};
-
 class Renderer
 {
 private:
 	GLSLProgram m_prog;
 	Image framebuffer;
 	DepthBuffer depthbuffer;
-	ResourceManager res_man;
+	MeshManager mesh_man;
+	MaterialManager mat_man;
 	Window* m_window;
 	GLFWwindow* m_glwindow;
 	Input* m_input;
@@ -49,7 +38,7 @@ private:
 	void glPass();
 	void screenQuadInit();
 public:
-    void init(const int width, const int height, const int msaa);
+    void init(const int width, const int height, const int msaa, const BoshartParam& param);
 	void destroy();
     void draw(const BoshartParam& param);
 

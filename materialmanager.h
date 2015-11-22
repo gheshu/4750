@@ -17,7 +17,7 @@ class MaterialManager{
 	inline void removeTexture(const std::string& name){textures.remove(name);}
 	inline void removeNormal(const std::string& name){normals.remove(name);}
 	inline void removeMaterial(const std::string& name){materials.remove(name);}
-	inline void clear(){textures.clear(); normals.clear();}
+	inline void clear(){textures.clear(); normals.clear(); materials.clear();}
 	void bindMaterial(const std::string& name, GLSLProgram& prog);
 };
 

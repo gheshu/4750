@@ -2,6 +2,7 @@
 #define LIGHT_H
 
 #include "vec3.h"
+class GLSLProgram;
 
 struct Light{
 	hlm::vec3 position, color, falloff;
@@ -12,5 +13,7 @@ struct Light{
 };
 
 typedef std::vector<Light> LightList;
+
+void bindLights(LightList& lights, GLSLProgram& prog);
 
 #endif

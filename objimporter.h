@@ -5,6 +5,6 @@
 
 struct MeshData;
 
-bool objload(const std::string& filename, MeshData& out);
+bool objload(const std::string& filename, MeshData& out, bool smooth, bool project);
 
 #endif
