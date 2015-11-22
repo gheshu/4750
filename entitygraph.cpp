@@ -3,8 +3,8 @@
 #include "util.h"
 #include <iostream>
 
-Entity::Entity(const std::string& _id, Entity* parent_ptr, const std::string& _mesh_id, const Transform& trans) 
-	: id(_id), mesh_id(_mesh_id) {
+Entity::Entity(const std::string& _id, Entity* parent_ptr, bool _hasMesh, const Transform& trans) 
+	: id(_id), hasMesh(_hasMesh) {
 	if(parent_ptr){
 		parents.insert(parent_ptr);
 	}
@@ -77,7 +77,7 @@ void EntityGraph::init(const int size){
 		return;
 	}
 	entities.reserve(size);
-	root = new Entity("root", nullptr, "", Transform());
+	root = new Entity("root", nullptr, false, Transform());
 	entities.insert({"root", root});
 }
 
@@ -90,7 +90,7 @@ void EntityGraph::destroy(){
 	mesh_transforms.clear();
 }
 
-void EntityGraph::insert(const std::string& id, const std::string& parent_id, const std::string& mesh_id, const Transform& trans){
+void EntityGraph::insert(const std::string& id, const std::string& parent_id, bool hasMesh, const Transform& trans){
 	if(entities.find(id) != entities.end()){
 		std::cerr << "Entity " << id << " already exists\n";
 		return;
@@ -100,7 +100,7 @@ void EntityGraph::insert(const std::string& id, const std::string& parent_id, co
 		std::cerr << "Parent Entity " << parent_id << " doesn't exist\n";
 		return;
 	}
-	Entity* ent = new Entity(id, parent_iterator->second, mesh_id, trans);
+	Entity* ent = new Entity(id, parent_iterator->second, hasMesh, trans);
 	parent_iterator->second->addChild(ent);	// bi directional method, makes a double-link
 	entities.insert({id, ent});
 }
@@ -148,8 +148,8 @@ void EntityGraph::update(){
 void EntityGraph::update(Entity* ent, const hlm::mat4& inmat){
 	hlm::mat4 outmat = inmat * ent->transform;
 	
-	if(ent->mesh_id.compare("") != 0){
-		mesh_transforms.push_back(MeshTransform(ent->mesh_id, outmat));
+	if(ent->hasMesh){
+		mesh_transforms.push_back({ent->id, outmat});
 	}
 	for(auto a : ent->children){
 		update(a, outmat);

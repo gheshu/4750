@@ -306,6 +306,21 @@ bool GLSLProgram::setUniform(const std::string& name, hlm::vec3& uniform)
 
 // ----------------------------------------------------------------------------
 
+bool GLSLProgram::setUniform(const std::string& name, hlm::vec2& uniform)
+{
+	const GLint location = getUniformLocation(name);
+	if (location == -1)
+	{
+		return false;
+	}
+
+	glUniform2fv(location, 1, hlm::value_ptr(uniform));
+	MYGLERRORMACRO
+	return true;
+}
+
+// ----------------------------------------------------------------------------
+
 bool GLSLProgram::setUniformFloat(const std::string& name, const float uniform)
 {
 	const GLint location = getUniformLocation(name);

@@ -8,12 +8,9 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include "instancetransform.h"
 
-enum TRANSFORM_TYPE{
-	T,
-	R,
-	S
-};
+enum TRANSFORM_TYPE { T,R,S };
 
 struct TransOp{
 	hlm::vec4 data;
@@ -24,28 +21,16 @@ struct TransOp{
 
 struct Transform{
 	std::vector<TransOp> data;
-	inline void add(const TransOp& t){
-		data.push_back(t);
-	}
-	inline void add(const TRANSFORM_TYPE type, const hlm::vec4& in){
-		data.push_back(TransOp(type, in));
-	}
-	inline void clear(){
-		data.clear();
-	}
-};
-
-struct MeshTransform{
-	hlm::mat4 mat;
-	std::string mesh_id;
-	MeshTransform(const std::string& id, const hlm::mat4& inmat) : mat(inmat), mesh_id(id) {};
+	inline void add(const TRANSFORM_TYPE type, const hlm::vec4& in){data.push_back(TransOp(type, in));}
+	inline void clear(){data.clear();}
 };
 
 struct Entity{
 	hlm::mat4 transform;
 	std::set<Entity*> children, parents;
-	std::string id, mesh_id;
-	Entity(const std::string& _id, Entity* parent_ptr, const std::string& _mesh_id, const Transform& trans);
+	std::string id;
+	bool hasMesh;
+	Entity(const std::string& _id, Entity* parent_ptr, bool _hasMesh, const Transform& trans);
 	void addChild(Entity* ent);
 	void removeChild(Entity* ent);
 	void rotate(const hlm::vec4& v);
@@ -57,17 +42,17 @@ struct Entity{
 class EntityGraph{
 private:
 	std::unordered_map<std::string, Entity*> entities;
-	std::vector<MeshTransform> mesh_transforms;
+	TransformList mesh_transforms;
 	Entity* root = nullptr;
 	void update(Entity* ent, const hlm::mat4& inmat);
 public:
 	void init(const int size);
 	void destroy();
-	void insert(const std::string& id, const std::string& parent_id, const std::string& mesh_id, const Transform& trans);
+	void insert(const std::string& id, const std::string& parent_id, bool hasMesh, const Transform& trans);
 	void remove(const std::string& _id);
 	void addParent(const std::string& _id, const std::string& _parent_id);
 	void update();
-	inline std::vector<MeshTransform>* getTransforms(){ return &mesh_transforms; };
+	inline TransformList* getTransforms(){ return &mesh_transforms; };
 	void translate(const std::string& id, const hlm::vec3& v);
 	void rotate(const std::string& id, const hlm::vec4& v);
 	void scale(const std::string& id, const hlm::vec3& v);

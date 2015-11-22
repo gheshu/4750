@@ -2,7 +2,6 @@
 #define IMAGE_H
 
 #include <string>
-#include <cstring>	// memset
 
 typedef unsigned char uint_8;
 namespace hlm{
@@ -12,15 +11,12 @@ namespace hlm{
 };
 
 struct Image{
-	int width, height, length;
+	int width, height;
+	unsigned gl_id = -1;
 	uint_8* data = nullptr;
-	void init(const int width, const int height);
-	void loadFile(const std::string& filename);
-	void unloadFile();
-	inline void destroy(){ free(data); data = nullptr; }
-	void setPixel(const hlm::vec4& pos, const hlm::vec3& color);
-	hlm::vec3 texelW(const hlm::vec2& pos);
-	inline void clear(){ memset(data, 0, length); }
+	Image(const std::string& filename);
+	~Image();
+	void bind(unsigned channel);
 };
 
 #endif

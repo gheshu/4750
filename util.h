@@ -241,6 +241,9 @@ inline mat4 translate(const vec4& v){
 	return m;
 }
 
+inline const float* value_ptr(vec2& v){
+	return &v.x;
+}
 inline const float* value_ptr(vec3& v){
 	return &v.x;
 }
