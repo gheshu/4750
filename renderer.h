@@ -2,12 +2,12 @@
 #define RENDERER_H
 
 #include "myglheaders.h"
-#include "glsl_program.h"
+#include "meshmanager.h"
+#include "materialmanager.h"
 #include "window.h"
 #include "input.h"
 #include "hlm.h"
-#include "meshmanager.h"
-#include "materialmanager.h"
+#include "glsl_program.h"
 
 struct BoshartParam{
 	hlm::vec3 t, r, s, mat;

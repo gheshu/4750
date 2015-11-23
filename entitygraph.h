@@ -7,7 +7,6 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include <string>
 #include "instancetransform.h"
 
 enum TRANSFORM_TYPE { T,R,S };
@@ -28,9 +27,9 @@ struct Transform{
 struct Entity{
 	hlm::mat4 transform;
 	std::set<Entity*> children, parents;
-	std::string id;
+	unsigned id;
 	bool hasMesh;
-	Entity(const std::string& _id, Entity* parent_ptr, bool _hasMesh, const Transform& trans);
+	Entity(unsigned _id, Entity* parent_ptr, bool _hasMesh, const Transform& trans);
 	void addChild(Entity* ent);
 	void removeChild(Entity* ent);
 	void rotate(const hlm::vec4& v);
@@ -41,22 +40,22 @@ struct Entity{
 
 class EntityGraph{
 private:
-	std::unordered_map<std::string, Entity*> entities;
+	std::unordered_map<unsigned, Entity*> entities;
 	TransformList mesh_transforms;
 	Entity* root = nullptr;
 	void update(Entity* ent, const hlm::mat4& inmat);
 public:
 	void init(const int size);
 	void destroy();
-	void insert(const std::string& id, const std::string& parent_id, bool hasMesh, const Transform& trans);
-	void remove(const std::string& _id);
-	void addParent(const std::string& _id, const std::string& _parent_id);
+	void insert(unsigned id, unsigned parent_id, bool hasMesh, const Transform& trans);
+	void remove(unsigned _id);
+	void addParent(unsigned _id, unsigned _parent_id);
 	void update();
 	inline TransformList* getTransforms(){ return &mesh_transforms; };
-	void translate(const std::string& id, const hlm::vec3& v);
-	void rotate(const std::string& id, const hlm::vec4& v);
-	void scale(const std::string& id, const hlm::vec3& v);
-	void setTransform(const std::string& id, const Transform& trans);
+	void translate(unsigned id, const hlm::vec3& v);
+	void rotate(unsigned id, const hlm::vec4& v);
+	void scale(unsigned id, const hlm::vec3& v);
+	void setTransform(unsigned id, const Transform& trans);
 };
 
 #endif

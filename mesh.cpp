@@ -3,8 +3,7 @@
 #include "objimporter.h"
 #include "debugmacro.h"
 
-Mesh::Mesh(const std::string& filename, const std::string& mat) 
-	: material(mat){
+Mesh::Mesh(const std::string& filename, unsigned mat) : material(mat){
 	num_vertices = 0;
 	MeshData data;
 	if(!objload(filename, data, true, true)) return;

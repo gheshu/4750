@@ -4,17 +4,12 @@
 #include <string>
 
 typedef unsigned char uint_8;
-namespace hlm{
-	class vec2;
-	class vec3;
-	class vec4;
-};
 
 struct Image{
 	int width, height;
-	unsigned gl_id = -1;
+	unsigned gl_id = -1, id;
 	uint_8* data = nullptr;
-	Image(const std::string& filename);
+	Image(const std::string& filename, unsigned _id);
 	~Image();
 	void bind(unsigned channel);
 };

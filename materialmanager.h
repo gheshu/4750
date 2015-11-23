@@ -1,25 +1,32 @@
 #ifndef MAT_MANAGER_H
 #define MAT_MANAGER_H
 
-#include <unordered_map>
-#include <string>
+#include "manager.h"
 #include "image.h"
 #include "material.h"
 
 class GLSLProgram;
 
 class MaterialManager{
-	std::unordered_map<std::string, Image> textures, normals;
-	std::unordered_map<std::string, Material> materials;
+	Manager<Image> images;
+	Manager<Material> materials;
 public:
-	inline void addTexture(const std::string& filename, const std::string& name){textures.insert({name, Image(name)});}
-	inline void addNormal(const std::string& filename, const std::string& name){normals.insert({name, Image(name)});}
-	inline void addMaterial(const std::string& name, const Material& mat){materials.insert({name, mat});}
-	inline void removeTexture(const std::string& name){textures.erase(name);}
-	inline void removeNormal(const std::string& name){normals.erase(name);}
-	inline void removeMaterial(const std::string& name){materials.erase(name);}
-	inline void clear(){textures.clear(); normals.clear(); materials.clear();}
-	void bindMaterial(std::string& name, GLSLProgram& prog);
+	inline void addImage(const Image& img, unsigned id){images.add(img, id);}
+	inline void addMaterial(const Material& mat, unsigned id){materials.add(mat, id);}
+	inline Image* getImage(unsigned id){ return images.get(id);}
+	inline Material* getMaterial(unsigned id){return materials.get(id);}
+	inline void removeImage(unsigned id){images.remove(id);}
+	inline void removeMaterial(unsigned id){materials.remove(id);}
+	inline void sortImages(){images.sort();}
+	inline void sortMaterials(){materials.sort();}
+	inline void sort(){sortImages(); sortMaterials();}
+	inline void clearImages(){images.clear();}
+	inline void clearMaterials(){materials.clear();}
+	inline void clear(){clearImages(); clearMaterials();}
+	inline void reserveImages(unsigned i){images.reserve(i);}
+	inline void reserveMaterials(unsigned i){materials.reserve(i);}
+	inline void reserve(unsigned i){reserveImages(i); reserveMaterials(i);}
+	void bindMaterial(unsigned id, GLSLProgram& prog);
 };
 
 #endif

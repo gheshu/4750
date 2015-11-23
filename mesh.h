@@ -23,18 +23,16 @@ struct MeshData{
 
 class Mesh{
 	hlm::mat4 transform;
-	std::string material;
+	unsigned material;
 	unsigned vbo, vao, num_vertices;
 public:
-	Mesh(const std::string& filename, const std::string& mat);
+	Mesh(const std::string& filename, unsigned mat);
 	~Mesh();
 	inline hlm::mat4& getTransform(){return transform;}
-	inline std::string& getMaterial(){return material;}
+	inline unsigned getMaterial(){return material;}
 	inline void setTransform(const hlm::mat4& xform){transform = xform;}
 	inline void setMaterial(const unsigned mat){material = mat;}
 	void draw();
-	inline bool operator < (const Mesh& other){ return material < other.material 
-		|| (material == other.material && vao < other.vao); }
 };
 
 #endif
