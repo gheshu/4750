@@ -62,7 +62,7 @@ public:
 		}
 		lock = false;
 	}
-	void operator=(const HashMap& other){
+	inline void operator=(const HashMap& other){
 		while(lock);
 		lock = true;
 		delete[] data;
