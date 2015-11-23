@@ -124,24 +124,18 @@ void EntityGraph::addParent(unsigned _id, unsigned _parent_id){
 }
 
 void EntityGraph::update(){
-	{
-		mesh_transforms.clear();
-		const int reserve_size = hlm::clamp(8, 1024, (int)entities.size() / 4);
-		mesh_transforms.reserve(reserve_size);
-	}
+	mesh_transforms.clear();
+	mesh_transforms.reserve(hlm::clamp(4, 1024, (int)entities.size() / 4));
 	Entity* root = entities.get(0);
-	for(auto i : root->children){
+	for(auto i : root->children)
 		update(i, hlm::mat4());
-	}
 }
 void EntityGraph::update(Entity* ent, const hlm::mat4& inmat){
 	hlm::mat4 outmat = inmat * ent->transform;
-	if(ent->mesh_id >= 0){
+	if(ent->mesh_id >= 0)
 		mesh_transforms.add((unsigned)ent->mesh_id, outmat);
-	}
-	for(auto a : ent->children){
+	for(auto a : ent->children)
 		update(a, outmat);
-	}
 }
 
 void EntityGraph::translate(unsigned id, const hlm::vec3& v){
