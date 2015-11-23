@@ -5,8 +5,8 @@
 #include <algorithm>
 
 /*
-	Be wary of pointer invalkeyation due to resizing.
-	Only use shared_ptr if you put dynamic memory inskeye this.
+	Be wary of pointer invalidation due to resizing.
+	Only use shared_ptr if you put dynamic memory inside this.
 	Basically a Binary Search Array, log2(N) access and array cache-coherency.
 */
 

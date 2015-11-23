@@ -2,7 +2,6 @@
 #define MESHMANAGER_H
 
 #include "mesh.h"
-#include "objimporter.h"
 #include "instancetransform.h"
 #include "light.h"
 #include "manager.h"

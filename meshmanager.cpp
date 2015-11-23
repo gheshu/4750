@@ -3,7 +3,6 @@
 #include "glsl_program.h"
 #include "materialmanager.h"
 #include "camera.h"
-#include "light.h"
 #include "hlm.h"
 
 void MeshManager::drawAll(GLSLProgram& prog, MaterialManager& mats, Camera& cam, LightList& lights){

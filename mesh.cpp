@@ -6,8 +6,7 @@
 Mesh::Mesh(const std::string& filename, unsigned mat) : material(mat){
 	num_vertices = 0;
 	MeshData data;
-	if(!objload(filename, data, true, true)) return;
-	if (data.vertices.empty()) return;
+	objload(filename, data, true, true);
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glBindVertexArray(vao);
