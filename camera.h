@@ -4,7 +4,7 @@
 #include "hlm.h"
 
 class Camera{
-	hlm::mat4 view, projection;
+	hlm::mat4 view, proj;
 	hlm::vec3 eye;
 	hlm::vec3 forward;
 public:
@@ -17,10 +17,10 @@ public:
 	void moveRight(const float amt);
 	void moveUp(const float amt);
 	void update();
-	inline const hlm::mat4& getViewMatrix(){ return view; };
-	inline const hlm::vec3& getEye(){ return eye; }
-	inline const hlm::vec3& getForward() { return forward; }
-	inline const hlm::mat4 getVP(){return proj * view;}
+	inline hlm::mat4& getViewMatrix(){ return view; };
+	inline hlm::vec3& getEye(){ return eye; }
+	inline hlm::vec3& getForward() { return forward; }
+	inline hlm::mat4 getVP(){return proj * view;}
 
 };
 

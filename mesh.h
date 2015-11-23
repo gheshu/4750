@@ -13,19 +13,25 @@ struct MeshVertex{
 };
 
 typedef std::vector<MeshVertex> VertexBuffer;
-typedef std::vector<int> IndexBuffer;
-typedef std::pair<VertexBuffer, IndexBuffer> MeshData;
+typedef std::vector<unsigned> IndexBuffer;
+struct MeshData{
+	VertexBuffer vertices;
+	IndexBuffer indices;
+	inline MeshVertex& at(const int i){return vertices[i];}
+	inline MeshVertex& atIndex(const int i){return vertices[indices[i]];}
+};
 
 class Mesh{
 	hlm::mat4 transform;
 	std::string material;
 	unsigned vbo, vao, num_vertices;
 public:
-	Mesh(const std::string& filename, const std::string& mat) : material(mat);
+	Mesh(const std::string& filename, const std::string& mat);
+	~Mesh();
 	inline hlm::mat4& getTransform(){return transform;}
 	inline std::string& getMaterial(){return material;}
 	inline void setTransform(const hlm::mat4& xform){transform = xform;}
-	inline void setMaterial(const unsigned material){mat_id = material;}
+	inline void setMaterial(const unsigned mat){material = mat;}
 	void draw();
 	inline bool operator < (const Mesh& other){ return material < other.material 
 		|| (material == other.material && vao < other.vao); }

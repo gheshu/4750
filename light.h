@@ -2,6 +2,7 @@
 #define LIGHT_H
 
 #include "vec3.h"
+#include <vector>
 class GLSLProgram;
 
 struct Light{
@@ -9,7 +10,7 @@ struct Light{
 	Light(const hlm::vec3& pos = hlm::vec3(0.0f), 
 		const hlm::vec3& col = hlm::vec3(1.0f), 
 		const hlm::vec3& fall = hlm::vec3(0.01f, 0.01f, 1.0f))
-		: position(pos), col(color), fallof(fall){};
+		: position(pos), color(col), falloff(fall){};
 };
 
 typedef std::vector<Light> LightList;

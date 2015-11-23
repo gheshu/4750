@@ -5,6 +5,7 @@
 #include "debugmacro.h"
 #include "objimporter.h"
 #include "entitygraph.h"
+#include "camera.h"
 
 #ifdef OMP_PARALLEL
 	#include "omp.h"
@@ -22,7 +23,7 @@ void Renderer::init(const int width, const int height, const int msaa, const Bos
 		exit(1);
 	}
 	glViewport(0, 0, m_width, m_height);
-	mesh_man.add(Mesh("assets/sphere.obj", "moon"), "sphere");
+	mesh_man.add("assets/sphere.obj", "moon", "sphere");
 	mat_man.addTexture("assets/MoonMap.png", "moon");
 	mat_man.addNormal("assets/MoonNormal.png", "moon");
 	mat_man.addMaterial("moon", Material("moon", "moon", param.spec_power));
@@ -52,9 +53,10 @@ void Renderer::draw(const BoshartParam& param) {
 	mesh_man.setTransforms(*instance_xforms);
 	LightList lights;
 	lights.push_back(Light(param.light_pos));
-	const double ratio = (double)m_window.getWidth() / (double)m_window.getHeight();
+	const double ratio = (double)m_width / (double)m_height;
 	Camera cam;
 	cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
+	m_prog.setUniform("ambient", param.ambient);
 
 	m_prog.bind();
 	glfwSetTime(0.0);

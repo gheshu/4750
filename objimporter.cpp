@@ -22,7 +22,7 @@ bool objload(const std::string& filename, MeshData& out, bool smooth, bool proje
 			if(line.substr(0, 2) == "v "){
 				istringstream s(line.substr(2));
 				MeshVertex v;
-				s >> v.position.x; s >> v.position.y; s >> v.position.z; v.position.w = 1.0f;
+				s >> v.position.x; s >> v.position.y; s >> v.position.z;
 				temp.vertices.push_back(v);
 				min.x = std::min(min.x, v.position.x);
 				max.x = std::max(max.x, v.position.x);
@@ -65,10 +65,10 @@ bool objload(const std::string& filename, MeshData& out, bool smooth, bool proje
 						// for each vertex in the face
 						if(temp.indices[j + k] == index){
 							// if jth face has the ith vertex in it, add jth face normal to ith normal.
-							vec4& j1 = temp.atIndex(j).position;
-							vec4& j2 = temp.atIndex(j+1).position;
-							vec4& j3 = temp.atIndex(j+2).position;
-							vec3 jnormal = normalize(cross(vec3(j2 - j1), vec3(j3 - j1)));
+							vec3& j1 = temp.atIndex(j).position;
+							vec3& j2 = temp.atIndex(j+1).position;
+							vec3& j3 = temp.atIndex(j+2).position;
+							vec3 jnormal = normalize(cross(j2 - j1, j3 - j1));
 							mv.normal += jnormal;
 							break;
 						}

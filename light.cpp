@@ -1,8 +1,8 @@
 #include "light.h"
-#include "GLSLProgram.h"
+#include "glsl_program.h"
 
 void bindLights(LightList& lights, GLSLProgram& prog){
-	prog.setUniform("numLights", std::min(10, lights.size()));
+	prog.setUniformInt("numLights", std::min(10, (int)lights.size()));
 	for(unsigned j = 0; j < lights.size() && j < 10; j++){
 		Light& l = lights[j];
 		const std::string js = std::to_string(j);

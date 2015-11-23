@@ -39,6 +39,7 @@ public:
 	bool setUniform(const std::string& name, hlm::mat3& uniform);
 	bool setUniform(const std::string& name, hlm::vec4& uniform);
 	bool setUniform(const std::string& name, hlm::vec3& uniform);
+	bool setUniform(const std::string& name, hlm::vec2& uniform);
 
 	// NB: overloading deliberately avoided here to prevent problems with literals
 	// being converted, e.g. with an integer setUniform func setUniform("bob", 1.f)

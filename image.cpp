@@ -7,8 +7,9 @@
 #include "stb_image.h"
 
 #include "myglheaders.h"
+#include "debugmacro.h"
 
-void Image::Image(const std::string& filename){
+Image::Image(const std::string& filename){
 	data = stbi_load(filename.c_str(), &width, &height, nullptr, 3);
 	if (!data){
 		printf("image %s could not be loaded\n", filename.c_str());
@@ -26,14 +27,14 @@ void Image::Image(const std::string& filename){
 	MYGLERRORMACRO
 }
 
-void Image::~Image(){
+Image::~Image(){
 	glDeleteTextures(1, &gl_id);
 	stbi_image_free(data);
 	data = nullptr;	
 	MYGLERRORMACRO
 }
 
-void bind(unsigned channel){
+void Image::bind(unsigned channel){
 	glActiveTexture(GL_TEXTURE0 + channel);
 	glBindTexture(GL_TEXTURE_2D, gl_id);
 }

@@ -105,13 +105,13 @@ void doFOV(const string& file, BoshartParam& param){
 int main()
 {
 	{
-		Renderer renderer;
-		renderer.init(800, 600, 0);
 		BoshartParam param;
 		doTRS("trs.txt", param);
 		doCamera("camera.txt", param);
 		doFOV("fov.txt", param);
 		doLight("shade.txt", param);
+		Renderer renderer;
+		renderer.init(800, 600, 4, param);
 		renderer.draw(param);
 		renderer.destroy();
 	}

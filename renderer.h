@@ -2,15 +2,12 @@
 #define RENDERER_H
 
 #include "myglheaders.h"
-#include "image.h"
 #include "glsl_program.h"
 #include "window.h"
 #include "input.h"
 #include "hlm.h"
-#include "mesh.h"
-#include "resourcemanager.h"
-#include "camera.h"
-#include "depthbuffer.h"
+#include "meshmanager.h"
+#include "materialmanager.h"
 
 struct BoshartParam{
 	hlm::vec3 t, r, s, mat;
@@ -19,28 +16,17 @@ struct BoshartParam{
 	float fov, near, far, lin_atten, spec_power;
 };
 
-class Renderer
-{
-private:
+class Renderer{
 	GLSLProgram m_prog;
-	Image framebuffer;
-	DepthBuffer depthbuffer;
 	MeshManager mesh_man;
 	MaterialManager mat_man;
 	Window* m_window;
 	GLFWwindow* m_glwindow;
 	Input* m_input;
-
-	GLuint m_width, m_height, m_vao;
-	GLuint fb_id;
-	
-	void fillPass(const DrawData& data, const unsigned i);
-	void glPass();
-	void screenQuadInit();
+	unsigned m_width, m_height;
 public:
-    void init(const int width, const int height, const int msaa, const BoshartParam& param);
+    void init(const int width, const int height, const int msaa, BoshartParam& param);
 	void destroy();
-    void draw(const BoshartParam& param);
-
+    void draw(BoshartParam& param);
 };
 #endif

@@ -2,11 +2,11 @@
 #include <cmath>
 #include <algorithm>
 
-void Camera::init(const hlm::vec3& _eye, const hlm::vec3& center, const hlm::vec3& up
+void Camera::init(const hlm::vec3& _eye, const hlm::vec3& center, const hlm::vec3& up,
 		float fov, double ratio, double near, double far){
 	eye = _eye;
 	view = hlm::lookAt(eye, center, up);
-	proj = hlm::GLPerspective(fov, ratio, near, far);
+	proj = hlm::GLperspective(fov, ratio, near, far);
 	forward = hlm::getForward(view);
 }
 void Camera::pitch(const float amt){

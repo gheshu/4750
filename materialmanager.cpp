@@ -1,7 +1,7 @@
 #include "materialmanager.h"
-#include "GLSLProgram.h"
+#include "glsl_program.h"
 
-void MaterialManager::bindMaterial(const std::string& name, GLSLProgram& prog){
+void MaterialManager::bindMaterial(std::string& name, GLSLProgram& prog){
 	auto i = materials[name];
 	auto j = textures[i.diffuse];
 	auto k = normals[i.normal];

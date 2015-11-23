@@ -1,13 +1,14 @@
 #include "mesh.h"
 #include "myglheaders.h"
 #include "objimporter.h"
+#include "debugmacro.h"
 
-Mesh::Mesh(const std::string& filename, const hlm::mat4& xform = hlm::mat4(), const std::string& mat) 
-	: transform(xform), material(mat){
+Mesh::Mesh(const std::string& filename, const std::string& mat) 
+	: material(mat){
 	num_vertices = 0;
 	MeshData data;
 	if(!objload(filename, data, true, true)) return;
-	if (data.first.empty()) return;
+	if (data.vertices.empty()) return;
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glBindVertexArray(vao);
@@ -18,18 +19,15 @@ Mesh::Mesh(const std::string& filename, const hlm::mat4& xform = hlm::mat4(), co
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(sizeof(hlm::vec3) * 1));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(sizeof(hlm::vec3) * 2));
-	glBufferData(GL_ARRAY_BUFFER, sizeof(MeshVertex) * data.first.size(), &data.first[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(MeshVertex) * data.vertices.size(), &data.vertices[0], GL_STATIC_DRAW);
 	glBindVertexArray(0);
-	num_vertices = data.first.size();
+	num_vertices = data.vertices.size();
 	MYGLERRORMACRO
 }
 
 Mesh::~Mesh(){
-	glDeleteBuffers(1, &ibuf);
 	glDeleteBuffers(1, &vbo);
 	glDeleteVertexArrays(1, &vao);
-	vertices.clear();
-	indices.clear();
 	MYGLERRORMACRO
 }
 
