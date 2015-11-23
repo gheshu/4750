@@ -15,21 +15,17 @@ public:
 
 template<typename T>
 class Manager{
-public:
 	std::vector< IDType<T> > items;
 	inline IDType<T>* getIDType(unsigned i){
 		auto item = std::lower_bound(items.begin(), items.end(), i);
-		if(item == items.end() || item->id != i)
-			return nullptr;
-		return item;
+		return (item == items.end() || item->id != i) ? nullptr : item;
 	}
+public:
 	inline IDType<T>& operator[](unsigned i){return items[i];}
-	inline void add(const T& item, unsigned id){items.push_back(IDType<T>(item, id));}
+	inline void add(const T& item, unsigned id){items.push_back(IDType<T>(item, id));sort();}
 	inline T* get(unsigned i){
 		auto item = std::lower_bound(items.begin(), items.end(), i);
-		if(item == items.end() || item->id != i)
-			return nullptr;
-		return &item->item;
+		return (item == items.end() || item->id != i) ? nullptr : &item->item;
 	}
 	inline void remove(unsigned i){
 		IDType<T>* iditem = getIDType(i);
@@ -37,6 +33,7 @@ public:
 			std::swap(*iditem, *items.end());
 			items.pop_back();
 		}
+		sort();
 	}
 	inline void sort(){std::sort(items.begin(), items.end());}
 	inline void clear(){items.clear();}

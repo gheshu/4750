@@ -12,14 +12,8 @@ class GLSLProgram;
 class MaterialManager;
 
 class MeshManager{
-	Manager<Mesh> meshes;
 public:
-	inline void add(const Mesh& mesh, unsigned id){meshes.add(mesh, id);}
-	inline Mesh* get(const unsigned i){return meshes.get(i);}
-	inline void remove(const unsigned i){meshes.remove(i);
-	inline void sort(){meshes.sort();}
-	inline void clear(){meshes.clear();}
-	inline void reserve(unsigned i){meshes.reserve(i);}
+	Manager<Mesh> meshes;
 	void drawAll(GLSLProgram& prog, MaterialManager& mats, Camera& cam, LightList& lights);
 	inline void setTransforms(InstanceList& list){
 		list.sort();
