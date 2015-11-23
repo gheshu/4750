@@ -28,6 +28,17 @@ int main(){
 		cout << i->key << " : " << i->value << endl;
 	}
 	hm.print();
-
+	HashMap<unsigned, int> h2(hm);
+	cout << "h2: \n";
+	h2.add(Pair<unsigned, int>(30, 950));
+	h2.print();
+	
+	HashMap<unsigned, int> h3(5);
+	h3 = h2;
+	h3.add(Pair<unsigned, int>(15, 300));
+	h3.remove(111);
+	cout << "h3: \n";
+	h3.print();
+	
 	return 0;
 }

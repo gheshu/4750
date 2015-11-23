@@ -47,6 +47,34 @@ public:
 		lock = false;
 	}
 	~HashMap(){delete[] data;}
+	HashMap(const HashMap& other){
+		lock = true;
+		buckets = other.buckets;
+		items = other.buckets;
+		load = (float) items / (float) buckets;
+		data = new std::vector< Pair<K, V> >[buckets];
+		for(unsigned i = 0; i < buckets; i++){
+			for(unsigned j = 0; j < other.data[i].size(); j++){
+				data[i].push_back(other.data[i][j]);
+			}
+		}
+		lock = false;
+	}
+	void operator=(const HashMap& other){
+		while(lock);
+		lock = true;
+		delete[] data;
+		buckets = other.buckets;
+		items = other.buckets;
+		load = (float) items / (float) buckets;
+		data = new std::vector< Pair<K, V> >[buckets];
+		for(unsigned i = 0; i < buckets; i++){
+			for(unsigned j = 0; j < other.data[i].size(); j++){
+				data[i].push_back(other.data[i][j]);
+			}
+		}
+		lock = false;
+	}
 	inline unsigned numItems(){return items;}
 	inline unsigned numBuckets(){return buckets;}
 	inline float loadAmt(){return load;}
