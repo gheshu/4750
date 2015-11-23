@@ -25,33 +25,28 @@ template<typename K, typename V>
 class Manager{
 	std::vector< Pair<K, V> > values;
 	bool unsorted = false;
-	inline Pair<K, V>* getPair(const K& key){
+	inline typename std::vector< Pair<K, V> >::iterator getPair(const K& key){
 		if(unsorted)sort();
-		auto pair = std::lower_bound(values.begin(), values.end(), key);
-		return (pair == values.end() || pair->key != key) ? nullptr : &*pair;
+		return std::lower_bound(values.begin(), values.end(), key);
 	}
 public:
 	inline Pair<K, V>* operator[](unsigned i){return &values[i];}
 	inline void add(const K& key, const V& value){values.push_back(Pair<K, V>(key, value)); unsorted = true;}
 	inline V* get(const K& key){
-		if(unsorted)sort();
-		auto pair = std::lower_bound(values.begin(), values.end(), key);
+		auto pair = getPair(key);
 		return (pair == values.end() || pair->key != key) ? nullptr : &pair->value;
 	}
 	inline void remove(const K& key){
-		Pair<K, V>* pair = getPair(key);
-		if(pair){
-			std::swap(*pair, *values.end());
-			values.pop_back();
-			unsorted = true;
-		}
+		auto pair = getPair(key);
+		if(pair == values.end() || pair->key != key) return;
+		values.erase(pair);
 	}
-	inline void sort(){std::sort(values.begin(), values.end());}
+	inline void sort(){std::sort(values.begin(), values.end()); unsorted = false;}
 	inline void clear(){values.clear();}
 	inline void reserve(unsigned i){values.reserve(i);}
 	inline unsigned size(){return values.size();}
-	typename std::vector< Pair<K, V> >::iterator begin(){return values.begin();}
-	typename std::vector< Pair<K, V> >::iterator end(){return values.end();}
+	inline typename std::vector< Pair<K, V> >::iterator begin(){return values.begin();}
+	inline typename std::vector< Pair<K, V> >::iterator end(){return values.end();}
 };
 
 #endif
