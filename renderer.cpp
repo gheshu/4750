@@ -14,7 +14,7 @@
 using namespace std;
 using namespace hlm;
 
-void Renderer::init(const int width, const int height, const int msaa, const BoshartParam& param) {
+void Renderer::init(const int width, const int height, const int msaa, BoshartParam& param) {
 	m_width = width; m_height = height;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
@@ -23,10 +23,10 @@ void Renderer::init(const int width, const int height, const int msaa, const Bos
 		exit(1);
 	}
 	glViewport(0, 0, m_width, m_height);
-	mesh_man.add("assets/sphere.obj", "moon", "sphere");
-	mat_man.addTexture("assets/MoonMap.png", "moon");
-	mat_man.addNormal("assets/MoonNormal.png", "moon");
-	mat_man.addMaterial("moon", Material("moon", "moon", param.spec_power));
+	mesh_man.add(0, Mesh("assets/sphere.obj", 0));
+	mat_man.add(0, Image("assets/MoonMap.png"));
+	mat_man.add(1, Image("assets/MoonNormal.png"));
+	mat_man.add(0, Material(0, 1, param.spec_power));
 }
 
 void Renderer::destroy(){
@@ -38,7 +38,7 @@ void Renderer::destroy(){
 	m_input = nullptr;
 }
 
-void Renderer::draw(const BoshartParam& param) {
+void Renderer::draw(BoshartParam& param) {
 	EntityGraph graph;
 	graph.init(1);
 	{
@@ -46,11 +46,10 @@ void Renderer::draw(const BoshartParam& param) {
 		t.add(T, param.t);
 		t.add(R, param.r);
 		t.add(S, param.s);
-		graph.insert("sphere", "root", true, t);
+		graph.insert(1, 0, 0, t);
 		graph.update();
 	}
-	TransformList* instance_xforms = graph.getTransforms();
-	mesh_man.setTransforms(*instance_xforms);
+	mesh_man.setTransforms(graph.getTransforms());
 	LightList lights;
 	lights.push_back(Light(param.light_pos));
 	const double ratio = (double)m_width / (double)m_height;
@@ -84,6 +83,5 @@ void Renderer::draw(const BoshartParam& param) {
 		glfwSwapBuffers(m_glwindow);
     }
 	//---------end draw loop--------------------------------
-	instance_xforms = nullptr;
 	graph.destroy();
 }

@@ -4,6 +4,6 @@
 #include "manager.h"
 #include "mat4.h"
 
-typedef Manager<hlm::mat4> TransformList;
+typedef Manager<unsigned, hlm::mat4> TransformList;
 
 #endif

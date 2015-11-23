@@ -3,11 +3,9 @@
 #include "util.h"
 #include <iostream>
 
-Entity::Entity(unsigned _id, Entity* parent_ptr, bool _hasMesh, const Transform& trans) 
-	: id(_id), hasMesh(_hasMesh) {
-	if(parent_ptr){
+Entity::Entity(unsigned _id, Entity* parent_ptr, int _mesh_id, const Transform& trans) : id(_id), mesh_id(_mesh_id) {
+	if(parent_ptr)
 		parents.insert(parent_ptr);
-	}
 	for(TransOp i : trans.data){
 		switch(i.type){
 			case T:
@@ -72,67 +70,57 @@ void Entity::setTransform(const Transform& trans){
 }
 
 void EntityGraph::init(const int size){
-	if(root != nullptr){
-		std::cerr << "Cannot initialize entitygraph, root already exists\n";
-		return;
-	}
+	entities.clear();
 	entities.reserve(size);
-	root = new Entity(0, nullptr, false, Transform());
-	entities.insert({0, root});
+	entities.add(0, Entity());
 }
 
 void EntityGraph::destroy(){
-	for(auto i : entities){
-		delete i.second;
-	}
-	root = nullptr;
 	entities.clear();
 	mesh_transforms.clear();
 }
 
-void EntityGraph::insert(unsigned id, unsigned parent_id, bool hasMesh, const Transform& trans){
-	if(entities.find(id) != entities.end()){
+void EntityGraph::insert(unsigned id, unsigned parent_id, int mesh_id, const Transform& trans){
+	if(entities.get(id)){
 		std::cerr << "Entity " << id << " already exists\n";
 		return;
 	}
-	auto parent_iterator = entities.find(parent_id);
-	if(parent_iterator == entities.end()){
+	Entity* parent = entities.get(parent_id);
+	if(nullptr == parent){
 		std::cerr << "Parent Entity " << parent_id << " doesn't exist\n";
 		return;
 	}
-	Entity* ent = new Entity(id, parent_iterator->second, hasMesh, trans);
-	parent_iterator->second->addChild(ent);	// bi directional method, makes a double-link
-	entities.insert({id, ent});
+	entities.add(id, Entity(id, parent, mesh_id, trans));
+	Entity* ent = entities.get(id);
+	parent->addChild(ent);
 }
 void EntityGraph::remove(unsigned id){
-	auto iterator = entities.find(id);
-	if(iterator == entities.end()){
+	Entity* item = entities.get(id);
+	if(item == nullptr){
 		std::cerr << "Entity " << id << " doesn't exist\n";
 		return;
 	}
-	Entity* ent = iterator->second;
-	for(Entity* i : ent->parents){
-		i->removeChild(ent);
+	for(Entity* i : item->parents){
+		i->removeChild(item);
 	}
-	delete ent;
-	entities.erase(iterator);
+	entities.remove(id);
 }
 void EntityGraph::addParent(unsigned _id, unsigned _parent_id){
 	if(_id == 0){
 		std::cerr << "Cannot make anything the parent of root\n";
 		return;
 	}
-	auto i = entities.find(_id);
-	if(i == entities.end()){
+	Entity* i = entities.get(_id);
+	if(i == nullptr){
 		std::cerr << "Entity " << _id << " doesn't exist\n";
 		return;
 	}
-	auto p = entities.find(_parent_id);
-	if(p == entities.end()){
+	Entity* p = entities.get(_parent_id);
+	if(p == nullptr){
 		std::cerr << "Parent " << _parent_id << " doesn't exist\n";
 		return;
 	}
-	p->second->addChild(i->second);
+	p->addChild(i);
 }
 
 void EntityGraph::update(){
@@ -141,15 +129,15 @@ void EntityGraph::update(){
 		const int reserve_size = hlm::clamp(8, 1024, (int)entities.size() / 4);
 		mesh_transforms.reserve(reserve_size);
 	}
+	Entity* root = entities.get(0);
 	for(auto i : root->children){
 		update(i, hlm::mat4());
 	}
 }
 void EntityGraph::update(Entity* ent, const hlm::mat4& inmat){
 	hlm::mat4 outmat = inmat * ent->transform;
-	
-	if(ent->hasMesh){
-		mesh_transforms.add(outmat, ent->id);
+	if(ent->mesh_id >= 0){
+		mesh_transforms.add((unsigned)ent->mesh_id, outmat);
 	}
 	for(auto a : ent->children){
 		update(a, outmat);
@@ -157,34 +145,18 @@ void EntityGraph::update(Entity* ent, const hlm::mat4& inmat){
 }
 
 void EntityGraph::translate(unsigned id, const hlm::vec3& v){
-	auto i = entities.find(id);
-	if(i == entities.end()){
-		std::cerr << "Couldn't find entity " << id << std::endl;
-		return;
-	}
-	i->second->translate(v);
+	Entity* i = entities.get(id);
+	if(i) i->translate(v);
 }
 void EntityGraph::rotate(unsigned id, const hlm::vec4& v){
-	auto i = entities.find(id);
-	if(i == entities.end()){
-		std::cerr << "Couldn't find entity " << id << std::endl;
-		return;
-	}
-	i->second->rotate(v);
+	Entity* i = entities.get(id);
+	if(i) i->rotate(v);
 }
 void EntityGraph::scale(unsigned id, const hlm::vec3& v){
-	auto i = entities.find(id);
-	if(i == entities.end()){
-		std::cerr << "Couldn't find entity " << id << std::endl;
-		return;
-	}
-	i->second->translate(v);
+	Entity* i = entities.get(id);
+	if(i) i->scale(v);
 }
 void EntityGraph::setTransform(unsigned id, const Transform& trans){
-	auto i = entities.find(id);
-	if(i == entities.end()){
-		std::cerr << "Couldn't find entity " << id << std::endl;
-		return;
-	}
-	i->second->setTransform(trans);
+	Entity* i = entities.get(id);
+	if(i) i->setTransform(trans);
 }

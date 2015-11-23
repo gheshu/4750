@@ -5,7 +5,7 @@
 #include "mat4.h"
 #include "vec4.h"
 #include <set>
-#include <unordered_map>
+#include "manager.h"
 #include <vector>
 #include "instancetransform.h"
 
@@ -28,8 +28,10 @@ struct Entity{
 	hlm::mat4 transform;
 	std::set<Entity*> children, parents;
 	unsigned id;
+	int mesh_id;
 	bool hasMesh;
-	Entity(unsigned _id, Entity* parent_ptr, bool _hasMesh, const Transform& trans);
+	Entity(unsigned _id, Entity* parent_ptr, int _mesh_id, const Transform& trans);
+	Entity() : id(0), mesh_id(-1){};
 	void addChild(Entity* ent);
 	void removeChild(Entity* ent);
 	void rotate(const hlm::vec4& v);
@@ -40,14 +42,13 @@ struct Entity{
 
 class EntityGraph{
 private:
-	std::unordered_map<unsigned, Entity*> entities;
+	Manager<unsigned, Entity> entities;
 	TransformList mesh_transforms;
-	Entity* root = nullptr;
 	void update(Entity* ent, const hlm::mat4& inmat);
 public:
 	void init(const int size);
 	void destroy();
-	void insert(unsigned id, unsigned parent_id, bool hasMesh, const Transform& trans);
+	void insert(unsigned id, unsigned parent_id, int mesh_id, const Transform& trans);
 	void remove(unsigned _id);
 	void addParent(unsigned _id, unsigned _parent_id);
 	void update();

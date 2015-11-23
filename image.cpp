@@ -9,7 +9,7 @@
 #include "myglheaders.h"
 #include "debugmacro.h"
 
-Image::Image(const std::string& filename, unsigned _id) : id(_id){
+Image::Image(const std::string& filename){
 	data = stbi_load(filename.c_str(), &width, &height, nullptr, 3);
 	if (!data){
 		printf("image %s could not be loaded\n", filename.c_str());
