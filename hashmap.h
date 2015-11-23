@@ -5,7 +5,9 @@
 #include <string>
 #include <algorithm>
 
+#ifdef DEBUG
 #include <iostream>
+#endif
 
 template<typename K, typename V>
 struct Pair{
@@ -166,6 +168,7 @@ public:
 			}
 		}
 	}
+#ifdef DEBUG
 	inline void print(){
 		for(unsigned i = 0; i < buckets; i++){
 			std::cout << "Bucket: " << i << std::endl;
@@ -174,6 +177,7 @@ public:
 			}
 		}
 	}
+#endif
 };
 
 #endif
