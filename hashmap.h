@@ -78,7 +78,7 @@ public:
 			if(i->key == key){
 				bucket.erase(i);
 				items--;
-				if(items < (buckets >> 2)) resize(items);
+				if(items < (buckets >> 1)) resize(buckets >> 1);
 				return true;
 			}
 			++i;
@@ -91,7 +91,7 @@ public:
 			return false;
 		bucket.push_back(item);
 		items++;
-		if(items > (buckets << 1)) resize(buckets * 3);
+		if(items > (buckets << 1)) resize(buckets << 1);
 		return true;
 	}
 	inline void getPairs(std::vector<Pair<K, V>*>& list){

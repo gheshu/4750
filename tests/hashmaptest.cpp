@@ -12,17 +12,19 @@ int main(){
 	//unsigned a[]={0,1,2,3,4,5,6,7,8,9,10,10,9,8,7,6,5,4,3,2,1,0};
 	//unsigned b[]={3,1,4,1,5,9,2,8,6,5,7,8,9,10,15,200,32,18,19,20,21,22};
 	#define STATISTICS \
-	float new_load = (float)hm.numItems()/(float)size;	\
-	float new_col = (float)hm.collisions() / (float)hm.numItems();	\
+	float new_load = (size == 0) ? 0.0f : (float)hm.numItems()/(float)size;	\
+	float new_col = (hm.numItems() == 0) ? 0.0f : (float)hm.collisions() / (float)hm.numItems();	\
 	avg_load += new_load;	\
 	avg_col += 	new_col;\
-	resizes++;	\
+	if(hm.numItems() > 0) resizes++;	\
 	cout << "load: " << setw(10) << new_load << " collisions per item: " << setw(10) << new_col << endl;
 	unsigned size = hm.numBuckets();
-	for(unsigned i = 0; i < 100000; i++){
+	for(unsigned i = 0; i < 1000000; i++){
 		unsigned j = rand();
-		if(hm.add({j, j}))
-			//cout << j << " : " << j << " added\n";
+		if(rand()%2)
+			hm.add({j, j});
+		else
+			hm.remove(j);
 		if(size != hm.numBuckets()){
 			size = hm.numBuckets();
 			STATISTICS
@@ -45,15 +47,6 @@ int main(){
 		cout << j->key << " : " << j->value << endl;
 	}
 	*/
-	for(unsigned i = 0; i < 100000; i++){
-		unsigned j = rand();
-		if(hm.remove(j))
-			//cout << j << " removed\n";
-		if(size != hm.numBuckets()){
-			size = hm.numBuckets();
-			STATISTICS
-		}
-	}
 	STATISTICS
 	cout << "avg_load: " << setw(10) << avg_load / resizes << " avg_col: " << setw(10) << avg_col / resizes << endl;
 	//hm.print();
