@@ -18,20 +18,17 @@ struct Pair{
 	inline bool operator == (const Pair<K, V>& other){return key == other.key;}
 };
 
-//http://stackoverflow.com/a/12996028
+
 inline unsigned hash(unsigned x){
-    x = ((x >> 16) ^ x) * 0x45d9f3b;
-    x = ((x >> 16) ^ x) * 0x45d9f3b;
-    x = ((x >> 16) ^ x);
     return x;
 }
+
 //http://stackoverflow.com/a/107657
 inline unsigned hash(const std::string& x){
 	unsigned v = 0;
 	for(unsigned char i : x){
 		v = v * 101 + (unsigned)i;
 	}
-	return v;
 }
 
 template<typename K, typename V>
