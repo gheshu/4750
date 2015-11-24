@@ -29,6 +29,11 @@ public:
 		data = new std::list< Pair<K, V> >[buckets];
 		items = 0;
 	}
+	HashMap(){
+		buckets = 4;
+		data = new std::list< Pair<K, V> >[buckets];
+		items = 0;
+	}
 	~HashMap(){delete[] data;}
 	HashMap(const HashMap& other){
 		buckets = other.buckets;
@@ -52,7 +57,7 @@ public:
 	inline unsigned numItems(){return items;}
 	inline unsigned numBuckets(){return buckets;}
 	inline std::list<Pair<K, V> >& getBucket(const K& key){return data[hash(key) % buckets];}
-	inline Pair<K, V>* find(const K& key){
+	inline Pair<K, V>* getPair(const K& key){
 		std::list<Pair<K, V> >& bucket = getBucket(key);
 		for(auto& i : bucket){
 			if(i.key == key)
@@ -60,7 +65,15 @@ public:
 		}
 		return nullptr;
 	}
-	inline Pair<K, V>* operator [](const K& key){return find(key);}
+	inline V* get(const K& key){
+		std::list<Pair<K, V> >& bucket = getBucket(key);
+		for(auto& i : bucket){
+			if(i.key == key)
+				return &i->value;
+		}
+		return nullptr;
+	}
+	inline V* operator [](const K& key){return get(key);}
 	inline void resize(unsigned i){
 		unsigned new_buckets = i;
 		std::list< Pair<K, V> >* temp = new std::list<Pair<K, V> >[new_buckets]; 

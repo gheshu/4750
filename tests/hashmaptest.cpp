@@ -4,8 +4,31 @@
 #include "time.h"
 #include <random>
 using namespace std;
+
+struct Foo{
+	int a;
+	char b;
+	Foo(int c, char d) : a(c), b(d){};
+	void print(){
+		std::cout << a << " " << b << endl;
+	}
+	bool operator==(const Foo& other){
+		return a == other.a && b == other.b;
+	}
+};
+
+unsigned hash(const Foo& x){
+	return ((x.a << 8) + x.b) * 0xFB;
+}
+
 int main(){
+	HashMap<Foo, int> hmch(0);
 	srand(time(NULL));
+	hmch.add({Foo(30, 'a'), 200});
+	auto* bar = hmch[Foo(30, 'a')];
+	bar->key.print();
+	cout << bar->value << endl;
+	hmch.remove(Foo(30, 'a'));
 	HashMap<unsigned, unsigned> hm(0);
 	float avg_load = 0.0f, avg_col = 0.0f;
 	unsigned resizes = 0;

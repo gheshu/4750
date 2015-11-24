@@ -2,11 +2,11 @@
 #include "glsl_program.h"
 
 void MaterialManager::bindMaterial(unsigned id, GLSLProgram& prog){
-	Material* i = materials.get(id);
+	Material* i = materials[id];
 	if(!i) return;
-	Image* j = images.get(i->d_id);
+	Image* j = images[i->d_id];
 	if(!j) return;
-	Image* k = images.get(i->n_id);
+	Image* k = images[i->n_id];
 	if(!k) return;
 	j->bind(0);
 	prog.setUniformInt("diffuse_tex", 0);

@@ -3,7 +3,7 @@
 
 #include "myglheaders.h"
 #include <vector>
-#include <unordered_map>
+#include "hashmap.h"
 #include "hlm.h"
 
 enum GLSLShaderTypes
@@ -57,7 +57,7 @@ private:
 	std::string				header_;
 
 	// Hash the locations of the uniforms to prevent glGet calls during frames
-	typedef std::unordered_map<std::string, GLint> UniformLocations;
+	typedef HashMap<std::string, GLint> UniformLocations;
 	UniformLocations		uniformLocations_;
 
 	const GLint getUniformLocation(const std::string& name);
