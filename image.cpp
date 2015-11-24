@@ -30,7 +30,6 @@ Image::Image(const std::string& filename){
 Image::~Image(){
 	glDeleteTextures(1, &gl_id);
 	stbi_image_free(data);
-	data = nullptr;	
 	MYGLERRORMACRO
 }
 

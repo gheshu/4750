@@ -6,10 +6,6 @@
 #include "objimporter.h"
 #include "camera.h"
 
-#ifdef OMP_PARALLEL
-	#include "omp.h"
-#endif
-
 using namespace std;
 using namespace hlm;
 
@@ -25,9 +21,15 @@ void Renderer::init(const int width, const int height, const int msaa, BoshartPa
 	mesh_man.add(0, Mesh("assets/sphere.obj", 0));
 	mat4 xform = scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t);
 	mesh_man.setTransform(0, xform);
+	Image a("assets/MoonMap.png");
+	PRINTLINEMACRO
+	
 	mat_man.add(0, Image("assets/MoonMap.png"));
+	PRINTLINEMACRO
 	mat_man.add(1, Image("assets/MoonNormal.png"));
+	PRINTLINEMACRO
 	mat_man.add(0, Material(0, 1, param.spec_power));
+	PRINTLINEMACRO
 }
 
 void Renderer::destroy(){

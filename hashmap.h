@@ -69,7 +69,7 @@ public:
 		std::list<Pair<K, V> >& bucket = getBucket(key);
 		for(auto& i : bucket){
 			if(i.key == key)
-				return &i->value;
+				return &i.value;
 		}
 		return nullptr;
 	}
