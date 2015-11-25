@@ -256,9 +256,6 @@ bool GLSLProgram::setUniform(const std::string& name, hlm::mat4& uniform)
 
 	glUniformMatrix4fv(location, 1, GL_FALSE, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 
@@ -274,9 +271,6 @@ bool GLSLProgram::setUniform(const std::string& name, hlm::mat3& uniform)
 
 	glUniformMatrix3fv(location, 1, GL_FALSE, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 
@@ -292,9 +286,6 @@ bool GLSLProgram::setUniform(const std::string& name, hlm::vec4& uniform)
 
 	glUniform4fv(location, 1, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 
@@ -310,9 +301,6 @@ bool GLSLProgram::setUniform(const std::string& name, hlm::vec3& uniform)
 
 	glUniform3fv(location, 1, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 
@@ -328,9 +316,6 @@ bool GLSLProgram::setUniform(const std::string& name, hlm::vec2& uniform)
 
 	glUniform2fv(location, 1, hlm::value_ptr(uniform));
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 
@@ -346,9 +331,6 @@ bool GLSLProgram::setUniformFloat(const std::string& name, const float uniform)
 
 	glUniform1f(location, uniform);
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 
@@ -364,9 +346,6 @@ bool GLSLProgram::setUniformInt(const std::string& name, const GLuint uniform)
 
 	glUniform1i(location, uniform);
 	MYGLERRORMACRO
-	#ifdef DEBUG
-		printf("%s\n", name.c_str());
-	#endif
 	return true;
 }
 

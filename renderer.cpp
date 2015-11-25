@@ -32,8 +32,10 @@ void Renderer::destroy(){
 
 void Renderer::draw(BoshartParam& param) {
     m_prog.bind();
-	LightList lights;
-	lights.push_back(Light(param.light_pos));
+    Light light(param.light_pos, vec3(1.0f), vec3(param.lin_atten));
+    m_prog.setUniform("light_pos", light.position);
+    m_prog.setUniform("light_color", light.color);
+    m_prog.setUniform("light_falloff", light.falloff);
 	Mesh sphere("assets/sphere.obj");
 	mat4 model(scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t));
 	m_prog.setUniform("model", model);
@@ -47,7 +49,6 @@ void Renderer::draw(BoshartParam& param) {
 	diffuse.bind(0);
 	m_prog.setUniformInt("normal_tex", 1);
 	normal.bind(1);
-	bindLights(lights, m_prog);
 	m_prog.setUniformFloat("spec_exp", param.spec_power);
 	const double ratio = (double)m_width / (double)m_height;
 	Camera cam;

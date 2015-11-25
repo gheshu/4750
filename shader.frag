@@ -10,13 +10,9 @@ uniform sampler2D normal_tex;
 uniform float spec_exp;
 uniform vec3 ambient;
 
-#define MAX_LIGHTS 10
-uniform int numLights;
-uniform struct Light{
-	vec3 position;
-	vec3 color;
-	vec3 falloff;
-} lights[MAX_LIGHTS];
+uniform vec3 light_pos;
+uniform vec3 light_color;
+uniform vec3 light_falloff;
 
 uniform vec3 eye;
 
@@ -33,16 +29,14 @@ void main(){
 	vec3 diffuse = vec3(0.0, 0.0, 0.0);
 	vec3 specular = vec3(0.0, 0.0, 0.0);
 	
-	for(int i = 0; i < numLights; i++){
-		vec3 L = normalize(lights[i].position - worldPos_f);
-		float d2 = dot(L, L);
-		float d = sqrt(d2);
-		float falloff = lights[i].falloff.x + lights[i].falloff.y * d + lights[i].falloff.z * d2;
-		diffuse += (max(0.0, dot(N, L)) * C * lights[i].color) / falloff;
-		vec3 H = normalize(L + V);
-		float specAngle = max(dot(N, H), 0.0);
-		specular += (pow(specAngle, 4.0*spec_exp) * lights[i].color) / falloff;
-	}
+	vec3 L = normalize(light_pos - worldPos_f);
+	float d2 = dot(L, L);
+	float d = sqrt(d2);
+	float falloff = light_falloff.x + light_falloff.y * d + light_falloff.z * d2;
+	diffuse += (max(0.0, dot(N, L)) * C * light_color) / falloff;
+	vec3 H = normalize(L + V);
+	float specAngle = max(dot(N, H), 0.0);
+	specular += (pow(specAngle, 4.0*spec_exp) * light_color) / falloff;
 	
 	out_color = vec4(ambient + diffuse + specular, 1.0);
 }

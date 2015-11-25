@@ -15,6 +15,5 @@ struct Light{
 
 typedef std::vector<Light> LightList;
 
-void bindLights(LightList& lights, GLSLProgram& prog);
 
 #endif
