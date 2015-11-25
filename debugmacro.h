@@ -3,7 +3,6 @@
 
 #include "myglheaders.h"
 #include "stdio.h"
-#include <iostream>
 
 #ifdef DEBUG
 

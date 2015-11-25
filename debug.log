@@ -1,0 +1,65 @@
+OpenGL version: 3.3 (Core Profile) Mesa 11.0.5
+OpenGL shading version: 3.30
+invalid operation at 258 in glsl_program.cpp
+model
+invalid operation at 276 in glsl_program.cpp
+normMat
+invalid operation at 366 in glsl_program.cpp
+diffuse_tex
+invalid operation at 366 in glsl_program.cpp
+normal_tex
+invalid operation at 366 in glsl_program.cpp
+numLights
+invalid operation at 348 in glsl_program.cpp
+spec_exp
+invalid operation at 312 in glsl_program.cpp
+ambient
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+eye
+MVP
+Clean exit
