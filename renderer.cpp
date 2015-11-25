@@ -12,7 +12,7 @@
 using namespace std;
 using namespace hlm;
 
-void Renderer::init(const int width, const int height, const int msaa) {
+Renderer::Renderer(const int width, const int height, const int msaa) {
 	m_width = width; m_height = height;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
@@ -23,11 +23,11 @@ void Renderer::init(const int width, const int height, const int msaa) {
 	glViewport(0, 0, m_width, m_height);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
-void Renderer::destroy(){
+Renderer::~Renderer(){
     delete m_window;
 	m_window = nullptr;
 	delete m_input;
@@ -41,12 +41,6 @@ void Renderer::draw(BoshartParam& param) {
     m_prog.setUniform("light_color", light.color);
     m_prog.setUniform("light_falloff", light.falloff);
 	Mesh sphere("assets/sphere.obj");
-	mat4 model(scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t));
-	m_prog.setUniform("model", model);
-	{
-		mat3 normMat = inverse(transpose(mat3(model)));
-		m_prog.setUniform("normMat", normMat);
-	}
 	Image diffuse("assets/MoonMap.png");
 	Image normal("assets/MoonNormal.png");
 	m_prog.setUniformInt("diffuse_tex", 0);
@@ -57,7 +51,6 @@ void Renderer::draw(BoshartParam& param) {
 	const double ratio = (double)m_width / (double)m_height;
 	Camera cam;
 	cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
-	mat4 MVP = cam.getVP() * model;
 	m_prog.setUniform("ambient", param.ambient);
 	glfwSetTime(0.0);
 	unsigned frame_i = 0;
@@ -72,6 +65,12 @@ void Renderer::draw(BoshartParam& param) {
 			printf("FPS: %f\n", 60.0 / dtavg);
 			dtavg = 0.0;
 		}
+		
+		mat4 model(scale(param.s) * rotateEuler(vec4(0.0f, frame_i * 0.1f, 0.0f, 0.0f)) * translate(param.t));
+		m_prog.setUniform("model", model);
+		mat3 normMat = inverse(transpose(mat3(model)));
+		m_prog.setUniform("normMat", normMat);
+		mat4 MVP = cam.getVP() * model;
 		
 		// update camera and poll glfw events
 		m_input->poll(dt, cam);

@@ -21,8 +21,8 @@ class Renderer{
 	Input* m_input;
 	unsigned m_width, m_height;
 public:
-    void init(const int width, const int height, const int msaa);
-	void destroy();
+    Renderer(const int width, const int height, const int msaa);
+	~Renderer();
     void draw(BoshartParam& param);
 };
 #endif

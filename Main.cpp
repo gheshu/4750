@@ -110,10 +110,8 @@ int main()
 		doCamera("camera.txt", param);
 		doFOV("fov.txt", param);
 		doLight("shade.txt", param);
-		Renderer renderer;
-		renderer.init(800, 600, 4);
+		Renderer renderer(800, 600, 4);
 		renderer.draw(param);
-		renderer.destroy();
 	}
 	printf("Clean exit\n");
 	return 0;
