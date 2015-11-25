@@ -12,7 +12,7 @@
 using namespace std;
 using namespace hlm;
 
-void Renderer::init(const int width, const int height, const int msaa, BoshartParam& param) {
+void Renderer::init(const int width, const int height, const int msaa) {
 	m_width = width; m_height = height;
 	m_window = new Window(width, height, 3, 3, msaa, "CSC4750");
 	m_glwindow = m_window->getWindow();
@@ -33,28 +33,25 @@ void Renderer::destroy(){
 void Renderer::draw(BoshartParam& param) {
 	LightList lights;
 	lights.push_back(Light(param.light_pos));
-	MeshList meshes;
-	meshes.push_back(Mesh("assets/sphere.obj"));
-	meshes[0].setTransform(
-		scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t)
-		);
-	m_prog.setUniform("model", meshes[0].getTransform());
+	Mesh sphere("assets/sphere.obj");
+	mat4 model(scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t));
+	m_prog.setUniform("model", model);
 	{
-		mat3 normMat = inverse(transpose(mat3(meshes[0].getTransform())));
+		mat3 normMat = inverse(transpose(mat3(model)));
 		m_prog.setUniform("normMat", normMat);
 	}
-	ImageList images;
-	images.push_back(Image("assets/MoonMap.png"));
-	images.push_back(Image("assets/MoonNormal.png"));
+	Image diffuse("assets/MoonMap.png");
+	Image normal("assets/MoonNormal.png");
 	m_prog.setUniformInt("diffuse_tex", 0);
-	images[0].bind(0);
+	diffuse.bind(0);
 	m_prog.setUniformInt("normal_tex", 1);
-	images[1].bind(1);
+	normal.bind(1);
 	bindLights(lights, m_prog);
 	m_prog.setUniformFloat("spec_exp", param.spec_power);
 	const double ratio = (double)m_width / (double)m_height;
 	Camera cam;
 	cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
+	mat4 MVP = cam.getVP() * model;
 	m_prog.setUniform("ambient", param.ambient);
 	m_prog.bind();
 	glfwSetTime(0.0);
@@ -70,18 +67,19 @@ void Renderer::draw(BoshartParam& param) {
 			printf("FPS: %f\n", 60.0 / dtavg);
 			dtavg = 0.0;
 		}
+		
 		// update camera and poll glfw events
 		m_input->poll(dt, cam);
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
 		}
+		
 		m_prog.setUniform("eye", cam.getEye());
-		{
-			mat4 MVP = cam.getVP() * meshes[0].getTransform();
-			m_prog.setUniform("MVP", MVP);
-		}
+		MVP = cam.getVP() * model;
+		m_prog.setUniform("MVP", MVP);
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		meshes[0].draw();
+		sphere.draw();
 		glfwSwapBuffers(m_glwindow);
     }
 }

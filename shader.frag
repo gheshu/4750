@@ -8,7 +8,6 @@ uniform sampler2D diffuse_tex;
 uniform sampler2D normal_tex;
 
 uniform float spec_exp;
-uniform float spec_str;
 uniform vec3 ambient;
 
 #define MAX_LIGHTS 10
@@ -42,7 +41,7 @@ void main(){
 		diffuse += (max(0.0, dot(N, L)) * C * lights[i].color) / falloff;
 		vec3 H = normalize(L + V);
 		float specAngle = max(dot(N, H), 0.0);
-		specular += (spec_str * pow(specAngle, 4.0*spec_exp) * lights[i].color) / falloff;
+		specular += (pow(specAngle, 4.0*spec_exp) * lights[i].color) / falloff;
 	}
 	
 	out_color = vec4(ambient + diffuse + specular, 1.0);

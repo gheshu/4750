@@ -241,19 +241,19 @@ inline mat4 translate(const vec4& v){
 	return m;
 }
 
-inline const float* value_ptr(vec2& v){
+inline float* value_ptr(vec2& v){
 	return &v.x;
 }
-inline const float* value_ptr(vec3& v){
+inline float* value_ptr(vec3& v){
 	return &v.x;
 }
-inline const float* value_ptr(vec4& v){
+inline float* value_ptr(vec4& v){
 	return &v.x;
 }
-inline const float* value_ptr(mat3& m){
+inline float* value_ptr(mat3& m){
 	return &m(0);
 }
-inline const float* value_ptr(mat4& m){
+inline float* value_ptr(mat4& m){
 	return &m(0);
 }
 

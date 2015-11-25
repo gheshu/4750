@@ -22,13 +22,10 @@ struct MeshData{
 };
 
 class Mesh{
-	hlm::mat4 transform;
 	unsigned vbo, vao, num_vertices;
 public:
 	Mesh(const std::string& filename);
 	~Mesh();
-	inline hlm::mat4& getTransform(){return transform;}
-	inline void setTransform(const hlm::mat4& xform){transform = xform;}
 	void draw();
 };
 

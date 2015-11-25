@@ -111,7 +111,7 @@ int main()
 		doFOV("fov.txt", param);
 		doLight("shade.txt", param);
 		Renderer renderer;
-		renderer.init(800, 600, 4, param);
+		renderer.init(800, 600, 4);
 		renderer.draw(param);
 		renderer.destroy();
 	}
