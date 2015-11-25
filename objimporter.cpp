@@ -12,24 +12,22 @@ using namespace std;
 using namespace hlm;
 
 bool objload(const std::string& filename, MeshData& out, bool smooth, bool project){
-	MeshData temp;
 	std::vector<vec2> uvs;
 	ifstream stream(filename);
 	if(stream.is_open()){
 		string line;
-		vec3 min, max;
+		vec3 max;
 		while(getline(stream, line)){
 			if(line.substr(0, 2) == "v "){
 				istringstream s(line.substr(2));
 				MeshVertex v;
 				s >> v.position.x; s >> v.position.y; s >> v.position.z;
-				temp.vertices.push_back(v);
-				min.x = std::min(min.x, v.position.x);
-				max.x = std::max(max.x, v.position.x);
-				min.y = std::min(min.y, v.position.y);
-				max.y = std::max(max.y, v.position.y);
-				min.z = std::min(min.z, v.position.z);
-				max.z = std::max(max.z, v.position.z);
+				out.vertices.push_back(v);
+				if(!project){
+					max.x = std::max(max.x, v.position.x);
+					max.y = std::max(max.y, v.position.y);
+					max.z = std::max(max.z, v.position.z);
+				}
 			} 
 			else if(line.substr(0, 2) == "f "){
 				char f[16];
@@ -37,9 +35,9 @@ bool objload(const std::string& filename, MeshData& out, bool smooth, bool proje
 				sscanf(line.c_str(), "%s %i//%i %i//%i %i//%i\n", 
 					f, &i1, &ivn1, &i2, &ivn2, &i3, &ivn3);
 				//cout << i1 << " " << i2 << " " << i3 << endl;
-				temp.indices.push_back(i1 - 1);
-				temp.indices.push_back(i2 - 1);
-				temp.indices.push_back(i3 - 1);
+				out.indices.push_back(i1 - 1);
+				out.indices.push_back(i2 - 1);
+				out.indices.push_back(i3 - 1);
 			}
 			else if(!project && line.substr(0, 2) == "vt"){
 				istringstream s(line.substr(2));
@@ -52,22 +50,19 @@ bool objload(const std::string& filename, MeshData& out, bool smooth, bool proje
 			}
 		}
 		stream.close();
-		out.vertices.clear();
-		out.vertices.reserve(temp.indices.size());
-		out.indices.clear();
-		for(unsigned i = 0; i < temp.indices.size(); i++){
-			MeshVertex& mv = temp.atIndex(i);
-			const unsigned index = temp.indices[i];
+		for(unsigned i = 0; i < out.indices.size(); i++){
+			MeshVertex& mv = out.atIndex(i);
+			const unsigned index = out.indices[i];
 			if(smooth){
-				for(unsigned j = 0; j < temp.indices.size() - 2; j+=3){
+				for(unsigned j = 0; j < out.indices.size() - 2; j+=3){
 					// for each face
 					for(unsigned k = 0; k < 3; k++){
 						// for each vertex in the face
-						if(temp.indices[j + k] == index){
+						if(out.indices[j + k] == index){
 							// if jth face has the ith vertex in it, add jth face normal to ith normal.
-							vec3& j1 = temp.atIndex(j).position;
-							vec3& j2 = temp.atIndex(j+1).position;
-							vec3& j3 = temp.atIndex(j+2).position;
+							vec3& j1 = out.atIndex(j).position;
+							vec3& j2 = out.atIndex(j+1).position;
+							vec3& j3 = out.atIndex(j+2).position;
 							vec3 jnormal = normalize(cross(j2 - j1, j3 - j1));
 							mv.normal += jnormal;
 							break;
@@ -78,8 +73,8 @@ bool objload(const std::string& filename, MeshData& out, bool smooth, bool proje
 			}
 			else {
 				int ind = i - (i%3);
-				vec3 e1(temp.atIndex(ind+1).position - temp.atIndex(ind).position);
-				vec3 e2(temp.atIndex(ind+2).position - temp.atIndex(ind).position);
+				vec3 e1(out.atIndex(ind+1).position - out.atIndex(ind).position);
+				vec3 e2(out.atIndex(ind+2).position - out.atIndex(ind).position);
 				mv.normal = normalize(cross(e1, e2));
 			}
 			if(project){
@@ -109,7 +104,6 @@ bool objload(const std::string& filename, MeshData& out, bool smooth, bool proje
 					mv.uv.y = mv.position.y / max.y;
 				}
 			}
-			out.vertices.push_back(mv);
 		}
 		return true;
 	} 

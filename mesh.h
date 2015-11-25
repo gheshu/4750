@@ -22,7 +22,7 @@ struct MeshData{
 };
 
 class Mesh{
-	unsigned vbo, vao, num_vertices;
+	unsigned vbo, vao, ibuf, num_indices;
 public:
 	Mesh(const std::string& filename);
 	~Mesh();
