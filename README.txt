@@ -1,17 +1,19 @@
-Currently builds with TDM-GCC-64, glew, and glfw3 on Windows.
+Currently builds with TDM-GCC-64, glew, and glfw3 on Windows, as well as clang++ and g++ on arch linux.
 
-Build instructions:
+Windows Build Instructions:
 	build <drive letter> <optional target>
 	
 	targets:
 			run: runs the program after building with default flags
 			debug: builds with debug flags
 			release: builds with optimization flags (-O3)
-			parallel: builds (on compilers with openmp support) with threading and optimization
 			
 	clean.bat removes .o and .exe files.
 
-Controls (requires build release to be interactive):
+Linux Build Instructions:
+	make -j release run
+
+Controls (runs better with release target):
 	W: move forward
 	A: move left
 	S: move backward
@@ -23,7 +25,5 @@ Controls (requires build release to be interactive):
 	Mouse: look around
 	
 	R: reset camera
-	1: Moon
-	2: TTU Cube
 	
 	Escape: close program
