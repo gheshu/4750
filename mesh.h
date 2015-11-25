@@ -23,16 +23,15 @@ struct MeshData{
 
 class Mesh{
 	hlm::mat4 transform;
-	unsigned material;
 	unsigned vbo, vao, num_vertices;
 public:
-	Mesh(const std::string& filename, unsigned mat);
+	Mesh(const std::string& filename);
 	~Mesh();
 	inline hlm::mat4& getTransform(){return transform;}
-	inline unsigned getMaterial(){return material;}
 	inline void setTransform(const hlm::mat4& xform){transform = xform;}
-	inline void setMaterial(const unsigned mat){material = mat;}
 	void draw();
 };
+
+typedef std::vector<Mesh> MeshList;
 
 #endif

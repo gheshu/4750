@@ -3,7 +3,7 @@
 #include "objimporter.h"
 #include "debugmacro.h"
 
-Mesh::Mesh(const std::string& filename, unsigned mat) : material(mat){
+Mesh::Mesh(const std::string& filename){
 	num_vertices = 0;
 	MeshData data;
 	objload(filename, data, true, true);

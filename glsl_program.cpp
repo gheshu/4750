@@ -224,14 +224,14 @@ GLuint GLSLProgram::getId() const
 // ----------------------------------------------------------------------------
 
 const GLint GLSLProgram::getUniformLocation(const std::string& name){
-	auto pair = uniformLocations_.getPair(name);
-	if(!pair){
+	const auto iter = uniformLocations_.find(name);	
+	if (iter == uniformLocations_.end()){
 		const GLint location = glGetUniformLocation(program_, name.c_str());
 		MYGLERRORMACRO
-		uniformLocations_.add({name, location});
+		uniformLocations_[name] = location;
 		return location;
 	}
-	return pair->value;
+	return iter->second;
 }
 
 // ----------------------------------------------------------------------------

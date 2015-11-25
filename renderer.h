@@ -2,8 +2,6 @@
 #define RENDERER_H
 
 #include "myglheaders.h"
-#include "meshmanager.h"
-#include "materialmanager.h"
 #include "window.h"
 #include "input.h"
 #include "hlm.h"
@@ -18,8 +16,6 @@ struct BoshartParam{
 
 class Renderer{
 	GLSLProgram m_prog;
-	MeshManager mesh_man;
-	MaterialManager mat_man;
 	Window* m_window;
 	GLFWwindow* m_glwindow;
 	Input* m_input;

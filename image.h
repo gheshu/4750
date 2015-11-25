@@ -2,6 +2,7 @@
 #define IMAGE_H
 
 #include <string>
+#include <vector>
 
 typedef unsigned char uint_8;
 
@@ -13,5 +14,7 @@ struct Image{
 	~Image();
 	void bind(unsigned channel);
 };
+
+typedef std::vector<Image> ImageList;
 
 #endif

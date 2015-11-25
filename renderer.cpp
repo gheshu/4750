@@ -5,6 +5,9 @@
 #include "debugmacro.h"
 #include "objimporter.h"
 #include "camera.h"
+#include "light.h"
+#include "mesh.h"
+#include "image.h"
 
 using namespace std;
 using namespace hlm;
@@ -18,18 +21,6 @@ void Renderer::init(const int width, const int height, const int msaa, BoshartPa
 		exit(1);
 	}
 	glViewport(0, 0, m_width, m_height);
-	mesh_man.add(0, Mesh("assets/sphere.obj", 0));
-	mat4 xform = scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t);
-	mesh_man.setTransform(0, xform);
-	Image a("assets/MoonMap.png");
-	PRINTLINEMACRO
-	
-	mat_man.add(0, Image("assets/MoonMap.png"));
-	PRINTLINEMACRO
-	mat_man.add(1, Image("assets/MoonNormal.png"));
-	PRINTLINEMACRO
-	mat_man.add(0, Material(0, 1, param.spec_power));
-	PRINTLINEMACRO
 }
 
 void Renderer::destroy(){
@@ -42,6 +33,25 @@ void Renderer::destroy(){
 void Renderer::draw(BoshartParam& param) {
 	LightList lights;
 	lights.push_back(Light(param.light_pos));
+	MeshList meshes;
+	meshes.push_back(Mesh("assets/sphere.obj"));
+	meshes[0].setTransform(
+		scale(param.s) * rotateEuler(vec4(param.r)) * translate(param.t)
+		);
+	m_prog.setUniform("model", meshes[0].getTransform());
+	{
+		mat3 normMat = inverse(transpose(mat3(meshes[0].getTransform())));
+		m_prog.setUniform("normMat", normMat);
+	}
+	ImageList images;
+	images.push_back(Image("assets/MoonMap.png"));
+	images.push_back(Image("assets/MoonNormal.png"));
+	m_prog.setUniformInt("diffuse_tex", 0);
+	images[0].bind(0);
+	m_prog.setUniformInt("normal_tex", 1);
+	images[1].bind(1);
+	bindLights(lights, m_prog);
+	m_prog.setUniformFloat("spec_exp", param.spec_power);
 	const double ratio = (double)m_width / (double)m_height;
 	Camera cam;
 	cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
@@ -65,8 +75,13 @@ void Renderer::draw(BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
 		}
+		m_prog.setUniform("eye", cam.getEye());
+		{
+			mat4 MVP = cam.getVP() * meshes[0].getTransform();
+			m_prog.setUniform("MVP", MVP);
+		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		mesh_man.drawAll(m_prog, mat_man, cam, lights);
+		meshes[0].draw();
 		glfwSwapBuffers(m_glwindow);
     }
 }
