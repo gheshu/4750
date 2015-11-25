@@ -31,6 +31,7 @@ void Renderer::destroy(){
 }
 
 void Renderer::draw(BoshartParam& param) {
+    m_prog.bind();
 	LightList lights;
 	lights.push_back(Light(param.light_pos));
 	Mesh sphere("assets/sphere.obj");
@@ -53,7 +54,6 @@ void Renderer::draw(BoshartParam& param) {
 	cam.init(param.eye, param.at, param.up, param.fov, ratio, param.near, param.far);
 	mat4 MVP = cam.getVP() * model;
 	m_prog.setUniform("ambient", param.ambient);
-	m_prog.bind();
 	glfwSetTime(0.0);
 	unsigned frame_i = 0;
 	double dtavg = 0.0;
