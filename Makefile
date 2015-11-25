@@ -1,11 +1,21 @@
 CXX = g++
 EXE = Renderer.exe
- 
-INC_DIRS = -I./include
-CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
-LDFLAGS = -L./lib
-LDLIBS = .\glfw3.dll -lglew32 -lopengl32
- 
+
+ifdef SystemRoot
+	INC_DIRS = -I./include
+	CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
+	LDFLAGS = -L./lib
+	LDLIBS = .\glfw3.dll -lglew32 -lopengl32
+else 
+	ifeq ($(shell uname), Linux)
+		INC_DIRS = -I/usr/include
+		CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
+		LDFLAGS = -L/usr/lib
+		LDLIBS = -lglfw -lGLEW -lGL
+	endif
+endif
+
+
 LINK = $(CXX) -o
 COMPILE = $(CXX) -c
  
