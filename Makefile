@@ -1,7 +1,7 @@
 CXX = g++
 EXE = Renderer.exe
 
-ifdef SystemRoot
+ifeq ($(OS), Windows_NT)
 	INC_DIRS = -I./include
 	CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
 	LDFLAGS = -L./lib
