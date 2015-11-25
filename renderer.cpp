@@ -21,6 +21,10 @@ void Renderer::init(const int width, const int height, const int msaa) {
 		exit(1);
 	}
 	glViewport(0, 0, m_width, m_height);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 }
 
 void Renderer::destroy(){
