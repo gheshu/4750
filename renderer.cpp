@@ -3,7 +3,6 @@
 #include <iostream>
 #include <algorithm>
 #include "debugmacro.h"
-#include "objimporter.h"
 #include "camera.h"
 #include "light.h"
 #include "mesh.h"
@@ -28,18 +27,18 @@ Renderer::Renderer(const int width, const int height, const int msaa) {
 }
 
 Renderer::~Renderer(){
-    delete m_window;
+	delete m_window;
 	m_window = nullptr;
 	delete m_input;
 	m_input = nullptr;
 }
 
 void Renderer::draw(BoshartParam& param) {
-    m_prog.bind();
-    Light light(param.light_pos, vec3(1.0f), vec3(param.lin_atten));
-    m_prog.setUniform("light_pos", light.position);
-    m_prog.setUniform("light_color", light.color);
-    m_prog.setUniform("light_falloff", light.falloff);
+	m_prog.bind();
+	Light light(param.light_pos, vec3(1.0f), vec3(param.lin_atten));
+	m_prog.setUniform("light_pos", light.position);
+	m_prog.setUniform("light_color", light.color);
+	m_prog.setUniform("light_falloff", light.falloff);
 	Mesh sphere("assets/sphere.obj");
 	Image diffuse("assets/MoonMap.png");
 	Image normal("assets/MoonNormal.png");
@@ -70,7 +69,6 @@ void Renderer::draw(BoshartParam& param) {
 		m_prog.setUniform("model", model);
 		mat3 normMat = inverse(transpose(mat3(model)));
 		m_prog.setUniform("normMat", normMat);
-		mat4 MVP = cam.getVP() * model;
 		
 		// update camera and poll glfw events
 		m_input->poll(dt, cam);
@@ -79,7 +77,7 @@ void Renderer::draw(BoshartParam& param) {
 		}
 		
 		m_prog.setUniform("eye", cam.getEye());
-		MVP = cam.getVP() * model;
+		mat4 MVP = cam.getVP() * model;
 		m_prog.setUniform("MVP", MVP);
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
