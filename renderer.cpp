@@ -6,6 +6,7 @@
 #include "objimporter.h"
 #include "entitygraph.h"
 
+
 #ifdef OMP_PARALLEL
 	#include "omp.h"
 #endif
@@ -110,7 +111,6 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 		da = 1.0f / (length(scre1) * 2.0f);
 		db = 1.0f / (length(scre2) * 2.0f);
 	}
-
 	const vec4 e1(face[1] - face[0]);
 	const vec4 e2(face[2] - face[0]);
 	vec3 normals[3];
@@ -144,17 +144,15 @@ void Renderer::fillPass(const DrawData& data, const unsigned i){
 					normal = normalize(vec3(normal.x + texNorm.x, normal.y + texNorm.y, normal.z * texNorm.z));
 				}
 				const vec3 light = normalize(data.light_pos - frag_pos);
-				float d2 = dot(light, light);
+				float d2 = dot(data.light_pos - frag_pos, data.light_pos - frag_pos);
 				const float diffuse = max(0.0f, dot(light, normal));
 				const vec3 H = normalize(light + vec3(0.0f, 0.0f, 1.0f));
 				const float specular = pow( max(0.0f, dot(normal, H)), data.spec_power*4.0f);
-				color = data.ambient + (mat * diffuse + specular) / (data.lin_atten + d2);
+				color = data.ambient + (mat * diffuse + specular) / (data.lin_atten + data.lin_atten*d2);
+				color = pow(color, 1.0f / 2.2f);
 				color = clamp(0.0f, 1.0f, color);
-				#pragma omp critical
-				{
-					framebuffer.setPixel(point, color);
-					depthbuffer.set(point);
-				}
+				framebuffer.setPixel(point, color);
+				depthbuffer.set(point);
 			}
 		}
 	}
@@ -203,12 +201,15 @@ void Renderer::draw(const BoshartParam& param) {
 	cam.init(param.eye, param.at, param.up);
 	glfwSetTime(0.0);
 	double dtavg = 0.0;
+	m_input->poll();
+	int waitcounter = 10;
     while (!glfwWindowShouldClose(m_glwindow)) {
 		// update frame time
 		double dt = glfwGetTime();
 		glfwSetTime(0.0);
 		dtavg += dt;
 		frame_i++;
+		waitcounter--;
 		if(frame_i % 60 == 0){
 			printf("FPS: %f\n", 60.0 / dtavg);
 			dtavg = 0.0;
@@ -219,21 +220,23 @@ void Renderer::draw(const BoshartParam& param) {
 		if(glfwGetKey(m_glwindow, GLFW_KEY_R)){
 			cam.init(param.eye, param.at, param.up);
 		}
-		if(glfwGetKey(m_glwindow, GLFW_KEY_1)){
+		if(glfwGetKey(m_glwindow, GLFW_KEY_1) && waitcounter < 0){
 			drawdata.texture = &moon;
 			drawdata.normal = &normal;
 			graph.insert("sphere", "root", "sphere", t2);
 			graph.remove("cube");
 			graph.update();
 			instance_xforms = graph.getTransforms();
+			waitcounter = 10;
 		}
-		else if(glfwGetKey(m_glwindow, GLFW_KEY_2)){
+		else if(glfwGetKey(m_glwindow, GLFW_KEY_2) && waitcounter < 0){
 			drawdata.texture = &ttu;
 			drawdata.normal = nullptr;
 			graph.insert("cube", "root", "cube", t);
 			graph.remove("sphere");
 			graph.update();
 			instance_xforms = graph.getTransforms();
+			waitcounter = 10;
 		}
 		vec4 l_pos(param.light_pos);
 		l_pos.w = 1.0f;

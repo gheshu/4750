@@ -81,6 +81,9 @@ inline vec4 fract(const vec4& v){
 	float i;
 	return vec4(std::modf(v.x, &i),std::modf(v.y, &i),std::modf(v.z, &i),std::modf(v.w, &i));
 }
+inline vec3 pow(const vec3& v, float p){
+	return vec3(std::pow(v.x, p), std::pow(v.y, p), std::pow(v.z, p));
+}
 
 inline vec3 floor(const vec3& v){
 	return vec3(std::floor(v.x),std::floor(v.y),std::floor(v.z));

@@ -1,10 +1,20 @@
-CXX = g++
 EXE = Renderer.exe
- 
-INC_DIRS = -I./include
-CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
-LDFLAGS = -L./lib
-LDLIBS = .\glfw3.dll -lglew32 -lopengl32
+
+ifeq ($(OS), Windows_NT)
+	CXX = g++
+	INC_DIRS = -I./include
+	CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
+	LDFLAGS = -L./lib
+	LDLIBS = .\glfw3.dll -lglew32 -lopengl32
+else 
+	ifeq ($(shell uname), Linux)
+		CXX = g++
+		INC_DIRS = -I/usr/include
+		CXXFLAGS = $(INC_DIRS) -std=c++11 -Wfatal-errors -Wall
+		LDFLAGS = -L/usr/lib
+		LDLIBS = -lglfw -lGLEW -lGL
+	endif
+endif
  
 LINK = $(CXX) -o
 COMPILE = $(CXX) -c
@@ -21,6 +31,10 @@ debug:	$(EXE)
 
 release: CXXFLAGS += -O3
 release: $(EXE)
+
+parallel:	CXXFLAGS += -O3 -fopenmp -DOMP_PARALLEL
+parallel:	LDLIBS += -fopenmp
+parallel:	$(EXE)
 
 run:	$(EXE)
 	./$(EXE)
