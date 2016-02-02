@@ -1,8 +1,8 @@
 Currently builds with TDM-GCC-64, glew, and glfw3 on Windows.
 Updated to build on Manjaro using g++, glew, openMP, and glfw3.
 
-Build instructions <Windows>:
-	build <drive letter> <optional target>
+Build instructions for Windows:
+	build drive target
 	
 	targets:
 			run: runs the program after building with default flags
@@ -12,13 +12,13 @@ Build instructions <Windows>:
 			
 	clean.bat removes .o and .exe files.
 	
-Build instructions <Linux>:
+Build instructions for Linux:
 	make -j parallel
 
 Running instructions:
 	make run
 
-Controls (requires release or parallel targets to be interactive):
+Controls:
 	W: move forward
 	A: move left
 	S: move backward
