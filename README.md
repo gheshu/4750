@@ -1,4 +1,5 @@
 Currently builds with TDM-GCC-64, glew, and glfw3 on Windows.
+
 Updated to build on Manjaro using g++, glew, openMP, and glfw3.
 
 Build instructions for Windows:
