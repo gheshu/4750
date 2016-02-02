@@ -2,6 +2,7 @@ Currently builds with TDM-GCC-64, glew, and glfw3 on Windows.
 Updated to build on Manjaro using g++, glew, openMP, and glfw3.
 
 Build instructions for Windows:
+
 	build drive target
 	
 	targets:
@@ -13,12 +14,15 @@ Build instructions for Windows:
 	clean.bat removes .o and .exe files.
 	
 Build instructions for Linux:
+
 	make -j parallel
 
 Running instructions:
+
 	make run
 
 Controls:
+
 	W: move forward
 	A: move left
 	S: move backward
