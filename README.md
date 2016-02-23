@@ -1,3 +1,6 @@
+# Software Renderer
+## Be sure to check all branches to see each program and feature set
+
 Currently builds with TDM-GCC-64, glew, and glfw3 on Windows.
 
 Build instructions:
